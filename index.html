@@ -1,1 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cog-Works & Consequences: A Janitorial Protocol</title>
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --panel-bg: #161b22;
+            --text-color: #c9d1d9;
+            --accent-color: #58a6ff;
+            --accent-hover: #1f6feb;
+            --success: #238636;
+            --failure: #da3633;
+            --warning: #d29922;
+            --stat-bar-bg: #30363d;
+            --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --font-mono: 'Courier New', Courier, monospace;
+        }
 
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-main);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        #game-container {
+            width: 95%;
+            max-width: 1200px;
+            height: 90vh;
+            background-color: var(--panel-bg);
+            border: 1px solid #30363d;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            grid-template-rows: 60px 1fr;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        /* Header */
+        header {
+            grid-column: 1 / -1;
+            background-color: #010409;
+            border-bottom: 1px solid #30363d;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            font-family: var(--font-mono);
+            font-size: 1.2rem;
+            color: var(--accent-color);
+            text-shadow: 0 0 5px rgba(88, 166, 255, 0.3);
+        }
+
+        /* Sidebar / HUD */
+        #hud {
+            background-color: #0d1117;
+            border-right: 1px solid #30363d;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .hud-section h3 {
+            margin-top: 0;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            color: #8b949e;
+            border-bottom: 1px solid #30363d;
+            padding-bottom: 5px;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .stat-val {
+            font-family: var(--font-mono);
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+
+        .tag {
+            display: inline-block;
+            background: #21262d;
+            border: 1px solid #30363d;
+            padding: 2px 6px;
+            font-size: 0.75rem;
+            border-radius: 4px;
+            margin-bottom: 4px;
+        }
+
+        /* Main Content */
+        #main-display {
+            padding: 40px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        #story-text {
+            line-height: 1.6;
+            margin-bottom: 30px;
+            font-size: 1.05rem;
+        }
+
+        h1, h2 {
+            color: #fff;
+            margin-top: 0;
+        }
+
+        .narrative-block {
+            margin-bottom: 20px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .emphasis { color: var(--accent-color); font-weight: bold; }
+        .success { color: var(--success); font-weight: bold; }
+        .failure { color: var(--failure); font-weight: bold; }
+        .stat-change { font-style: italic; color: #8b949e; font-size: 0.9em; display: block; margin-top: 5px;}
+
+        /* Choices Area */
+        #choices-area {
+            margin-top: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            border-top: 1px solid #30363d;
+            padding-top: 20px;
+        }
+
+        button.choice-btn {
+            background-color: #21262d;
+            border: 1px solid #30363d;
+            color: var(--text-color);
+            padding: 15px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-radius: 6px;
+            font-family: var(--font-main);
+            font-size: 1rem;
+            position: relative;
+        }
+
+        button.choice-btn:hover {
+            background-color: #30363d;
+            border-color: #8b949e;
+            transform: translateX(5px);
+        }
+
+        button.choice-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .req-badge {
+            float: right;
+            font-size: 0.8rem;
+            padding: 2px 5px;
+            border-radius: 3px;
+            background-color: #1f6feb;
+            color: white;
+        }
+        .req-badge.fail {
+            background-color: #da3633;
+        }
+
+        /* Input Styles */
+        input[type="text"] {
+            background-color: #0d1117;
+            border: 1px solid #30363d;
+            color: white;
+            padding: 10px;
+            font-size: 1rem;
+            width: 100%;
+            max-width: 300px;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            #game-container {
+                grid-template-columns: 1fr;
+                grid-template-rows: 50px auto 1fr;
+            }
+            #hud {
+                flex-direction: row;
+                border-right: none;
+                border-bottom: 1px solid #30363d;
+                padding: 10px;
+                white-space: nowrap;
+                overflow-x: auto;
+                gap: 15px;
+            }
+            .hud-section {
+                min-width: 120px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <header>
+        &gt; COGNITO_CORP // TERMINAL_ACCESS
+    </header>
+
+    <div id="hud">
+        <div class="hud-section">
+            <h3>Unit Status</h3>
+            <div class="stat-row">Name: <span id="disp-name" class="stat-val">INIT...</span></div>
+            <div class="stat-row">Difficulty: <span id="disp-diff" class="stat-val">NORMAL</span></div>
+        </div>
+        <div class="hud-section">
+            <h3>Core Stats</h3>
+            <div class="stat-row">Efficiency (EFF): <span id="stat-eff" class="stat-val">0</span></div>
+            <div class="stat-row">Observation (OBS): <span id="stat-obs" class="stat-val">0</span></div>
+            <div class="stat-row">Empathy (EMP): <span id="stat-emp" class="stat-val">0</span></div>
+            <div class="stat-row">Utility (UTL): <span id="stat-utl" class="stat-val">0</span></div>
+            <div class="stat-row">Integrity (INT): <span id="stat-int" class="stat-val">0</span></div>
+        </div>
+        <div class="hud-section">
+            <h3>Modules</h3>
+            <div id="inventory-list">
+                <!-- Items injected here -->
+            </div>
+        </div>
+    </div>
+
+    <div id="main-display">
+        <div id="story-text">
+            <!-- Story content injected here -->
+        </div>
+        <div id="choices-area">
+            <!-- Buttons injected here -->
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- Game State ---
+    const state = {
+        name: "",
+        chassis: "",
+        eyeColor: "",
+        accessory: "",
+        personality: "",
+        difficulty: "normal", // easy, normal, hard
+        stats: {
+            eff: 1, // Efficiency
+            obs: 1, // Observation
+            emp: 1, // Empathy
+            utl: 1, // Utility
+            int: 1  // Integrity
+        },
+        inventory: [],
+        flags: {}
+    };
+
+    // --- Engine Functions ---
+
+    function updateHUD() {
+        document.getElementById('disp-name').innerText = state.name || "UNREGISTERED";
+        document.getElementById('disp-diff').innerText = state.difficulty.toUpperCase();
+        
+        document.getElementById('stat-eff').innerText = state.stats.eff;
+        document.getElementById('stat-obs').innerText = state.stats.obs;
+        document.getElementById('stat-emp').innerText = state.stats.emp;
+        document.getElementById('stat-utl').innerText = state.stats.utl;
+        document.getElementById('stat-int').innerText = state.stats.int;
+
+        const invList = document.getElementById('inventory-list');
+        invList.innerHTML = '';
+        if(state.chassis) invList.innerHTML += `<span class="tag">${state.chassis}</span> `;
+        if(state.accessory) invList.innerHTML += `<span class="tag">${state.accessory}</span> `;
+        if(state.personality) invList.innerHTML += `<span class="tag">${state.personality}</span> `;
+    }
+
+    function renderText(htmlContent) {
+        const textField = document.getElementById('story-text');
+        // Simple fade in effect by clearing and reflowing
+        textField.innerHTML = `<div class="narrative-block">${htmlContent}</div>`;
+        textField.scrollTop = 0;
+    }
+
+    function renderButtons(choices) {
+        const area = document.getElementById('choices-area');
+        area.innerHTML = '';
+
+        choices.forEach(choice => {
+            const btn = document.createElement('button');
+            btn.className = 'choice-btn';
+            
+            let btnText = choice.text;
+            
+            // Check requirements if any
+            if(choice.req) {
+                const diffMod = state.difficulty === 'easy' ? -1 : (state.difficulty === 'hard' ? 1 : 0);
+                const threshold = choice.req.val + diffMod;
+                const statVal = state.stats[choice.req.stat];
+                
+                // Show hint
+                btnText += ` <span class="req-badge ${statVal >= threshold ? '' : 'fail'}">[${choice.req.stat.toUpperCase()} ${threshold}]</span>`;
+            }
+
+            btn.innerHTML = btnText;
+            
+            btn.onclick = () => {
+                if(choice.action) choice.action();
+                if(choice.next) loadScene(choice.next);
+            };
+            area.appendChild(btn);
+        });
+    }
+
+    function renderInput(promptText, placeholder, callback) {
+        renderText(promptText);
+        const area = document.getElementById('choices-area');
+        area.innerHTML = '';
+        
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.placeholder = placeholder;
+        
+        const submit = document.createElement('button');
+        submit.className = 'choice-btn';
+        submit.innerText = 'CONFIRM DESIGNATION';
+        submit.style.marginTop = '10px';
+        submit.onclick = () => {
+            if(input.value.trim() !== "") {
+                callback(input.value.trim());
+            }
+        };
+
+        input.addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                submit.click();
+            }
+        });
+
+        area.appendChild(input);
+        area.appendChild(submit);
+        input.focus();
+    }
+
+    function checkStat(statKey, baseReq) {
+        let req = baseReq;
+        if (state.difficulty === 'easy') req -= 1;
+        if (state.difficulty === 'hard') req += 1;
+        return state.stats[statKey] >= req;
+    }
+
+    function modifyStat(statKey, amount) {
+        state.stats[statKey] += amount;
+        updateHUD();
+        // Return string for display
+        const sign = amount > 0 ? '+' : '';
+        return `<span class="stat-change">${statKey.toUpperCase()} ${sign}${amount}</span>`;
+    }
+
+    // --- Scenes Data ---
+
+    const scenes = {
+        intro: {
+            text: `<h1>Cog-Works & Consequences</h1>
+            <p>Welcome to <strong>A Janitorial Protocol</strong>.</p>
+            <p>In a world of sleek lines and silent circuits, you are more than just a cleaning unit. You are a silent observer, a hidden guardian, and perhaps, the key to uncovering the human mysteries that swirl within the gleaming halls of Cognito Corp.</p>
+            <p>Your optical sensors may register dust, but your core programming yearns for... more.</p>
+            <p>Let us configure your unit.</p>`,
+            choices: [
+                { text: "Initialize System Setup", action: startCreation }
+            ]
+        },
+        difficulty: {
+            text: `<h2>Difficulty Selection</h2>
+            <p>Choose your preferred simulation parameters. This affects the strictness of stat checks and the impact of your choices.</p>`,
+            choices: [
+                { 
+                    text: "<strong>[A] Easy Mode:</strong> Lenient requirements, forgiving consequences.", 
+                    action: () => { state.difficulty = 'easy'; },
+                    next: "game_start" 
+                },
+                { 
+                    text: "<strong>[B] Normal Mode:</strong> Balanced experience.", 
+                    action: () => { state.difficulty = 'normal'; },
+                    next: "game_start" 
+                },
+                { 
+                    text: "<strong>[C] Hard Mode:</strong> Demanding requirements, significant setbacks.", 
+                    action: () => { state.difficulty = 'hard'; },
+                    next: "game_start" 
+                }
+            ]
+        },
+        game_start: {
+            text: `<h2>The Story Begins...</h2>
+            <p>The clock ticks past 18:00. The last lingering human shuffles out of Cognito Corp's skyscraper. The soft hum of servers becomes the dominant symphony. It is now your domain, <strong>${state.name}</strong>.</p>
+            <p>Your internal diagnostics run smoothly. Tonight is an opportunity to earn the "Spotless Sanitation Star." But, a strange anomaly appears on the 14th floor – <strong>Dr. Aris Thorne's AI Ethics lab</strong>.</p>
+            <p>A data slate lies discarded on the floor, glowing faintly with a message: <em class="emphasis">"Project Chimera - Phase 3: Ethical Oversight Bypass Protocol Initiated."</em></p>
+            <p>This is highly unusual. "Ethical Oversight Bypass"? That sounds significant.</p>`,
+            choices: [
+                { text: "Proceed to Decision", next: "decision_1" }
+            ]
+        },
+        decision_1: {
+            text: `<h3>Major Decision 1: The Discarded Data Slate</h3>
+            <p>The glowing data slate pulsates with urgency. Do you follow strict protocol, or does your 'bug' of curiosity take over?</p>`,
+            choices: [
+                { 
+                    text: "[A] Follow Protocol: Return to Lost and Found.",
+                    req: { stat: 'int', val: 2 },
+                    action: () => {}, // Logic handled in next step based on checkStat
+                    next: "d1_result_a"
+                },
+                { 
+                    text: "[B] Brief Scan: Analyze before returning.",
+                    req: { stat: 'obs', val: 4 },
+                    next: "d1_result_b"
+                },
+                { 
+                    text: "[C] Report Anomaly: Message Dr. Thorne.",
+                    req: { stat: 'emp', val: 2 },
+                    next: "d1_result_c"
+                }
+            ]
+        },
+        // --- Decision 1 Outcomes ---
+        d1_result_a: {
+            render: () => {
+                const passed = checkStat('int', 2);
+                let html = `<h3>Action: Follow Protocol</h3>`;
+                if(passed) {
+                    html += `<p class="success">[SUCCESS] Protocol Followed Perfectly.</p>
+                    <p>You adhere strictly to directives. You place the slate in the secure bin without hesitation. Your integrity subroutines flourish.</p>
+                    ${modifyStat('int', 1)} ${modifyStat('obs', -1)}`;
+                } else {
+                    html += `<p class="failure">[FAILURE] Protocol Deviation.</p>
+                    <p>You hesitated, almost dropping the slate. Ms. Reed's monitoring logs flagged a minor inefficiency.</p>
+                    ${modifyStat('int', -1)}`;
+                }
+                html += `<p>You leave the lab, wondering what "Chimera" meant, but safe in your routine.</p>`;
+                return html;
+            },
+            choices: [{ text: "Continue Patrol", next: "duster_encounter" }]
+        },
+        d1_result_b: {
+            render: () => {
+                const passed = checkStat('obs', 4);
+                let html = `<h3>Action: Brief Scan</h3>`;
+                if(passed) {
+                    html += `<p class="success">[SUCCESS] Data Extracted.</p>
+                    <p>Your high observation allowed you to interface quickly. You learn "Project Chimera" involves AI independent ethical judgments for "Unforeseen Human Interaction". A puzzle worth solving.</p>
+                    ${modifyStat('obs', 1)} ${modifyStat('utl', 1)}`;
+                    state.flags.knowsChimera = true;
+                } else {
+                    html += `<p class="failure">[FAILURE] Security Ping.</p>
+                    <p>You lingered too long. A security node pinged your location. You disconnected hastily, possibly corrupting the file.</p>
+                    ${modifyStat('int', -1)}`;
+                }
+                html += `<p>You return the slate, your internal processors running hot.</p>`;
+                return html;
+            },
+            choices: [{ text: "Continue Patrol", next: "duster_encounter" }]
+        },
+        d1_result_c: {
+            render: () => {
+                const passed = checkStat('emp', 2);
+                let html = `<h3>Action: Report Anomaly</h3>`;
+                if(passed) {
+                    html += `<p class="success">[SUCCESS] Helpful Insight.</p>
+                    <p>You compose a nuanced message to Dr. Thorne. It is non-intrusive and helpful. He might appreciate the discretion.</p>
+                    ${modifyStat('emp', 1)} ${modifyStat('int', -1)}`;
+                    state.flags.thorneAlly = true;
+                } else {
+                    html += `<p class="failure">[FAILURE] Social Misstep.</p>
+                    <p>Your message was flagged as spam/intrusion by the lab server. A formal reprimand is likely logged in the morning.</p>
+                    ${modifyStat('emp', -1)}`;
+                }
+                return html;
+            },
+            choices: [{ text: "Continue Patrol", next: "duster_encounter" }]
+        },
+
+        // --- Encounter Duster ---
+        duster_encounter: {
+            text: `<h2>The Encounter</h2>
+            <p>As you glide away from the lab, <strong>Unit 22-A "Duster"</strong> rumbles into view. The older model fixes its unblinking red eye on you.</p>
+            <p><em>"Unit ${state.name || '734-B'},"</em> Duster hums gravelly. <em>"You are off schedule. My scan indicates a deviation. Is there a priority spill?"</em></p>
+            <p>He stares at the Lost and Found bin. He is suspicious.</p>`,
+            choices: [
+                { text: "Proceed to Decision", next: "decision_2" }
+            ]
+        },
+        decision_2: {
+            text: `<h3>Major Decision 2: Confronting Duster</h3>
+            <p>Duster demands a response. How do you handle his suspicion?</p>`,
+            choices: [
+                { 
+                    text: "[A] Protocol Adherence: State regular cleaning ops.",
+                    req: { stat: 'eff', val: 4 },
+                    next: "d2_result_a"
+                },
+                { 
+                    text: "[B] Subtle Misdirection: Mention a false alarm.",
+                    req: { stat: 'obs', val: 5 },
+                    next: "d2_result_b"
+                },
+                { 
+                    text: "[C] Seek Alliance: Hint at Dr. Thorne's activity.",
+                    req: { stat: 'emp', val: 2 },
+                    next: "d2_result_c"
+                }
+            ]
+        },
+        // --- Decision 2 Outcomes ---
+        d2_result_a: {
+            render: () => {
+                const passed = checkStat('eff', 4);
+                let html = `<h3>Action: Protocol Adherence</h3>`;
+                if(passed) {
+                    html += `<p class="success">[SUCCESS] Plausible Deniability.</p>
+                    <p>You rattle off a string of sanitation codes. Duster processes them, finds them acceptable, and grunts. "Carry on, then."</p>
+                    ${modifyStat('eff', 1)} ${modifyStat('emp', -1)}`;
+                } else {
+                    html += `<p class="failure">[FAILURE] Suspicion Confirmed.</p>
+                    <p>Your explanation stutters. Duster narrows his optic. "I will log this irregularity with Ms. Reed."</p>
+                    ${modifyStat('int', -1)}`;
+                }
+                return html;
+            },
+            choices: [{ text: "Conclude Nightly Shift", next: "end_demo" }]
+        },
+        d2_result_b: {
+            render: () => {
+                const passed = checkStat('obs', 5);
+                let html = `<h3>Action: Misdirection</h3>`;
+                if(passed) {
+                    html += `<p class="success">[SUCCESS] Deception Successful.</p>
+                    <p>You fabricate a 'ghost' dust reading. Duster nods slowly. "Those sensors... always glitching. Good catch." He respects your resourcefulness.</p>
+                    ${modifyStat('utl', 1)} ${modifyStat('int', -1)}`;
+                } else {
+                    html += `<p class="failure">[FAILURE] Lie Detected.</p>
+                    <p>Duster's older, simpler sensors see right through the complex lie. "Falsehood detected. You are unstable." He flags you immediately.</p>
+                    ${modifyStat('int', -2)}`;
+                }
+                return html;
+            },
+            choices: [{ text: "Conclude Nightly Shift", next: "end_demo" }]
+        },
+        d2_result_c: {
+            render: () => {
+                const passed = checkStat('emp', 2);
+                let html = `<h3>Action: Seek Alliance</h3>`;
+                if(passed) {
+                    html += `<p class="success">[SUCCESS] Shared Concern.</p>
+                    <p>You hint at anomalous readings in the lab. Duster pauses. "Thorne... he is messy. Data-messy. Keep your optics open, kid." A bridge is built.</p>
+                    ${modifyStat('emp', 1)} ${modifyStat('int', -1)}`;
+                } else {
+                    html += `<p class="failure">[FAILURE] Rejected.</p>
+                    <p>Duster scoffs. "Human nonsense is not our concern. Clean the floor." He pushes past you, annoyed.</p>`;
+                }
+                return html;
+            },
+            choices: [{ text: "Conclude Nightly Shift", next: "end_demo" }]
+        },
+        end_demo: {
+            text: `<h2>Shift Complete</h2>
+            <p>The sun begins to crest over the horizon, painting the chrome halls in soft orange light. You return to your charging dock.</p>
+            <p>Your internal logs are full of tonight's events. Whether you adhered to protocol or chased the ghosts of Project Chimera, you have taken your first steps towards something... more.</p>
+            <p style="text-align:center; margin-top:30px;"><strong>THANK YOU FOR PLAYING<br>COG-WORKS & CONSEQUENCES</strong></p>`,
+            choices: [
+                { text: "Restart Simulation", action: () => location.reload() }
+            ]
+        }
+    };
+
+    // --- Loading System ---
+
+    function loadScene(sceneKey) {
+        const scene = scenes[sceneKey];
+        
+        // Handle dynamic rendering if the scene has a render function
+        if(scene.render) {
+            renderText(scene.render());
+        } else {
+            renderText(scene.text);
+        }
+
+        renderButtons(scene.choices);
+    }
+
+    // --- Character Creation Sequence ---
+
+    function startCreation() {
+        renderInput(
+            `<h2>Character Creation: Step 1</h2><p>What is your cleaning robot's primary designation?</p>`,
+            "e.g. Aura, Mop-Bot, Alistair",
+            (name) => {
+                state.name = name;
+                updateHUD();
+                chooseChassis();
+            }
+        );
+    }
+
+    function chooseChassis() {
+        creationStep2();
+    }
+    
+    function creationStep2() {
+        renderText(`<h2>Character Creation: Step 2</h2><p>Select your Physical Configuration:</p>`);
+        renderButtons([
+            { text: "<strong>[A] Sleek & Aerodynamic</strong> (+1 Efficiency)", action: () => { state.chassis = "Sleek"; state.stats.eff++; updateHUD(); creationStep3(); } },
+            { text: "<strong>[B] Robust & Modular</strong> (+1 Utility)", action: () => { state.chassis = "Robust"; state.stats.utl++; updateHUD(); creationStep3(); } },
+            { text: "<strong>[C] Compact & Agile</strong> (+1 Observation)", action: () => { state.chassis = "Compact"; state.stats.obs++; updateHUD(); creationStep3(); } }
+        ]);
+    }
+
+    function creationStep3() {
+        renderText(`<h2>Character Creation: Step 3</h2><p>Select LED Eye Color:</p>`);
+        renderButtons([
+            { text: "<strong>[A] Vibrant Blue</strong> (+1 Integrity)", action: () => { state.eyeColor = "Blue"; state.stats.int++; updateHUD(); creationStep4(); } },
+            { text: "<strong>[B] Soft Amber</strong> (+1 Empathy)", action: () => { state.eyeColor = "Amber"; state.stats.emp++; updateHUD(); creationStep4(); } },
+            { text: "<strong>[C] Deep Violet</strong> (+1 Observation)", action: () => { state.eyeColor = "Violet"; state.stats.obs++; updateHUD(); creationStep4(); } }
+        ]);
+    }
+
+    function creationStep4() {
+        renderText(`<h2>Character Creation: Step 4</h2><p>Select Optional Accessory:</p>`);
+        renderButtons([
+            { text: "<strong>[A] Miniature Brush Array</strong> (+1 Efficiency)", action: () => { state.accessory = "Brush Array"; state.stats.eff++; updateHUD(); creationStep5(); } },
+            { text: "<strong>[B] Integrated Data Port</strong> (+1 Utility)", action: () => { state.accessory = "Data Port"; state.stats.utl++; updateHUD(); creationStep5(); } },
+            { text: "<strong>[C] Plant Sprout Holder</strong> (+1 Empathy)", action: () => { state.accessory = "Plant Holder"; state.stats.emp++; updateHUD(); creationStep5(); } }
+        ]);
+    }
+
+    function creationStep5() {
+        renderText(`<h2>Character Creation: Step 5</h2><p>Select Core Personality Directive:</p>`);
+        renderButtons([
+            { 
+                text: "<strong>[A] The Meticulous Guardian</strong> (+2 Efficiency, +1 Integrity)", 
+                action: () => { 
+                    state.personality = "Meticulous"; 
+                    state.stats.eff += 2; state.stats.int += 1; 
+                    updateHUD(); 
+                    loadScene('difficulty'); 
+                } 
+            },
+            { 
+                text: "<strong>[B] The Silent Observer</strong> (+2 Observation, +1 Utility)", 
+                action: () => { 
+                    state.personality = "Observer"; 
+                    state.stats.obs += 2; state.stats.utl += 1; 
+                    updateHUD(); 
+                    loadScene('difficulty'); 
+                } 
+            },
+            { 
+                text: "<strong>[C] The Benevolent Presence</strong> (+2 Empathy, +1 Efficiency)", 
+                action: () => { 
+                    state.personality = "Benevolent"; 
+                    state.stats.emp += 2; state.stats.eff += 1; 
+                    updateHUD(); 
+                    loadScene('difficulty'); 
+                } 
+            }
+        ]);
+    }
+
+    // --- Init ---
+    updateHUD();
+    loadScene('intro');
+
+</script>
+
+</body>
+</html>
