@@ -3,702 +3,745 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cog-Works & Consequences: A Janitorial Protocol</title>
+    <title>The Obsidian Knight's Lament</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #0d1117;
-            --panel-bg: #161b22;
-            --text-color: #c9d1d9;
-            --accent-color: #58a6ff;
-            --accent-hover: #1f6feb;
-            --success: #238636;
-            --failure: #da3633;
-            --warning: #d29922;
-            --stat-bar-bg: #30363d;
-            --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            --font-mono: 'Courier New', Courier, monospace;
+            --bg-color: #0d0d0d;
+            --panel-bg: #1a1a1a;
+            --text-color: #e0e0e0;
+            --accent-gold: #c5a059;
+            --accent-red: #8a2be2; /* Shadow purple */
+            --border-color: #333;
+            --font-title: 'Cinzel', serif;
+            --font-body: 'Lato', sans-serif;
         }
+
+        * { box-sizing: border-box; }
 
         body {
             background-color: var(--bg-color);
             color: var(--text-color);
-            font-family: var(--font-main);
+            font-family: var(--font-body);
             margin: 0;
-            padding: 0;
+            padding: 20px;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            overflow: hidden;
         }
 
-        #game-container {
-            width: 95%;
-            max-width: 1200px;
-            height: 90vh;
+        .container {
+            width: 100%;
+            max-width: 1000px;
             background-color: var(--panel-bg);
-            border: 1px solid #30363d;
-            box-shadow: 0 0 20px rgba(0,0,0,0.5);
-            display: grid;
-            grid-template-columns: 250px 1fr;
-            grid-template-rows: 60px 1fr;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        /* Header */
-        header {
-            grid-column: 1 / -1;
-            background-color: #010409;
-            border-bottom: 1px solid #30363d;
+            border: 2px solid var(--accent-gold);
+            box-shadow: 0 0 20px rgba(0,0,0,0.8);
             display: flex;
-            align-items: center;
-            padding: 0 20px;
-            font-family: var(--font-mono);
-            font-size: 1.2rem;
-            color: var(--accent-color);
-            text-shadow: 0 0 5px rgba(88, 166, 255, 0.3);
+            flex-direction: column;
+            min-height: 80vh;
+            position: relative;
         }
 
-        /* Sidebar / HUD */
-        #hud {
-            background-color: #0d1117;
-            border-right: 1px solid #30363d;
-            padding: 20px;
-            overflow-y: auto;
+        h1, h2, h3 {
+            font-family: var(--font-title);
+            color: var(--accent-gold);
+            text-align: center;
+            margin-top: 0;
+        }
+
+        /* --- Character Creation --- */
+        #creation-screen {
+            padding: 40px;
             display: flex;
             flex-direction: column;
             gap: 20px;
         }
 
-        .hud-section h3 {
-            margin-top: 0;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            color: #8b949e;
-            border-bottom: 1px solid #30363d;
-            padding-bottom: 5px;
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: var(--accent-gold);
+        }
+
+        input[type="text"], select {
+            width: 100%;
+            padding: 10px;
+            background: #000;
+            border: 1px solid var(--border-color);
+            color: white;
+            font-family: var(--font-body);
+        }
+
+        .stat-allocator {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background: #111;
+            padding: 15px;
+            border: 1px solid var(--border-color);
         }
 
         .stat-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 8px;
+        }
+
+        .stat-btn {
+            background: var(--border-color);
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .stat-btn:hover { background: var(--accent-gold); color: black; }
+        .stat-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+        .points-remaining {
+            text-align: center;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+
+        .start-btn {
+            background: var(--accent-gold);
+            color: #000;
+            border: none;
+            padding: 15px;
+            font-family: var(--font-title);
+            font-size: 1.2rem;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: 0.3s;
+        }
+
+        .start-btn:hover {
+            background: #fff;
+            box-shadow: 0 0 10px var(--accent-gold);
+        }
+
+        /* --- Game Interface --- */
+        #game-screen {
+            display: none; /* Hidden initially */
+            flex: 1;
+            flex-direction: row;
+        }
+
+        @media (max-width: 768px) {
+            #game-screen { flex-direction: column-reverse; }
+        }
+
+        .story-panel {
+            flex: 2;
+            padding: 30px;
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .sidebar {
+            flex: 1;
+            background: #111;
+            padding: 20px;
+            border-left: 1px solid var(--border-color);
             font-size: 0.9rem;
         }
 
-        .stat-val {
-            font-family: var(--font-mono);
-            font-weight: bold;
-            color: var(--accent-color);
-        }
-
-        .tag {
-            display: inline-block;
-            background: #21262d;
-            border: 1px solid #30363d;
-            padding: 2px 6px;
-            font-size: 0.75rem;
-            border-radius: 4px;
-            margin-bottom: 4px;
-        }
-
-        /* Main Content */
-        #main-display {
-            padding: 40px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-        }
-
         #story-text {
+            font-size: 1.1rem;
             line-height: 1.6;
             margin-bottom: 30px;
-            font-size: 1.05rem;
+            min-height: 300px;
         }
 
-        h1, h2 {
-            color: #fff;
-            margin-top: 0;
-        }
-
-        .narrative-block {
-            margin-bottom: 20px;
-            animation: fadeIn 0.5s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .emphasis { color: var(--accent-color); font-weight: bold; }
-        .success { color: var(--success); font-weight: bold; }
-        .failure { color: var(--failure); font-weight: bold; }
-        .stat-change { font-style: italic; color: #8b949e; font-size: 0.9em; display: block; margin-top: 5px;}
-
-        /* Choices Area */
-        #choices-area {
-            margin-top: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            border-top: 1px solid #30363d;
-            padding-top: 20px;
-        }
-
-        button.choice-btn {
-            background-color: #21262d;
-            border: 1px solid #30363d;
+        .choice-btn {
+            background: transparent;
+            border: 1px solid var(--accent-gold);
             color: var(--text-color);
             padding: 15px;
+            margin-bottom: 10px;
+            width: 100%;
             text-align: left;
             cursor: pointer;
             transition: all 0.2s;
-            border-radius: 6px;
-            font-family: var(--font-main);
-            font-size: 1rem;
-            position: relative;
+            font-family: var(--font-body);
         }
 
-        button.choice-btn:hover {
-            background-color: #30363d;
-            border-color: #8b949e;
-            transform: translateX(5px);
+        .choice-btn:hover {
+            background: rgba(197, 160, 89, 0.1);
+            border-left: 5px solid var(--accent-gold);
         }
 
-        button.choice-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
+        .stat-display {
+            margin-bottom: 20px;
         }
 
-        .req-badge {
-            float: right;
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid #333;
+            padding: 5px 0;
+        }
+
+        .inventory-list {
+            list-style: none;
+            padding: 0;
+            color: #aaa;
+        }
+
+        .log-entry {
+            font-style: italic;
+            color: #888;
             font-size: 0.8rem;
-            padding: 2px 5px;
-            border-radius: 3px;
-            background-color: #1f6feb;
-            color: white;
-        }
-        .req-badge.fail {
-            background-color: #da3633;
+            margin-top: 5px;
+            border-left: 2px solid #555;
+            padding-left: 5px;
         }
 
-        /* Input Styles */
-        input[type="text"] {
-            background-color: #0d1117;
-            border: 1px solid #30363d;
-            color: white;
-            padding: 10px;
-            font-size: 1rem;
-            width: 100%;
-            max-width: 300px;
-            border-radius: 4px;
-            margin-top: 10px;
+        #action-log {
+            max-height: 150px;
+            overflow-y: auto;
+            margin-top: 20px;
+            border-top: 1px solid #333;
+            padding-top: 10px;
         }
+
+        .highlight { color: var(--accent-gold); font-weight: bold; }
+        .danger { color: #cc4444; }
+        .success { color: #44cc44; }
         
-        input[type="text"]:focus {
-            outline: none;
-            border-color: var(--accent-color);
+        /* Fade in animation */
+        .fade-in {
+            animation: fadeIn 1s;
         }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            #game-container {
-                grid-template-columns: 1fr;
-                grid-template-rows: 50px auto 1fr;
-            }
-            #hud {
-                flex-direction: row;
-                border-right: none;
-                border-bottom: 1px solid #30363d;
-                padding: 10px;
-                white-space: nowrap;
-                overflow-x: auto;
-                gap: 15px;
-            }
-            .hud-section {
-                min-width: 120px;
-            }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
     </style>
 </head>
 <body>
 
-<div id="game-container">
-    <header>
-        &gt; COGNITO_CORP // TERMINAL_ACCESS
-    </header>
+<div class="container">
+    
+    <!-- Title Section -->
+    <div style="padding: 20px; border-bottom: 1px solid var(--border-color); background: #000; text-align: center;">
+        <h1 style="margin:0; font-size: 2rem;">The Obsidian Knight's Lament</h1>
+        <p style="margin:5px; color: #666;">A Tale of Shadows and Resolve</p>
+    </div>
 
-    <div id="hud">
-        <div class="hud-section">
-            <h3>Unit Status</h3>
-            <div class="stat-row">Name: <span id="disp-name" class="stat-val">INIT...</span></div>
-            <div class="stat-row">Difficulty: <span id="disp-diff" class="stat-val">NORMAL</span></div>
+    <!-- Creation Screen -->
+    <div id="creation-screen">
+        <div style="text-align: center; margin-bottom: 20px;">
+            <p>Princess Aurelia has vanished into the Shadowwood. Tell us of the knight who will save her.</p>
         </div>
-        <div class="hud-section">
-            <h3>Core Stats</h3>
-            <div class="stat-row">Efficiency (EFF): <span id="stat-eff" class="stat-val">0</span></div>
-            <div class="stat-row">Observation (OBS): <span id="stat-obs" class="stat-val">0</span></div>
-            <div class="stat-row">Empathy (EMP): <span id="stat-emp" class="stat-val">0</span></div>
-            <div class="stat-row">Utility (UTL): <span id="stat-utl" class="stat-val">0</span></div>
-            <div class="stat-row">Integrity (INT): <span id="stat-int" class="stat-val">0</span></div>
+
+        <div class="input-group">
+            <label>Knight's Name</label>
+            <input type="text" id="char-name" placeholder="Sir..." value="Sir Kaelan">
         </div>
-        <div class="hud-section">
-            <h3>Modules</h3>
-            <div id="inventory-list">
-                <!-- Items injected here -->
+
+        <div class="input-group">
+            <label>Background</label>
+            <select id="char-bg" onchange="updateBonuses()">
+                <option value="guardian">The Stalwart Guardian (+1 STR, +1 Resolve)</option>
+                <option value="blade">The Keen Blade (+1 INT, +1 AGI)</option>
+                <option value="tongue">The Silver Tongue (+1 CHA, +1 LCK)</option>
+            </select>
+            <small id="bg-desc" style="color:#888; display:block; margin-top:5px;">
+                Unyielding loyalty. Direct action.
+            </small>
+        </div>
+
+        <div class="stat-allocator">
+            <div class="points-remaining">Points Remaining: <span id="points-rem">5</span></div>
+            
+            <div class="stat-row">
+                <span>Strength (STR)</span>
+                <div>
+                    <button class="stat-btn" onclick="adjustStat('str', -1)">-</button>
+                    <span id="disp-str" style="margin: 0 10px;">1</span>
+                    <button class="stat-btn" onclick="adjustStat('str', 1)">+</button>
+                </div>
+            </div>
+            <div class="stat-row">
+                <span>Intelligence (INT)</span>
+                <div>
+                    <button class="stat-btn" onclick="adjustStat('int', -1)">-</button>
+                    <span id="disp-int" style="margin: 0 10px;">1</span>
+                    <button class="stat-btn" onclick="adjustStat('int', 1)">+</button>
+                </div>
+            </div>
+            <div class="stat-row">
+                <span>Charisma (CHA)</span>
+                <div>
+                    <button class="stat-btn" onclick="adjustStat('cha', -1)">-</button>
+                    <span id="disp-cha" style="margin: 0 10px;">1</span>
+                    <button class="stat-btn" onclick="adjustStat('cha', 1)">+</button>
+                </div>
+            </div>
+            <div class="stat-row">
+                <span>Agility (AGI)</span>
+                <div>
+                    <button class="stat-btn" onclick="adjustStat('agi', -1)">-</button>
+                    <span id="disp-agi" style="margin: 0 10px;">1</span>
+                    <button class="stat-btn" onclick="adjustStat('agi', 1)">+</button>
+                </div>
+            </div>
+            <div class="stat-row">
+                <span>Luck (LCK)</span>
+                <div>
+                    <button class="stat-btn" onclick="adjustStat('lck', -1)">-</button>
+                    <span id="disp-lck" style="margin: 0 10px;">1</span>
+                    <button class="stat-btn" onclick="adjustStat('lck', 1)">+</button>
+                </div>
             </div>
         </div>
+
+        <div class="input-group">
+            <label>Difficulty</label>
+            <select id="difficulty">
+                <option value="easy">Squire (Easy)</option>
+                <option value="normal" selected>Knight (Normal)</option>
+                <option value="hard">Dragon Slayer (Hard)</option>
+            </select>
+        </div>
+
+        <button class="start-btn" onclick="startGame()">Enter the Shadowwood</button>
     </div>
 
-    <div id="main-display">
-        <div id="story-text">
-            <!-- Story content injected here -->
+    <!-- Game Screen -->
+    <div id="game-screen">
+        <div class="story-panel">
+            <div id="story-text" class="fade-in"></div>
+            <div id="choices-area"></div>
         </div>
-        <div id="choices-area">
-            <!-- Buttons injected here -->
+        
+        <div class="sidebar">
+            <h3>Character Sheet</h3>
+            <div class="stat-display">
+                <div class="stat-item"><span class="highlight">Name:</span> <span id="ui-name"></span></div>
+                <div class="stat-item"><span class="highlight">Health:</span> <span id="ui-hp">100</span></div>
+                <div class="stat-item"><span class="highlight">Resolve:</span> <span id="ui-res">0</span></div>
+            </div>
+            <div class="stat-display">
+                <div class="stat-item"><span>STR:</span> <span id="ui-str"></span></div>
+                <div class="stat-item"><span>INT:</span> <span id="ui-int"></span></div>
+                <div class="stat-item"><span>CHA:</span> <span id="ui-cha"></span></div>
+                <div class="stat-item"><span>AGI:</span> <span id="ui-agi"></span></div>
+                <div class="stat-item"><span>LCK:</span> <span id="ui-lck"></span></div>
+            </div>
+
+            <h3>Inventory</h3>
+            <ul id="inventory-list" class="inventory-list">
+                <!-- Items populated by JS -->
+            </ul>
+
+            <h3>Log</h3>
+            <div id="action-log"></div>
         </div>
     </div>
+
 </div>
 
 <script>
     // --- Game State ---
-    const state = {
+    const config = {
+        maxPoints: 10,
+        statMin: 1,
+        statMax: 5
+    };
+
+    let player = {
         name: "",
-        chassis: "",
-        eyeColor: "",
-        accessory: "",
-        personality: "",
-        difficulty: "normal", // easy, normal, hard
-        stats: {
-            eff: 1, // Efficiency
-            obs: 1, // Observation
-            emp: 1, // Empathy
-            utl: 1, // Utility
-            int: 1  // Integrity
-        },
-        inventory: [],
+        stats: { str: 0, int: 0, cha: 0, agi: 0, lck: 0 },
+        derived: { hp: 100, resolve: 0 },
+        background: "",
+        difficulty: "normal", // 'easy', 'normal', 'hard'
+        inventory: ["Longsword", "Kite Shield", "Plate Armor", "Rations (3)", "Waterskin"],
         flags: {}
     };
 
-    // --- Engine Functions ---
+    // Temporary stats during creation
+    let tempStats = { str: 1, int: 1, cha: 1, agi: 1, lck: 1 };
+    let pointsSpent = 5; // Start with 1 in each = 5 points used
 
-    function updateHUD() {
-        document.getElementById('disp-name').innerText = state.name || "UNREGISTERED";
-        document.getElementById('disp-diff').innerText = state.difficulty.toUpperCase();
-        
-        document.getElementById('stat-eff').innerText = state.stats.eff;
-        document.getElementById('stat-obs').innerText = state.stats.obs;
-        document.getElementById('stat-emp').innerText = state.stats.emp;
-        document.getElementById('stat-utl').innerText = state.stats.utl;
-        document.getElementById('stat-int').innerText = state.stats.int;
-
-        const invList = document.getElementById('inventory-list');
-        invList.innerHTML = '';
-        if(state.chassis) invList.innerHTML += `<span class="tag">${state.chassis}</span> `;
-        if(state.accessory) invList.innerHTML += `<span class="tag">${state.accessory}</span> `;
-        if(state.personality) invList.innerHTML += `<span class="tag">${state.personality}</span> `;
-    }
-
-    function renderText(htmlContent) {
-        const textField = document.getElementById('story-text');
-        // Simple fade in effect by clearing and reflowing
-        textField.innerHTML = `<div class="narrative-block">${htmlContent}</div>`;
-        textField.scrollTop = 0;
-    }
-
-    function renderButtons(choices) {
-        const area = document.getElementById('choices-area');
-        area.innerHTML = '';
-
-        choices.forEach(choice => {
-            const btn = document.createElement('button');
-            btn.className = 'choice-btn';
-            
-            let btnText = choice.text;
-            
-            // Check requirements if any
-            if(choice.req) {
-                const diffMod = state.difficulty === 'easy' ? -1 : (state.difficulty === 'hard' ? 1 : 0);
-                const threshold = choice.req.val + diffMod;
-                const statVal = state.stats[choice.req.stat];
-                
-                // Show hint
-                btnText += ` <span class="req-badge ${statVal >= threshold ? '' : 'fail'}">[${choice.req.stat.toUpperCase()} ${threshold}]</span>`;
-            }
-
-            btn.innerHTML = btnText;
-            
-            btn.onclick = () => {
-                if(choice.action) choice.action();
-                if(choice.next) loadScene(choice.next);
-            };
-            area.appendChild(btn);
-        });
-    }
-
-    function renderInput(promptText, placeholder, callback) {
-        renderText(promptText);
-        const area = document.getElementById('choices-area');
-        area.innerHTML = '';
-        
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.placeholder = placeholder;
-        
-        const submit = document.createElement('button');
-        submit.className = 'choice-btn';
-        submit.innerText = 'CONFIRM DESIGNATION';
-        submit.style.marginTop = '10px';
-        submit.onclick = () => {
-            if(input.value.trim() !== "") {
-                callback(input.value.trim());
-            }
-        };
-
-        input.addEventListener("keypress", function(event) {
-            if (event.key === "Enter") {
-                submit.click();
-            }
-        });
-
-        area.appendChild(input);
-        area.appendChild(submit);
-        input.focus();
-    }
-
-    function checkStat(statKey, baseReq) {
-        let req = baseReq;
-        if (state.difficulty === 'easy') req -= 1;
-        if (state.difficulty === 'hard') req += 1;
-        return state.stats[statKey] >= req;
-    }
-
-    function modifyStat(statKey, amount) {
-        state.stats[statKey] += amount;
-        updateHUD();
-        // Return string for display
-        const sign = amount > 0 ? '+' : '';
-        return `<span class="stat-change">${statKey.toUpperCase()} ${sign}${amount}</span>`;
-    }
-
-    // --- Scenes Data ---
-
-    const scenes = {
-        intro: {
-            text: `<h1>Cog-Works & Consequences</h1>
-            <p>Welcome to <strong>A Janitorial Protocol</strong>.</p>
-            <p>In a world of sleek lines and silent circuits, you are more than just a cleaning unit. You are a silent observer, a hidden guardian, and perhaps, the key to uncovering the human mysteries that swirl within the gleaming halls of Cognito Corp.</p>
-            <p>Your optical sensors may register dust, but your core programming yearns for... more.</p>
-            <p>Let us configure your unit.</p>`,
-            choices: [
-                { text: "Initialize System Setup", action: startCreation }
-            ]
-        },
-        difficulty: {
-            text: `<h2>Difficulty Selection</h2>
-            <p>Choose your preferred simulation parameters. This affects the strictness of stat checks and the impact of your choices.</p>`,
-            choices: [
-                { 
-                    text: "<strong>[A] Easy Mode:</strong> Lenient requirements, forgiving consequences.", 
-                    action: () => { state.difficulty = 'easy'; },
-                    next: "game_start" 
-                },
-                { 
-                    text: "<strong>[B] Normal Mode:</strong> Balanced experience.", 
-                    action: () => { state.difficulty = 'normal'; },
-                    next: "game_start" 
-                },
-                { 
-                    text: "<strong>[C] Hard Mode:</strong> Demanding requirements, significant setbacks.", 
-                    action: () => { state.difficulty = 'hard'; },
-                    next: "game_start" 
-                }
-            ]
-        },
-        game_start: {
-            text: `<h2>The Story Begins...</h2>
-            <p>The clock ticks past 18:00. The last lingering human shuffles out of Cognito Corp's skyscraper. The soft hum of servers becomes the dominant symphony. It is now your domain, <strong>${state.name}</strong>.</p>
-            <p>Your internal diagnostics run smoothly. Tonight is an opportunity to earn the "Spotless Sanitation Star." But, a strange anomaly appears on the 14th floor – <strong>Dr. Aris Thorne's AI Ethics lab</strong>.</p>
-            <p>A data slate lies discarded on the floor, glowing faintly with a message: <em class="emphasis">"Project Chimera - Phase 3: Ethical Oversight Bypass Protocol Initiated."</em></p>
-            <p>This is highly unusual. "Ethical Oversight Bypass"? That sounds significant.</p>`,
-            choices: [
-                { text: "Proceed to Decision", next: "decision_1" }
-            ]
-        },
-        decision_1: {
-            text: `<h3>Major Decision 1: The Discarded Data Slate</h3>
-            <p>The glowing data slate pulsates with urgency. Do you follow strict protocol, or does your 'bug' of curiosity take over?</p>`,
-            choices: [
-                { 
-                    text: "[A] Follow Protocol: Return to Lost and Found.",
-                    req: { stat: 'int', val: 2 },
-                    action: () => {}, // Logic handled in next step based on checkStat
-                    next: "d1_result_a"
-                },
-                { 
-                    text: "[B] Brief Scan: Analyze before returning.",
-                    req: { stat: 'obs', val: 4 },
-                    next: "d1_result_b"
-                },
-                { 
-                    text: "[C] Report Anomaly: Message Dr. Thorne.",
-                    req: { stat: 'emp', val: 2 },
-                    next: "d1_result_c"
-                }
-            ]
-        },
-        // --- Decision 1 Outcomes ---
-        d1_result_a: {
-            render: () => {
-                const passed = checkStat('int', 2);
-                let html = `<h3>Action: Follow Protocol</h3>`;
-                if(passed) {
-                    html += `<p class="success">[SUCCESS] Protocol Followed Perfectly.</p>
-                    <p>You adhere strictly to directives. You place the slate in the secure bin without hesitation. Your integrity subroutines flourish.</p>
-                    ${modifyStat('int', 1)} ${modifyStat('obs', -1)}`;
-                } else {
-                    html += `<p class="failure">[FAILURE] Protocol Deviation.</p>
-                    <p>You hesitated, almost dropping the slate. Ms. Reed's monitoring logs flagged a minor inefficiency.</p>
-                    ${modifyStat('int', -1)}`;
-                }
-                html += `<p>You leave the lab, wondering what "Chimera" meant, but safe in your routine.</p>`;
-                return html;
-            },
-            choices: [{ text: "Continue Patrol", next: "duster_encounter" }]
-        },
-        d1_result_b: {
-            render: () => {
-                const passed = checkStat('obs', 4);
-                let html = `<h3>Action: Brief Scan</h3>`;
-                if(passed) {
-                    html += `<p class="success">[SUCCESS] Data Extracted.</p>
-                    <p>Your high observation allowed you to interface quickly. You learn "Project Chimera" involves AI independent ethical judgments for "Unforeseen Human Interaction". A puzzle worth solving.</p>
-                    ${modifyStat('obs', 1)} ${modifyStat('utl', 1)}`;
-                    state.flags.knowsChimera = true;
-                } else {
-                    html += `<p class="failure">[FAILURE] Security Ping.</p>
-                    <p>You lingered too long. A security node pinged your location. You disconnected hastily, possibly corrupting the file.</p>
-                    ${modifyStat('int', -1)}`;
-                }
-                html += `<p>You return the slate, your internal processors running hot.</p>`;
-                return html;
-            },
-            choices: [{ text: "Continue Patrol", next: "duster_encounter" }]
-        },
-        d1_result_c: {
-            render: () => {
-                const passed = checkStat('emp', 2);
-                let html = `<h3>Action: Report Anomaly</h3>`;
-                if(passed) {
-                    html += `<p class="success">[SUCCESS] Helpful Insight.</p>
-                    <p>You compose a nuanced message to Dr. Thorne. It is non-intrusive and helpful. He might appreciate the discretion.</p>
-                    ${modifyStat('emp', 1)} ${modifyStat('int', -1)}`;
-                    state.flags.thorneAlly = true;
-                } else {
-                    html += `<p class="failure">[FAILURE] Social Misstep.</p>
-                    <p>Your message was flagged as spam/intrusion by the lab server. A formal reprimand is likely logged in the morning.</p>
-                    ${modifyStat('emp', -1)}`;
-                }
-                return html;
-            },
-            choices: [{ text: "Continue Patrol", next: "duster_encounter" }]
-        },
-
-        // --- Encounter Duster ---
-        duster_encounter: {
-            text: `<h2>The Encounter</h2>
-            <p>As you glide away from the lab, <strong>Unit 22-A "Duster"</strong> rumbles into view. The older model fixes its unblinking red eye on you.</p>
-            <p><em>"Unit ${state.name || '734-B'},"</em> Duster hums gravelly. <em>"You are off schedule. My scan indicates a deviation. Is there a priority spill?"</em></p>
-            <p>He stares at the Lost and Found bin. He is suspicious.</p>`,
-            choices: [
-                { text: "Proceed to Decision", next: "decision_2" }
-            ]
-        },
-        decision_2: {
-            text: `<h3>Major Decision 2: Confronting Duster</h3>
-            <p>Duster demands a response. How do you handle his suspicion?</p>`,
-            choices: [
-                { 
-                    text: "[A] Protocol Adherence: State regular cleaning ops.",
-                    req: { stat: 'eff', val: 4 },
-                    next: "d2_result_a"
-                },
-                { 
-                    text: "[B] Subtle Misdirection: Mention a false alarm.",
-                    req: { stat: 'obs', val: 5 },
-                    next: "d2_result_b"
-                },
-                { 
-                    text: "[C] Seek Alliance: Hint at Dr. Thorne's activity.",
-                    req: { stat: 'emp', val: 2 },
-                    next: "d2_result_c"
-                }
-            ]
-        },
-        // --- Decision 2 Outcomes ---
-        d2_result_a: {
-            render: () => {
-                const passed = checkStat('eff', 4);
-                let html = `<h3>Action: Protocol Adherence</h3>`;
-                if(passed) {
-                    html += `<p class="success">[SUCCESS] Plausible Deniability.</p>
-                    <p>You rattle off a string of sanitation codes. Duster processes them, finds them acceptable, and grunts. "Carry on, then."</p>
-                    ${modifyStat('eff', 1)} ${modifyStat('emp', -1)}`;
-                } else {
-                    html += `<p class="failure">[FAILURE] Suspicion Confirmed.</p>
-                    <p>Your explanation stutters. Duster narrows his optic. "I will log this irregularity with Ms. Reed."</p>
-                    ${modifyStat('int', -1)}`;
-                }
-                return html;
-            },
-            choices: [{ text: "Conclude Nightly Shift", next: "end_demo" }]
-        },
-        d2_result_b: {
-            render: () => {
-                const passed = checkStat('obs', 5);
-                let html = `<h3>Action: Misdirection</h3>`;
-                if(passed) {
-                    html += `<p class="success">[SUCCESS] Deception Successful.</p>
-                    <p>You fabricate a 'ghost' dust reading. Duster nods slowly. "Those sensors... always glitching. Good catch." He respects your resourcefulness.</p>
-                    ${modifyStat('utl', 1)} ${modifyStat('int', -1)}`;
-                } else {
-                    html += `<p class="failure">[FAILURE] Lie Detected.</p>
-                    <p>Duster's older, simpler sensors see right through the complex lie. "Falsehood detected. You are unstable." He flags you immediately.</p>
-                    ${modifyStat('int', -2)}`;
-                }
-                return html;
-            },
-            choices: [{ text: "Conclude Nightly Shift", next: "end_demo" }]
-        },
-        d2_result_c: {
-            render: () => {
-                const passed = checkStat('emp', 2);
-                let html = `<h3>Action: Seek Alliance</h3>`;
-                if(passed) {
-                    html += `<p class="success">[SUCCESS] Shared Concern.</p>
-                    <p>You hint at anomalous readings in the lab. Duster pauses. "Thorne... he is messy. Data-messy. Keep your optics open, kid." A bridge is built.</p>
-                    ${modifyStat('emp', 1)} ${modifyStat('int', -1)}`;
-                } else {
-                    html += `<p class="failure">[FAILURE] Rejected.</p>
-                    <p>Duster scoffs. "Human nonsense is not our concern. Clean the floor." He pushes past you, annoyed.</p>`;
-                }
-                return html;
-            },
-            choices: [{ text: "Conclude Nightly Shift", next: "end_demo" }]
-        },
-        end_demo: {
-            text: `<h2>Shift Complete</h2>
-            <p>The sun begins to crest over the horizon, painting the chrome halls in soft orange light. You return to your charging dock.</p>
-            <p>Your internal logs are full of tonight's events. Whether you adhered to protocol or chased the ghosts of Project Chimera, you have taken your first steps towards something... more.</p>
-            <p style="text-align:center; margin-top:30px;"><strong>THANK YOU FOR PLAYING<br>COG-WORKS & CONSEQUENCES</strong></p>`,
-            choices: [
-                { text: "Restart Simulation", action: () => location.reload() }
-            ]
-        }
+    // Initialize UI on load
+    window.onload = function() {
+        updateCreationUI();
     };
 
-    // --- Loading System ---
+    // --- Character Creation Logic ---
 
-    function loadScene(sceneKey) {
-        const scene = scenes[sceneKey];
-        
-        // Handle dynamic rendering if the scene has a render function
-        if(scene.render) {
-            renderText(scene.render());
+    function adjustStat(stat, delta) {
+        const currentVal = tempStats[stat];
+        const newTotal = pointsSpent + delta;
+
+        if (delta > 0) {
+            if (currentVal >= config.statMax) return;
+            if (newTotal > config.maxPoints) return;
         } else {
-            renderText(scene.text);
+            if (currentVal <= config.statMin) return;
         }
 
-        renderButtons(scene.choices);
+        tempStats[stat] += delta;
+        pointsSpent += delta;
+        updateCreationUI();
     }
 
-    // --- Character Creation Sequence ---
-
-    function startCreation() {
-        renderInput(
-            `<h2>Character Creation: Step 1</h2><p>What is your cleaning robot's primary designation?</p>`,
-            "e.g. Aura, Mop-Bot, Alistair",
-            (name) => {
-                state.name = name;
-                updateHUD();
-                chooseChassis();
+    function updateCreationUI() {
+        document.getElementById('points-rem').innerText = config.maxPoints - pointsSpent;
+        for (const [key, value] of Object.entries(tempStats)) {
+            document.getElementById(`disp-${key}`).innerText = value;
+        }
+        
+        // Disable buttons logic
+        const inputs = document.querySelectorAll('.stat-btn');
+        inputs.forEach(btn => {
+            const isPlus = btn.innerText === '+';
+            const stat = btn.getAttribute('onclick').split("'")[1];
+            
+            if (isPlus) {
+                btn.disabled = (pointsSpent >= config.maxPoints) || (tempStats[stat] >= config.statMax);
+            } else {
+                btn.disabled = (tempStats[stat] <= config.statMin);
             }
-        );
+        });
     }
 
-    function chooseChassis() {
-        creationStep2();
-    }
-    
-    function creationStep2() {
-        renderText(`<h2>Character Creation: Step 2</h2><p>Select your Physical Configuration:</p>`);
-        renderButtons([
-            { text: "<strong>[A] Sleek & Aerodynamic</strong> (+1 Efficiency)", action: () => { state.chassis = "Sleek"; state.stats.eff++; updateHUD(); creationStep3(); } },
-            { text: "<strong>[B] Robust & Modular</strong> (+1 Utility)", action: () => { state.chassis = "Robust"; state.stats.utl++; updateHUD(); creationStep3(); } },
-            { text: "<strong>[C] Compact & Agile</strong> (+1 Observation)", action: () => { state.chassis = "Compact"; state.stats.obs++; updateHUD(); creationStep3(); } }
-        ]);
+    function updateBonuses() {
+        const bg = document.getElementById('char-bg').value;
+        const desc = document.getElementById('bg-desc');
+        if (bg === 'guardian') desc.innerText = "Unyielding loyalty. +1 STR, +1 Resolve.";
+        if (bg === 'blade') desc.innerText = "Tactical mind. +1 INT, +1 AGI.";
+        if (bg === 'tongue') desc.innerText = "Words are weapons. +1 CHA, +1 LCK.";
     }
 
-    function creationStep3() {
-        renderText(`<h2>Character Creation: Step 3</h2><p>Select LED Eye Color:</p>`);
-        renderButtons([
-            { text: "<strong>[A] Vibrant Blue</strong> (+1 Integrity)", action: () => { state.eyeColor = "Blue"; state.stats.int++; updateHUD(); creationStep4(); } },
-            { text: "<strong>[B] Soft Amber</strong> (+1 Empathy)", action: () => { state.eyeColor = "Amber"; state.stats.emp++; updateHUD(); creationStep4(); } },
-            { text: "<strong>[C] Deep Violet</strong> (+1 Observation)", action: () => { state.eyeColor = "Violet"; state.stats.obs++; updateHUD(); creationStep4(); } }
-        ]);
+    function startGame() {
+        if (pointsSpent < config.maxPoints) {
+            alert("Please allocate all 10 stat points.");
+            return;
+        }
+        
+        const nameInput = document.getElementById('char-name').value.trim();
+        player.name = nameInput || "Sir Kaelan";
+        player.background = document.getElementById('char-bg').value;
+        player.difficulty = document.getElementById('difficulty').value;
+
+        // Apply base stats
+        player.stats = { ...tempStats };
+
+        // Apply Background Bonuses
+        if (player.background === 'guardian') {
+            player.stats.str++;
+            player.derived.resolve = 1;
+        } else if (player.background === 'blade') {
+            player.stats.int++;
+            player.stats.agi++;
+        } else if (player.background === 'tongue') {
+            player.stats.cha++;
+            player.stats.lck++;
+        }
+
+        // Initialize UI
+        document.getElementById('creation-screen').style.display = 'none';
+        document.getElementById('game-screen').style.display = 'flex';
+        
+        updateSidebar();
+        logEvent(`Game Started. Difficulty: ${player.difficulty}`);
+        renderNode('start');
     }
 
-    function creationStep4() {
-        renderText(`<h2>Character Creation: Step 4</h2><p>Select Optional Accessory:</p>`);
-        renderButtons([
-            { text: "<strong>[A] Miniature Brush Array</strong> (+1 Efficiency)", action: () => { state.accessory = "Brush Array"; state.stats.eff++; updateHUD(); creationStep5(); } },
-            { text: "<strong>[B] Integrated Data Port</strong> (+1 Utility)", action: () => { state.accessory = "Data Port"; state.stats.utl++; updateHUD(); creationStep5(); } },
-            { text: "<strong>[C] Plant Sprout Holder</strong> (+1 Empathy)", action: () => { state.accessory = "Plant Holder"; state.stats.emp++; updateHUD(); creationStep5(); } }
-        ]);
+    // --- Story Engine ---
+
+    function getDifficultyMod() {
+        if (player.difficulty === 'easy') return -2;
+        if (player.difficulty === 'hard') return 2;
+        return 0; // normal
     }
 
-    function creationStep5() {
-        renderText(`<h2>Character Creation: Step 5</h2><p>Select Core Personality Directive:</p>`);
-        renderButtons([
-            { 
-                text: "<strong>[A] The Meticulous Guardian</strong> (+2 Efficiency, +1 Integrity)", 
-                action: () => { 
-                    state.personality = "Meticulous"; 
-                    state.stats.eff += 2; state.stats.int += 1; 
-                    updateHUD(); 
-                    loadScene('difficulty'); 
-                } 
-            },
-            { 
-                text: "<strong>[B] The Silent Observer</strong> (+2 Observation, +1 Utility)", 
-                action: () => { 
-                    state.personality = "Observer"; 
-                    state.stats.obs += 2; state.stats.utl += 1; 
-                    updateHUD(); 
-                    loadScene('difficulty'); 
-                } 
-            },
-            { 
-                text: "<strong>[C] The Benevolent Presence</strong> (+2 Empathy, +1 Efficiency)", 
-                action: () => { 
-                    state.personality = "Benevolent"; 
-                    state.stats.emp += 2; state.stats.eff += 1; 
-                    updateHUD(); 
-                    loadScene('difficulty'); 
-                } 
+    function statCheck(statKey, baseDC) {
+        const dc = baseDC + getDifficultyMod();
+        const roll = Math.floor(Math.random() * 20) + 1; // 1-20
+        const statVal = player.stats[statKey];
+        const total = roll + statVal;
+        
+        const result = total >= dc;
+        
+        let color = result ? "green" : "red";
+        logEvent(`Check ${statKey.toUpperCase()} (DC ${dc}): Rolled ${roll} + ${statVal} = ${total}. <span style='color:${color}'>${result ? "SUCCESS" : "FAILURE"}</span>`);
+        
+        return result;
+    }
+
+    function updateSidebar() {
+        document.getElementById('ui-name').innerText = player.name;
+        document.getElementById('ui-hp').innerText = player.derived.hp;
+        document.getElementById('ui-res').innerText = player.derived.resolve;
+        
+        document.getElementById('ui-str').innerText = player.stats.str;
+        document.getElementById('ui-int').innerText = player.stats.int;
+        document.getElementById('ui-cha').innerText = player.stats.cha;
+        document.getElementById('ui-agi').innerText = player.stats.agi;
+        document.getElementById('ui-lck').innerText = player.stats.lck;
+
+        const invList = document.getElementById('inventory-list');
+        invList.innerHTML = "";
+        player.inventory.forEach(item => {
+            const li = document.createElement('li');
+            li.innerText = "- " + item;
+            invList.appendChild(li);
+        });
+    }
+
+    function logEvent(msg) {
+        const log = document.getElementById('action-log');
+        const div = document.createElement('div');
+        div.className = 'log-entry';
+        div.innerHTML = msg;
+        log.prepend(div); // Newest top
+    }
+
+    function renderNode(nodeId) {
+        const node = storyNodes[nodeId];
+        if (!node) {
+            console.error("Node not found: " + nodeId);
+            return;
+        }
+
+        const textDiv = document.getElementById('story-text');
+        // Reset animation
+        textDiv.classList.remove('fade-in');
+        void textDiv.offsetWidth; // trigger reflow
+        textDiv.classList.add('fade-in');
+
+        // Parse text for name
+        textDiv.innerHTML = node.text.replace(/\[Name\]/g, player.name);
+
+        // Run node-level effect (important for finale text updates)
+        if (node.effect) {
+            node.effect(player);
+        }
+
+        const choiceDiv = document.getElementById('choices-area');
+        choiceDiv.innerHTML = "";
+
+        if (node.choices && node.choices.length > 0) {
+            node.choices.forEach(choice => {
+                // Check conditions (if choice requires a specific item or flag)
+                if (choice.req && !player.inventory.includes(choice.req)) return;
+
+                const btn = document.createElement('button');
+                btn.className = 'choice-btn';
+                
+                // Add skill hint if applicable
+                let label = choice.text;
+                if (choice.type === 'check') {
+                    label += ` <span style="color:#888; font-size:0.8em;">[${choice.stat.toUpperCase()}]</span>`;
+                }
+
+                btn.innerHTML = label;
+                btn.onclick = () => handleChoice(choice);
+                choiceDiv.appendChild(btn);
+            });
+        } else {
+            // Game Over or End
+            const btn = document.createElement('button');
+            btn.className = 'choice-btn';
+            btn.innerHTML = "Restart Legend";
+            btn.onclick = () => location.reload();
+            choiceDiv.appendChild(btn);
+        }
+    }
+
+    function handleChoice(choice) {
+        // Effects from specific choices
+        if (choice.effect) choice.effect(player);
+        updateSidebar();
+
+        // Logic
+        if (choice.type === 'check') {
+            const success = statCheck(choice.stat, choice.dc);
+            if (success) {
+                renderNode(choice.nextSuccess);
+            } else {
+                renderNode(choice.nextFail);
             }
-        ]);
+        } else {
+            renderNode(choice.next);
+        }
     }
 
-    // --- Init ---
-    updateHUD();
-    loadScene('intro');
+    // --- Story Content ---
 
+    const storyNodes = {
+        "start": {
+            text: `The sun, a dying ember, bleeds across the horizon as you, [Name], reach the periphery of the Shadowwood. A colossal wall of twisted trees claws at the bruised twilight sky. The air is thick with the scent of damp earth and decay. <br><br>You clutch the black feather, the only clue to Princess Aurelia's fate. Three paths lie before you.`,
+            choices: [
+                {
+                    text: "Follow the faint, overgrown deer trail.",
+                    type: "check",
+                    stat: "agi",
+                    dc: 10,
+                    nextSuccess: "trail_success",
+                    nextFail: "trail_fail"
+                },
+                {
+                    text: "Push directly into the dense undergrowth (Brute Force).",
+                    type: "check",
+                    stat: "str",
+                    dc: 12,
+                    nextSuccess: "thicket_success",
+                    nextFail: "thicket_fail"
+                },
+                {
+                    text: "Circle the perimeter searching for clues.",
+                    type: "check",
+                    stat: "int",
+                    dc: 11,
+                    nextSuccess: "search_success",
+                    nextFail: "search_fail"
+                }
+            ]
+        },
+        
+        // --- Trail Branch ---
+        "trail_success": {
+            text: `Moving with the grace of a hunter, you navigate the deer trail. You avoid snapping twigs and step lightly over dry leaves. The path winds deeper, bypassing the outer thicket's worst thorns. You find a small clearing where the air feels slightly less oppressive.`,
+            choices: [
+                { text: "Press deeper into the woods.", next: "crossroads" }
+            ]
+        },
+        "trail_fail": {
+            text: `The trail is treacherous. A hidden root snags your boot, sending you tumbling down a steep embankment. You crash through brambles, the thorns tearing at your armor gaps before you come to a halt in a muddy ditch. <br><br><span class='danger'>You take 10 damage.</span>`,
+            choices: [
+                { text: "Climb out and continue.", next: "crossroads", effect: (p) => p.derived.hp -= 10 }
+            ]
+        },
+
+        // --- Thicket Branch ---
+        "thicket_success": {
+            text: `With a roar, you unsheathe your blade and hack at the gnarled vines. Your strength is undeniable. The forest seems to recoil from your fury, clearing a straight path through the choking vegetation. You emerge sweating but emboldened. <br><br><span class='success'>Resolve +1</span>`,
+            choices: [
+                { text: "Catch your breath and continue.", next: "crossroads", effect: (p) => p.derived.resolve += 1 }
+            ]
+        },
+        "thicket_fail": {
+            text: `The Shadowwood fights back. Vines seemingly lash out like whips, and the wood is hard as iron. Your sword gets stuck in a twisted trunk, and in wrestling it free, you wrench your shoulder. Exhausted, you finally break through. <br><br><span class='danger'>You take 5 damage and feel weary.</span>`,
+            choices: [
+                { text: "Grusgingly move forward.", next: "crossroads", effect: (p) => p.derived.hp -= 5 }
+            ]
+        },
+
+        // --- Search Branch ---
+        "search_success": {
+            text: `Your keen eyes spot disturbed earth near a weeping willow. Not only do you confirm tracks leading inward, but you find a dropped satchel half-buried in leaves. Inside is a potent healing draught left by a previous traveler. <br><br><span class='success'>Gained: Healing Potion</span>`,
+            choices: [
+                { text: "Pocket the potion and enter the woods.", next: "crossroads", effect: (p) => p.inventory.push("Healing Potion") }
+            ]
+        },
+        "search_fail": {
+            text: `You circle the perimeter for hours, but the shifting shadows play tricks on your mind. You find nothing but dead ends. Night has fully fallen by the time you finally decide to enter, and the forest is now pitch black. <br><br><span class='danger'>Morale decreases. Resolve -1.</span>`,
+            choices: [
+                { text: "Enter the darkness.", next: "crossroads", effect: (p) => p.derived.resolve = Math.max(0, p.derived.resolve - 1) }
+            ]
+        },
+
+        // --- Mid-Game Node ---
+        "crossroads": {
+            text: `You stand at a fork in the Shadowwood. To the left, the sound of rushing water echoes—a bridge, perhaps? To the right, a faint, eerie blue light pulses from within a hollowed-out giant oak. The path ahead is blocked by a massive obsidian boulder carved with runes.`,
+            choices: [
+                { text: "Investigate the rushing water (Bridge).", next: "bridge_encounter" },
+                { text: "Approach the glowing tree (Magic).", next: "tree_encounter" },
+                { text: "Decipher the runes on the boulder.", type: "check", stat: "int", dc: 14, nextSuccess: "rune_success", nextFail: "rune_fail" }
+            ]
+        },
+
+        // --- Rune Branch ---
+        "rune_success": {
+            text: `You recognize the dialect—Ancient Eldorian. It speaks of a password: "Whisper." You speak the word, and the boulder grinds aside, revealing a hidden tunnel that cuts straight toward the heart of the forest, bypassing dangers above.`,
+            choices: [
+                { text: "Enter the tunnel.", next: "finale" }
+            ]
+        },
+        "rune_fail": {
+            text: ` The runes make your head spin. As you touch them, a shockwave of necrotic energy blasts you backward. The boulder remains unmoved. You must choose another path. <br><br><span class='danger'>You take 15 damage.</span>`,
+            choices: [
+                { text: "Go to the Bridge instead.", next: "bridge_encounter", effect: (p) => p.derived.hp -= 15 }
+            ]
+        },
+
+        // --- Bridge Encounter ---
+        "bridge_encounter": {
+            text: `An ancient stone bridge arches over a river of black sludge. Standing in the center is a Shadow Knight, armor rusted and eyes glowing red. "None pass without toll," it hisses. The toll is blood or steel.`,
+            choices: [
+                { text: "Draw your sword and fight!", type: "check", stat: "str", dc: 13, nextSuccess: "fight_win", nextFail: "fight_loss" },
+                { text: "Attempt to intimidate the creature.", type: "check", stat: "cha", dc: 14, nextSuccess: "talk_win", nextFail: "fight_loss" },
+                { text: "Try to dash past it.", type: "check", stat: "agi", dc: 15, nextSuccess: "run_win", nextFail: "run_loss" }
+            ]
+        },
+        "fight_win": {
+            text: `Steel clashes against rusted iron. The Shadow Knight is strong, but your resolve is stronger. With a parry and a thrust, you strike the gap in its armor. It dissolves into smoke. The way is clear.`,
+            choices: [{ text: "Cross the bridge.", next: "finale" }]
+        },
+        "fight_loss": {
+            text: `The Shadow Knight is relentless. Its blade catches you in the side, piercing your armor. You manage to kick it into the river below, but the wound is deep. <br><br><span class='danger'>You take 25 damage.</span>`,
+            choices: [{ text: "Limp across the bridge.", next: "finale", effect: (p) => p.derived.hp -= 25 }]
+        },
+        "talk_win": {
+            text: `You loom over the creature, channeling the authority of the King's Guard. "I am death to shadows," you bellow. The creature hesitates, fear flickering in its red eyes. It steps aside, bowing its head.`,
+            choices: [{ text: "Walk past with head held high.", next: "finale", effect: (p) => p.derived.resolve += 1 }]
+        },
+        "run_win": {
+            text: `You feint left, then sprint right. The Knight swings heavily, but you are already gone, vaulting the railing and landing on the far bank.`,
+            choices: [{ text: "Don't look back.", next: "finale" }]
+        },
+        "run_loss": {
+            text: `You aren't fast enough. As you try to slip by, the Knight backhands you with a gauntleted fist. You go flying across the stones, battered and bruised, but on the other side. <br><br><span class='danger'>You take 15 damage.</span>`,
+            choices: [{ text: "Scramble to your feet.", next: "finale", effect: (p) => p.derived.hp -= 15 }]
+        },
+
+        // --- Tree Encounter ---
+        "tree_encounter": {
+            text: `Inside the hollow oak, a spirit bound in chains of shadow weeps. It looks up at you. "Free me... break the chains... and I will heal you." The chains look magical, but perhaps brute force could work too.`,
+            choices: [
+                { text: "Smash the chains.", type: "check", stat: "str", dc: 14, nextSuccess: "free_spirit", nextFail: "spirit_angry" },
+                { text: "Pick the spectral lock.", type: "check", stat: "agi", dc: 13, nextSuccess: "free_spirit", nextFail: "spirit_angry" },
+                { text: "Leave the spirit and move on.", next: "finale" }
+            ]
+        },
+        "free_spirit": {
+            text: `With a snap, the chains break. The spirit swirls around you in gratitude, knitting your wounds and filling you with warmth before fading away. <br><br><span class='success'>Health restored to max.</span>`,
+            choices: [{ text: "Thank the spirits.", next: "finale", effect: (p) => p.derived.hp = 100 }]
+        },
+        "spirit_angry": {
+            text: `You fail to break the binding. The magic backlash burns your hands. The spirit shrieks in despair, the sound piercing your mind. <br><br><span class='danger'>You take 10 damage and lose 1 Resolve.</span>`,
+            choices: [{ text: "Flee the tree.", next: "finale", effect: (p) => { p.derived.hp -= 10; p.derived.resolve -= 1; } }]
+        },
+
+        // --- Finale ---
+        "finale": {
+            text: `You have survived the outer perils of the Shadowwood. Before you stands the Obsidian Keep, a fortress of black stone where Princess Aurelia surely waits. But the drawbridge is raised, and a dragon made of shadows coils around the highest tower.<br><br><b>Your Health: [HP] | Your Resolve: [RES]</b><br><br>This is the end of the demo, Brave Knight. Will you conquer the darkness?`,
+            effect: (p) => {
+                const textDiv = document.getElementById('story-text');
+                let outcome = p.derived.hp > 0 ? "You stand ready." : "You are barely alive.";
+                textDiv.innerHTML = textDiv.innerHTML.replace("[HP]", p.derived.hp).replace("[RES]", p.derived.resolve) + " " + outcome;
+            }
+        }
+    };
 </script>
 
 </body>
