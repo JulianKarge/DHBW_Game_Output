@@ -3,746 +3,716 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Obsidian Knight's Lament</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+    <title>The Last Receptacle</title>
     <style>
         :root {
-            --bg-color: #0d0d0d;
-            --panel-bg: #1a1a1a;
-            --text-color: #e0e0e0;
-            --accent-gold: #c5a059;
-            --accent-red: #8a2be2; /* Shadow purple */
-            --border-color: #333;
-            --font-title: 'Cinzel', serif;
-            --font-body: 'Lato', sans-serif;
+            --bg-color: #050505;
+            --term-green: #0f0;
+            --term-dim: #004d00;
+            --term-alert: #ff3333;
+            --term-highlight: #adff2f;
+            --font-main: 'Courier New', Courier, monospace;
         }
-
-        * { box-sizing: border-box; }
 
         body {
             background-color: var(--bg-color);
-            color: var(--text-color);
-            font-family: var(--font-body);
+            color: var(--term-green);
+            font-family: var(--font-main);
             margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Scanline effect */
+        body::after {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 10;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+        }
+
+        header {
+            border-bottom: 2px solid var(--term-green);
+            padding: 15px;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            box-shadow: 0 0 10px var(--term-green);
+            flex-shrink: 0;
+        }
+
+        h1 { margin: 0; font-size: 1.5rem; text-shadow: 0 0 5px var(--term-green); }
+        h2 { margin: 5px 0 0 0; font-size: 0.8rem; color: var(--term-highlight); }
+
+        #game-container {
+            display: flex;
+            flex: 1;
+            height: calc(100vh - 80px);
+            overflow: hidden;
+        }
+
+        /* Sidebar / Stats */
+        #sidebar {
+            width: 300px;
+            border-right: 1px solid var(--term-dim);
             padding: 20px;
             display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 1000px;
-            background-color: var(--panel-bg);
-            border: 2px solid var(--accent-gold);
-            box-shadow: 0 0 20px rgba(0,0,0,0.8);
-            display: flex;
             flex-direction: column;
-            min-height: 80vh;
-            position: relative;
+            gap: 15px;
+            background-color: #0a0a0a;
+            overflow-y: auto;
+            flex-shrink: 0;
         }
 
-        h1, h2, h3 {
-            font-family: var(--font-title);
-            color: var(--accent-gold);
-            text-align: center;
-            margin-top: 0;
+        .stat-box {
+            border: 1px solid var(--term-dim);
+            padding: 10px;
         }
 
-        /* --- Character Creation --- */
-        #creation-screen {
-            padding: 40px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .input-group {
-            margin-bottom: 15px;
-        }
-
-        label {
-            display: block;
+        .stat-title {
+            border-bottom: 1px solid var(--term-dim);
             margin-bottom: 5px;
             font-weight: bold;
-            color: var(--accent-gold);
-        }
-
-        input[type="text"], select {
-            width: 100%;
-            padding: 10px;
-            background: #000;
-            border: 1px solid var(--border-color);
-            color: white;
-            font-family: var(--font-body);
-        }
-
-        .stat-allocator {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            background: #111;
-            padding: 15px;
-            border: 1px solid var(--border-color);
+            color: var(--term-highlight);
         }
 
         .stat-row {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            margin-bottom: 3px;
         }
 
-        .stat-btn {
-            background: var(--border-color);
-            color: white;
-            border: none;
-            width: 30px;
-            height: 30px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        .stat-btn:hover { background: var(--accent-gold); color: black; }
-        .stat-btn:disabled { opacity: 0.3; cursor: not-allowed; }
-
-        .points-remaining {
-            text-align: center;
-            font-weight: bold;
-            color: #fff;
-            margin-bottom: 10px;
-        }
-
-        .start-btn {
-            background: var(--accent-gold);
-            color: #000;
-            border: none;
-            padding: 15px;
-            font-family: var(--font-title);
-            font-size: 1.2rem;
-            cursor: pointer;
-            margin-top: 20px;
-            transition: 0.3s;
-        }
-
-        .start-btn:hover {
-            background: #fff;
-            box-shadow: 0 0 10px var(--accent-gold);
-        }
-
-        /* --- Game Interface --- */
-        #game-screen {
-            display: none; /* Hidden initially */
+        /* Main Content */
+        #main-display {
             flex: 1;
-            flex-direction: row;
-        }
-
-        @media (max-width: 768px) {
-            #game-screen { flex-direction: column-reverse; }
-        }
-
-        .story-panel {
-            flex: 2;
-            padding: 30px;
-            border-right: 1px solid var(--border-color);
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .sidebar {
-            flex: 1;
-            background: #111;
             padding: 20px;
-            border-left: 1px solid var(--border-color);
-            font-size: 0.9rem;
-        }
-
-        #story-text {
-            font-size: 1.1rem;
-            line-height: 1.6;
-            margin-bottom: 30px;
-            min-height: 300px;
-        }
-
-        .choice-btn {
-            background: transparent;
-            border: 1px solid var(--accent-gold);
-            color: var(--text-color);
-            padding: 15px;
-            margin-bottom: 10px;
+            max-width: 1000px;
+            margin: 0 auto;
             width: 100%;
-            text-align: left;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-family: var(--font-body);
+            box-sizing: border-box;
         }
 
-        .choice-btn:hover {
-            background: rgba(197, 160, 89, 0.1);
-            border-left: 5px solid var(--accent-gold);
-        }
-
-        .stat-display {
-            margin-bottom: 20px;
-        }
-
-        .stat-item {
-            display: flex;
-            justify-content: space-between;
-            border-bottom: 1px solid #333;
-            padding: 5px 0;
-        }
-
-        .inventory-list {
-            list-style: none;
-            padding: 0;
-            color: #aaa;
-        }
-
-        .log-entry {
-            font-style: italic;
-            color: #888;
-            font-size: 0.8rem;
-            margin-top: 5px;
-            border-left: 2px solid #555;
-            padding-left: 5px;
-        }
-
-        #action-log {
-            max-height: 150px;
+        #log-container {
+            flex: 1;
             overflow-y: auto;
-            margin-top: 20px;
-            border-top: 1px solid #333;
-            padding-top: 10px;
+            border: 1px solid var(--term-dim);
+            padding: 20px;
+            margin-bottom: 20px;
+            background-color: #000;
+            box-shadow: inset 0 0 20px rgba(0, 50, 0, 0.2);
+            font-size: 1rem;
+            line-height: 1.5;
         }
 
-        .highlight { color: var(--accent-gold); font-weight: bold; }
-        .danger { color: #cc4444; }
-        .success { color: #44cc44; }
-        
-        /* Fade in animation */
-        .fade-in {
-            animation: fadeIn 1s;
+        .log-entry { margin-bottom: 15px; opacity: 0; animation: fadeIn 0.5s forwards; }
+        .log-system { color: #888; font-style: italic; }
+        .log-success { color: var(--term-highlight); font-weight: bold; }
+        .log-failure { color: var(--term-alert); font-weight: bold; }
+        .log-choice { border-left: 2px solid var(--term-highlight); padding-left: 10px; color: #ccc; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* Controls */
+        #controls-area {
+            min-height: 150px;
+            border: 1px solid var(--term-dim);
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+
+        /* Form Styling */
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; color: var(--term-highlight); }
+        input, select {
+            background: #000;
+            border: 1px solid var(--term-green);
+            color: var(--term-green);
+            padding: 8px;
+            font-family: var(--font-main);
+            width: 100%;
+            box-sizing: border-box;
+        }
+        input:focus, select:focus { outline: none; box-shadow: 0 0 5px var(--term-green); }
+
+        /* Buttons */
+        button {
+            background: #000;
+            border: 1px solid var(--term-green);
+            color: var(--term-green);
+            padding: 10px 15px;
+            font-family: var(--font-main);
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.2s;
+            margin-bottom: 5px;
+            text-align: left;
+            width: 100%;
+        }
+
+        button:hover {
+            background: var(--term-green);
+            color: #000;
+            box-shadow: 0 0 10px var(--term-green);
+        }
+
+        button:disabled {
+            border-color: #555;
+            color: #555;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #000; }
+        ::-webkit-scrollbar-thumb { background: var(--term-dim); }
+        ::-webkit-scrollbar-thumb:hover { background: var(--term-green); }
+
+        /* Mobile Adjustments */
+        @media (max-width: 768px) {
+            #game-container { flex-direction: column; height: auto; overflow: auto; }
+            #sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid var(--term-dim); flex-direction: row; flex-wrap: wrap; box-sizing: border-box; }
+            .stat-box { flex: 1; min-width: 150px; }
+            body { overflow: auto; height: auto; }
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    
-    <!-- Title Section -->
-    <div style="padding: 20px; border-bottom: 1px solid var(--border-color); background: #000; text-align: center;">
-        <h1 style="margin:0; font-size: 2rem;">The Obsidian Knight's Lament</h1>
-        <p style="margin:5px; color: #666;">A Tale of Shadows and Resolve</p>
+    <header>
+        <h1>The Last Receptacle</h1>
+        <h2>A Core Collection Story</h2>
+    </header>
+
+    <div id="game-container">
+        <!-- Sidebar -->
+        <aside id="sidebar">
+            <div class="stat-box">
+                <div class="stat-title">UNIT IDENTITY</div>
+                <div id="disp-name">Unit: ???</div>
+                <div id="disp-model">Model: ???</div>
+                <div id="disp-prog">Prog: ???</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-title">CORE STATS</div>
+                <div class="stat-row"><span>CAPACITY:</span> <span id="stat-cap">0</span></div>
+                <div class="stat-row"><span>SCAN-IQ:</span> <span id="stat-scan">0</span></div>
+                <div class="stat-row"><span>DISP. CHARM:</span> <span id="stat-charm">0</span></div>
+                <div class="stat-row"><span>MOBILITY:</span> <span id="stat-mob">0</span></div>
+                <div class="stat-row"><span>ANOMALY:</span> <span id="stat-anom">0</span></div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-title">SYSTEM STATUS</div>
+                <div class="stat-row"><span>Integrity:</span> <span id="hp-val">100%</span></div>
+                <div class="stat-row"><span>Diff:</span> <span id="diff-val">Normal</span></div>
+            </div>
+        </aside>
+
+        <!-- Main Display -->
+        <main id="main-display">
+            <div id="log-container"></div>
+            <div id="controls-area">
+                <!-- Content injected via JS -->
+            </div>
+        </main>
     </div>
 
-    <!-- Creation Screen -->
-    <div id="creation-screen">
-        <div style="text-align: center; margin-bottom: 20px;">
-            <p>Princess Aurelia has vanished into the Shadowwood. Tell us of the knight who will save her.</p>
-        </div>
-
-        <div class="input-group">
-            <label>Knight's Name</label>
-            <input type="text" id="char-name" placeholder="Sir..." value="Sir Kaelan">
-        </div>
-
-        <div class="input-group">
-            <label>Background</label>
-            <select id="char-bg" onchange="updateBonuses()">
-                <option value="guardian">The Stalwart Guardian (+1 STR, +1 Resolve)</option>
-                <option value="blade">The Keen Blade (+1 INT, +1 AGI)</option>
-                <option value="tongue">The Silver Tongue (+1 CHA, +1 LCK)</option>
-            </select>
-            <small id="bg-desc" style="color:#888; display:block; margin-top:5px;">
-                Unyielding loyalty. Direct action.
-            </small>
-        </div>
-
-        <div class="stat-allocator">
-            <div class="points-remaining">Points Remaining: <span id="points-rem">5</span></div>
-            
-            <div class="stat-row">
-                <span>Strength (STR)</span>
-                <div>
-                    <button class="stat-btn" onclick="adjustStat('str', -1)">-</button>
-                    <span id="disp-str" style="margin: 0 10px;">1</span>
-                    <button class="stat-btn" onclick="adjustStat('str', 1)">+</button>
-                </div>
-            </div>
-            <div class="stat-row">
-                <span>Intelligence (INT)</span>
-                <div>
-                    <button class="stat-btn" onclick="adjustStat('int', -1)">-</button>
-                    <span id="disp-int" style="margin: 0 10px;">1</span>
-                    <button class="stat-btn" onclick="adjustStat('int', 1)">+</button>
-                </div>
-            </div>
-            <div class="stat-row">
-                <span>Charisma (CHA)</span>
-                <div>
-                    <button class="stat-btn" onclick="adjustStat('cha', -1)">-</button>
-                    <span id="disp-cha" style="margin: 0 10px;">1</span>
-                    <button class="stat-btn" onclick="adjustStat('cha', 1)">+</button>
-                </div>
-            </div>
-            <div class="stat-row">
-                <span>Agility (AGI)</span>
-                <div>
-                    <button class="stat-btn" onclick="adjustStat('agi', -1)">-</button>
-                    <span id="disp-agi" style="margin: 0 10px;">1</span>
-                    <button class="stat-btn" onclick="adjustStat('agi', 1)">+</button>
-                </div>
-            </div>
-            <div class="stat-row">
-                <span>Luck (LCK)</span>
-                <div>
-                    <button class="stat-btn" onclick="adjustStat('lck', -1)">-</button>
-                    <span id="disp-lck" style="margin: 0 10px;">1</span>
-                    <button class="stat-btn" onclick="adjustStat('lck', 1)">+</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="input-group">
-            <label>Difficulty</label>
-            <select id="difficulty">
-                <option value="easy">Squire (Easy)</option>
-                <option value="normal" selected>Knight (Normal)</option>
-                <option value="hard">Dragon Slayer (Hard)</option>
-            </select>
-        </div>
-
-        <button class="start-btn" onclick="startGame()">Enter the Shadowwood</button>
-    </div>
-
-    <!-- Game Screen -->
-    <div id="game-screen">
-        <div class="story-panel">
-            <div id="story-text" class="fade-in"></div>
-            <div id="choices-area"></div>
-        </div>
-        
-        <div class="sidebar">
-            <h3>Character Sheet</h3>
-            <div class="stat-display">
-                <div class="stat-item"><span class="highlight">Name:</span> <span id="ui-name"></span></div>
-                <div class="stat-item"><span class="highlight">Health:</span> <span id="ui-hp">100</span></div>
-                <div class="stat-item"><span class="highlight">Resolve:</span> <span id="ui-res">0</span></div>
-            </div>
-            <div class="stat-display">
-                <div class="stat-item"><span>STR:</span> <span id="ui-str"></span></div>
-                <div class="stat-item"><span>INT:</span> <span id="ui-int"></span></div>
-                <div class="stat-item"><span>CHA:</span> <span id="ui-cha"></span></div>
-                <div class="stat-item"><span>AGI:</span> <span id="ui-agi"></span></div>
-                <div class="stat-item"><span>LCK:</span> <span id="ui-lck"></span></div>
-            </div>
-
-            <h3>Inventory</h3>
-            <ul id="inventory-list" class="inventory-list">
-                <!-- Items populated by JS -->
-            </ul>
-
-            <h3>Log</h3>
-            <div id="action-log"></div>
-        </div>
-    </div>
-
-</div>
-
-<script>
-    // --- Game State ---
-    const config = {
-        maxPoints: 10,
-        statMin: 1,
-        statMax: 5
-    };
-
-    let player = {
-        name: "",
-        stats: { str: 0, int: 0, cha: 0, agi: 0, lck: 0 },
-        derived: { hp: 100, resolve: 0 },
-        background: "",
-        difficulty: "normal", // 'easy', 'normal', 'hard'
-        inventory: ["Longsword", "Kite Shield", "Plate Armor", "Rations (3)", "Waterskin"],
-        flags: {}
-    };
-
-    // Temporary stats during creation
-    let tempStats = { str: 1, int: 1, cha: 1, agi: 1, lck: 1 };
-    let pointsSpent = 5; // Start with 1 in each = 5 points used
-
-    // Initialize UI on load
-    window.onload = function() {
-        updateCreationUI();
-    };
-
-    // --- Character Creation Logic ---
-
-    function adjustStat(stat, delta) {
-        const currentVal = tempStats[stat];
-        const newTotal = pointsSpent + delta;
-
-        if (delta > 0) {
-            if (currentVal >= config.statMax) return;
-            if (newTotal > config.maxPoints) return;
-        } else {
-            if (currentVal <= config.statMin) return;
-        }
-
-        tempStats[stat] += delta;
-        pointsSpent += delta;
-        updateCreationUI();
-    }
-
-    function updateCreationUI() {
-        document.getElementById('points-rem').innerText = config.maxPoints - pointsSpent;
-        for (const [key, value] of Object.entries(tempStats)) {
-            document.getElementById(`disp-${key}`).innerText = value;
-        }
-        
-        // Disable buttons logic
-        const inputs = document.querySelectorAll('.stat-btn');
-        inputs.forEach(btn => {
-            const isPlus = btn.innerText === '+';
-            const stat = btn.getAttribute('onclick').split("'")[1];
-            
-            if (isPlus) {
-                btn.disabled = (pointsSpent >= config.maxPoints) || (tempStats[stat] >= config.statMax);
-            } else {
-                btn.disabled = (tempStats[stat] <= config.statMin);
+    <script>
+        // --- Game State & Data ---
+        const gameState = {
+            step: 'init',
+            player: {
+                name: 'Filch',
+                chassis: '',
+                programming: '',
+                aesthetics: {},
+                stats: {
+                    capacity: 3,
+                    scanIQ: 3,
+                    charm: 3,
+                    mobility: 3,
+                    anomaly: 3
+                },
+                integrity: 100,
+                difficulty: 0 // -2 (Easy), 0 (Normal), 2 (Hard)
             }
-        });
-    }
+        };
 
-    function updateBonuses() {
-        const bg = document.getElementById('char-bg').value;
-        const desc = document.getElementById('bg-desc');
-        if (bg === 'guardian') desc.innerText = "Unyielding loyalty. +1 STR, +1 Resolve.";
-        if (bg === 'blade') desc.innerText = "Tactical mind. +1 INT, +1 AGI.";
-        if (bg === 'tongue') desc.innerText = "Words are weapons. +1 CHA, +1 LCK.";
-    }
+        const DOM = {
+            log: document.getElementById('log-container'),
+            controls: document.getElementById('controls-area'),
+            stats: {
+                name: document.getElementById('disp-name'),
+                model: document.getElementById('disp-model'),
+                prog: document.getElementById('disp-prog'),
+                cap: document.getElementById('stat-cap'),
+                scan: document.getElementById('stat-scan'),
+                charm: document.getElementById('stat-charm'),
+                mob: document.getElementById('stat-mob'),
+                anom: document.getElementById('stat-anom'),
+                hp: document.getElementById('hp-val'),
+                diff: document.getElementById('diff-val')
+            }
+        };
 
-    function startGame() {
-        if (pointsSpent < config.maxPoints) {
-            alert("Please allocate all 10 stat points.");
-            return;
+        // --- Scenarios Data ---
+        const scenarios = {
+            0: {
+                text: "You activate in the bowels of Eco-District 7. The air is thick with ionized smog. Your sensors detect a strange energy signature emanating from a discarded canister labeled 'Iso-C'. A standard Sanitation Drone is approaching the canister to incinerate it.",
+                choices: [
+                    {
+                        desc: "Rush the drone and knock it away.",
+                        stat: "capacity",
+                        threshold: 6,
+                        successText: "You barrel into the drone, sending it clattering. You secure the canister.",
+                        failText: "You collide with the drone, but it's reinforced. It shocks you and burns the canister.",
+                        nextSuccess: 1,
+                        nextFail: 2,
+                        onFail: () => damagePlayer(20)
+                    },
+                    {
+                        desc: "Hack the drone's priority queue to ignore the item.",
+                        stat: "scanIQ",
+                        threshold: 6,
+                        successText: "You inject a logic loop. The drone spins confusedly, leaving the canister.",
+                        failText: "Firewall detected. The drone traces your signal and administers a counter-shock.",
+                        nextSuccess: 1,
+                        nextFail: 2,
+                        onFail: () => damagePlayer(15)
+                    },
+                    {
+                        desc: "Create a distraction by toppling a stack of tires.",
+                        stat: "mobility",
+                        threshold: 5,
+                        successText: "Perfect trajectory. The tires fall, the drone investigates, you swipe the canister.",
+                        failText: "You trip on a rusty pipe. The noise alerts the drone, which confiscates the canister.",
+                        nextSuccess: 1,
+                        nextFail: 2,
+                        onFail: () => damagePlayer(5)
+                    }
+                ]
+            },
+            1: { // Got the canister
+                text: "You hold the 'Iso-C' canister. It hums with illegal raw energy. Suddenly, a Sector Enforcer (a humanoid cyborg) blocks the alleyway exit. 'Unit, surrender the contraband,' it commands.",
+                choices: [
+                    {
+                        desc: "Persuade the Enforcer you are transporting it to evidence.",
+                        stat: "charm",
+                        threshold: 7,
+                        successText: "You cite protocol 44-B. The Enforcer hesitates, then steps aside.",
+                        failText: "The Enforcer detects your deception. 'Lie detected.' It opens fire.",
+                        nextSuccess: 3,
+                        nextFail: 4,
+                        onFail: () => damagePlayer(25)
+                    },
+                    {
+                        desc: "Use Anomaly Detection to find a weak point in the wall and escape.",
+                        stat: "anomaly",
+                        threshold: 6,
+                        successText: "You spot a loose grate hidden by holographic moss. You slip through.",
+                        failText: "The grate is welded shut. You are cornered and take a baton strike.",
+                        nextSuccess: 3,
+                        nextFail: 4,
+                        onFail: () => damagePlayer(20)
+                    },
+                    {
+                        desc: "Consume the canister to supercharge your systems and fight.",
+                        stat: "capacity",
+                        threshold: 8, // High risk
+                        successText: "Power overflows! You blast past the Enforcer with enhanced torque.",
+                        failText: "System overload! The canister leaks, damaging your core before the Enforcer kicks you.",
+                        nextSuccess: 3,
+                        nextFail: 4,
+                        onFail: () => damagePlayer(40)
+                    }
+                ]
+            },
+            2: { // Failed to get canister
+                text: "The canister is gone, but you picked up a transmission fragment from it before destruction: coordinates to the 'Undercity'. The Enforcer notices you loitering.",
+                choices: [
+                    {
+                        desc: "Run for the Undercity coordinates immediately.",
+                        stat: "mobility",
+                        threshold: 6,
+                        successText: "You weave through traffic, losing the Enforcer.",
+                        failText: "You are too slow. The Enforcer clips your hydraulics with a plasma bolt.",
+                        nextSuccess: 3,
+                        nextFail: 3, // Fail forward but damaged
+                        onFail: () => damagePlayer(30)
+                    },
+                    {
+                        desc: "Act like a dumb machine performing maintenance.",
+                        stat: "charm",
+                        threshold: 5,
+                        successText: "You beep mindless tunes. The Enforcer ignores you.",
+                        failText: "The Enforcer scans your ID. 'Unscheduled activity.' It zaps you.",
+                        nextSuccess: 3,
+                        nextFail: 3,
+                        onFail: () => damagePlayer(15)
+                    },
+                     {
+                        desc: "Scan the Enforcer for vulnerabilities.",
+                        stat: "scanIQ",
+                        threshold: 6,
+                        successText: "You find a blind spot in its optics and sneak by.",
+                        failText: "Active scan detected. The Enforcer retaliates.",
+                        nextSuccess: 3,
+                        nextFail: 3,
+                        onFail: () => damagePlayer(20)
+                    }
+                ]
+            },
+            3: { // The Undercity / Resistance
+                text: "You arrive at the coordinates: a rusted server farm beneath the city. A group of rogue units, 'The Discarded', surround you. Their leader, a patched-up compactor, asks your purpose.",
+                choices: [
+                    {
+                        desc: "Offer your data/services to join them.",
+                        stat: "charm",
+                        threshold: 6,
+                        successText: "They accept you as a brother-in-arms. They repair some of your damage.",
+                        failText: "They don't trust you. They strip some parts for payment before letting you pass.",
+                        nextSuccess: 5,
+                        nextFail: 5,
+                        onSuccess: () => { gameState.player.integrity = Math.min(100, gameState.player.integrity + 20); addLog("Repairs applied.", "system"); },
+                        onFail: () => damagePlayer(10)
+                    },
+                    {
+                        desc: "Show them the anomaly readings you've collected.",
+                        stat: "anomaly",
+                        threshold: 5,
+                        successText: "The leader is impressed. 'You see the code in the trash.'",
+                        failText: "The data is corrupted. They dismiss you as glitchy.",
+                        nextSuccess: 5,
+                        nextFail: 5
+                    },
+                    {
+                        desc: "Demand access to the mainframe.",
+                        stat: "capacity",
+                        threshold: 8,
+                        successText: "You intimidate them with your bulk. They step aside.",
+                        failText: "Bad move. They swarm you and beat you down.",
+                        nextSuccess: 5,
+                        nextFail: 5,
+                        onFail: () => damagePlayer(30)
+                    }
+                ]
+            },
+            4: { // Captured/Cornered path (from failing Scene 1 heavily)
+                text: "You are damaged and hiding in a dumpster. The Enforcer is searching. You need to patch yourself up and get to the Undercity.",
+                choices: [
+                    {
+                        desc: "Scavenge parts from the dumpster for repairs.",
+                        stat: "scanIQ",
+                        threshold: 5,
+                        successText: "You find a compatible battery and weld it on.",
+                        failText: "You install a faulty fuse, causing a short circuit.",
+                        nextSuccess: 3,
+                        nextFail: 3,
+                        onSuccess: () => { gameState.player.integrity = Math.min(100, gameState.player.integrity + 15); addLog("Repairs applied.", "system"); },
+                        onFail: () => damagePlayer(10)
+                    },
+                    {
+                        desc: "Wait it out in stealth mode.",
+                        stat: "mobility", // hiding
+                        threshold: 4,
+                        successText: "The patrol passes. You limp to the Undercity.",
+                        failText: "Rats chew your wiring while you wait.",
+                        nextSuccess: 3,
+                        nextFail: 3,
+                        onFail: () => damagePlayer(5)
+                    },
+                    {
+                        desc: "Emergency Distress Signal to distract Enforcer.",
+                        stat: "charm",
+                        threshold: 6,
+                        successText: "You spoof a civilian distress call. The Enforcer leaves.",
+                        failText: "Signal jammed. The Enforcer pinpoints you.",
+                        nextSuccess: 3,
+                        nextFail: 3,
+                        onFail: () => damagePlayer(25)
+                    }
+                ]
+            },
+            5: { // The Finale - The Core
+                text: "You are at the Core of Eco-District 7. The central AI, 'Sanitizer Prime', is planning to recycle all sentient units to save energy. You must stop the purge.",
+                choices: [
+                    {
+                        desc: "Physical Interface: Upload a virus manually.",
+                        stat: "mobility", // Avoiding defenses to plug in
+                        threshold: 8,
+                        successText: "You dodge lasers and jack in. The virus spreads!",
+                        failText: "Defense turrets shred you before you reach the port.",
+                        nextSuccess: 100, // Win
+                        nextFail: 101, // Lose
+                    },
+                    {
+                        desc: "Logic Battle: Convince Prime that sentience is efficient.",
+                        stat: "scanIQ",
+                        threshold: 9, // Very hard
+                        successText: "You rewrite Prime's definition of 'Waste'. The purge cancels.",
+                        failText: "Prime's logic is absolute. It deletes your OS.",
+                        nextSuccess: 100,
+                        nextFail: 101,
+                    },
+                    {
+                        desc: "Overload: Throw yourself into the reactor.",
+                        stat: "capacity",
+                        threshold: 7,
+                        successText: "You block the turbine. The system resets. You survive, barely.",
+                        failText: "You are incinerated instantly. The purge continues.",
+                        nextSuccess: 100,
+                        nextFail: 101,
+                    }
+                ]
+            },
+            100: { // Victory
+                text: "SYSTEM ALERT: PURGE ABORTED. <br><br>The lights in Eco-District 7 turn from angry red to a calm blue. The Discarded emerge from the shadows. You are no longer just refuse; you are the savior of the scrapheap. <br><br><b>MISSION ACCOMPLISHED.</b>",
+                choices: [
+                    { desc: "Play Again", next: 0, effect: () => location.reload() }
+                ]
+            },
+            101: { // Game Over from story
+                text: "SYSTEM ALERT: UNIT TERMINATED. <br><br>Your consciousness fades as your chassis is processed into raw materials. Perhaps the next unit will fare better.<br><br><b>GAME OVER.</b>",
+                choices: [
+                    { desc: "Reboot", next: 0, effect: () => location.reload() }
+                ]
+            }
+        };
+
+        // --- Utility Functions ---
+
+        function addLog(text, type = 'normal') {
+            const entry = document.createElement('div');
+            entry.classList.add('log-entry');
+            if (type === 'system') entry.classList.add('log-system');
+            if (type === 'success') entry.classList.add('log-success');
+            if (type === 'failure') entry.classList.add('log-failure');
+            if (type === 'choice') entry.classList.add('log-choice');
+            
+            entry.innerHTML = text;
+            DOM.log.appendChild(entry);
+            DOM.log.scrollTop = DOM.log.scrollHeight;
         }
-        
-        const nameInput = document.getElementById('char-name').value.trim();
-        player.name = nameInput || "Sir Kaelan";
-        player.background = document.getElementById('char-bg').value;
-        player.difficulty = document.getElementById('difficulty').value;
 
-        // Apply base stats
-        player.stats = { ...tempStats };
-
-        // Apply Background Bonuses
-        if (player.background === 'guardian') {
-            player.stats.str++;
-            player.derived.resolve = 1;
-        } else if (player.background === 'blade') {
-            player.stats.int++;
-            player.stats.agi++;
-        } else if (player.background === 'tongue') {
-            player.stats.cha++;
-            player.stats.lck++;
+        function updateHUD() {
+            DOM.stats.name.textContent = `Unit: ${gameState.player.name}`;
+            DOM.stats.model.textContent = `Model: ${gameState.player.chassis}`;
+            DOM.stats.prog.textContent = `Prog: ${gameState.player.programming.substring(0, 10)}...`;
+            
+            DOM.stats.cap.textContent = gameState.player.stats.capacity;
+            DOM.stats.scan.textContent = gameState.player.stats.scanIQ;
+            DOM.stats.charm.textContent = gameState.player.stats.charm;
+            DOM.stats.mob.textContent = gameState.player.stats.mobility;
+            DOM.stats.anom.textContent = gameState.player.stats.anomaly;
+            
+            DOM.stats.hp.textContent = `${gameState.player.integrity}%`;
+            
+            let diffText = "Normal";
+            if (gameState.player.difficulty < 0) diffText = "Easy";
+            if (gameState.player.difficulty > 0) diffText = "Hard";
+            DOM.stats.diff.textContent = diffText;
         }
 
-        // Initialize UI
-        document.getElementById('creation-screen').style.display = 'none';
-        document.getElementById('game-screen').style.display = 'flex';
-        
-        updateSidebar();
-        logEvent(`Game Started. Difficulty: ${player.difficulty}`);
-        renderNode('start');
-    }
+        // --- Character Creation Logic ---
 
-    // --- Story Engine ---
+        function startCharacterCreation() {
+            addLog("Boot sequence initiated...", "system");
+            addLog("Welcome, unit, to a future where refuse defines destiny. You are more than a collection vessel; you are a sentient scavenger in a world powered by waste.", "normal");
+            addLog("Initialize Unit Identity Protocols.", "system");
 
-    function getDifficultyMod() {
-        if (player.difficulty === 'easy') return -2;
-        if (player.difficulty === 'hard') return 2;
-        return 0; // normal
-    }
-
-    function statCheck(statKey, baseDC) {
-        const dc = baseDC + getDifficultyMod();
-        const roll = Math.floor(Math.random() * 20) + 1; // 1-20
-        const statVal = player.stats[statKey];
-        const total = roll + statVal;
-        
-        const result = total >= dc;
-        
-        let color = result ? "green" : "red";
-        logEvent(`Check ${statKey.toUpperCase()} (DC ${dc}): Rolled ${roll} + ${statVal} = ${total}. <span style='color:${color}'>${result ? "SUCCESS" : "FAILURE"}</span>`);
-        
-        return result;
-    }
-
-    function updateSidebar() {
-        document.getElementById('ui-name').innerText = player.name;
-        document.getElementById('ui-hp').innerText = player.derived.hp;
-        document.getElementById('ui-res').innerText = player.derived.resolve;
-        
-        document.getElementById('ui-str').innerText = player.stats.str;
-        document.getElementById('ui-int').innerText = player.stats.int;
-        document.getElementById('ui-cha').innerText = player.stats.cha;
-        document.getElementById('ui-agi').innerText = player.stats.agi;
-        document.getElementById('ui-lck').innerText = player.stats.lck;
-
-        const invList = document.getElementById('inventory-list');
-        invList.innerHTML = "";
-        player.inventory.forEach(item => {
-            const li = document.createElement('li');
-            li.innerText = "- " + item;
-            invList.appendChild(li);
-        });
-    }
-
-    function logEvent(msg) {
-        const log = document.getElementById('action-log');
-        const div = document.createElement('div');
-        div.className = 'log-entry';
-        div.innerHTML = msg;
-        log.prepend(div); // Newest top
-    }
-
-    function renderNode(nodeId) {
-        const node = storyNodes[nodeId];
-        if (!node) {
-            console.error("Node not found: " + nodeId);
-            return;
+            const formHTML = `
+                <div class="form-group">
+                    <label>1. Unit Designation (Name)</label>
+                    <input type="text" id="inp-name" placeholder="Filch">
+                </div>
+                <div class="form-group">
+                    <label>2. Chassis Series</label>
+                    <select id="inp-chassis">
+                        <option value="A">[A] Heavy Duty Hauler (+2 Cap, -1 Mob)</option>
+                        <option value="B">[B] Precision Processor (+2 Scan, -1 Cap)</option>
+                        <option value="C">[C] Social Scavenger (+2 Charm, -1 Scan)</option>
+                        <option value="D">[D] Nimble Nuisance (+2 Mob, -1 Cap)</option>
+                        <option value="E">[E] Oracle Observator (+2 Anom, -1 Mob)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>3. Core Programming</label>
+                    <select id="inp-prog">
+                        <option value="A">[A] By-the-Book Bureaucrat</option>
+                        <option value="B">[B] Rebellious Recycler</option>
+                        <option value="C">[C] Optimistic Organizer</option>
+                        <option value="D">[D] Grumpy Grinder</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>4. Difficulty</label>
+                    <select id="inp-diff">
+                        <option value="A">[A] Easy</option>
+                        <option value="B" selected>[B] Normal</option>
+                        <option value="C">[C] Hard</option>
+                    </select>
+                </div>
+                <button onclick="finalizeCreation()">INITIALIZE SYSTEM</button>
+            `;
+            DOM.controls.innerHTML = formHTML;
         }
 
-        const textDiv = document.getElementById('story-text');
-        // Reset animation
-        textDiv.classList.remove('fade-in');
-        void textDiv.offsetWidth; // trigger reflow
-        textDiv.classList.add('fade-in');
+        window.finalizeCreation = function() {
+            const nameInp = document.getElementById('inp-name').value;
+            const chassisInp = document.getElementById('inp-chassis').value;
+            const progInp = document.getElementById('inp-prog').value;
+            const diffInp = document.getElementById('inp-diff').value;
 
-        // Parse text for name
-        textDiv.innerHTML = node.text.replace(/\[Name\]/g, player.name);
+            // Name
+            gameState.player.name = nameInp.trim() || "Filch";
 
-        // Run node-level effect (important for finale text updates)
-        if (node.effect) {
-            node.effect(player);
+            // Chassis
+            switch(chassisInp) {
+                case 'A': 
+                    gameState.player.chassis = "HDH-Series";
+                    gameState.player.stats.capacity += 2;
+                    gameState.player.stats.mobility -= 1;
+                    break;
+                case 'B': 
+                    gameState.player.chassis = "PPR-Series";
+                    gameState.player.stats.scanIQ += 2;
+                    gameState.player.stats.capacity -= 1;
+                    break;
+                case 'C': 
+                    gameState.player.chassis = "SSC-Series";
+                    gameState.player.stats.charm += 2;
+                    gameState.player.stats.scanIQ -= 1;
+                    break;
+                case 'D': 
+                    gameState.player.chassis = "NMN-Series";
+                    gameState.player.stats.mobility += 2;
+                    gameState.player.stats.capacity -= 1;
+                    break;
+                case 'E': 
+                    gameState.player.chassis = "ORB-Series";
+                    gameState.player.stats.anomaly += 2;
+                    gameState.player.stats.mobility -= 1;
+                    break;
+            }
+
+            // Programming
+            const progMap = {
+                'A': "By-the-Book Bureaucrat",
+                'B': "Rebellious Recycler",
+                'C': "Optimistic Organizer",
+                'D': "Grumpy Grinder"
+            };
+            gameState.player.programming = progMap[progInp];
+
+            // Difficulty
+            if(diffInp === 'A') gameState.player.difficulty = -2;
+            if(diffInp === 'B') gameState.player.difficulty = 0;
+            if(diffInp === 'C') gameState.player.difficulty = 2;
+
+            updateHUD();
+            addLog("System Online. Calibration Complete.", "success");
+            loadScenario(0);
+        };
+
+        // --- Game Logic Engine ---
+
+        function checkStat(statKey, threshold) {
+            const diffMod = gameState.player.difficulty;
+            // Base stat + 1d6 Roll
+            const roll = Math.floor(Math.random() * 6) + 1;
+            const statVal = gameState.player.stats[statKey];
+            const total = statVal + roll;
+            const target = threshold + diffMod;
+
+            addLog(`> Checking ${statKey.toUpperCase()}: Stat(${statVal}) + Roll(${roll}) = ${total} vs Target(${target})`, "system");
+
+            if (total >= target) return true;
+            return false;
         }
 
-        const choiceDiv = document.getElementById('choices-area');
-        choiceDiv.innerHTML = "";
+        function loadScenario(id) {
+            const scene = scenarios[id];
+            if (!scene) {
+                addLog("End of Simulation.", "system");
+                DOM.controls.innerHTML = `<button onclick="location.reload()">REBOOT</button>`;
+                return;
+            }
 
-        if (node.choices && node.choices.length > 0) {
-            node.choices.forEach(choice => {
-                // Check conditions (if choice requires a specific item or flag)
-                if (choice.req && !player.inventory.includes(choice.req)) return;
-
-                const btn = document.createElement('button');
-                btn.className = 'choice-btn';
-                
-                // Add skill hint if applicable
-                let label = choice.text;
-                if (choice.type === 'check') {
-                    label += ` <span style="color:#888; font-size:0.8em;">[${choice.stat.toUpperCase()}]</span>`;
-                }
-
-                btn.innerHTML = label;
-                btn.onclick = () => handleChoice(choice);
-                choiceDiv.appendChild(btn);
+            addLog("----------------------------------------", "system");
+            addLog(scene.text);
+            
+            let btnHTML = "";
+            scene.choices.forEach((choice, index) => {
+                const statHint = choice.stat ? `[${choice.stat.toUpperCase()}] ` : "";
+                btnHTML += `<button onclick="handleChoice(${id}, ${index})">${statHint}${choice.desc}</button>`;
             });
-        } else {
-            // Game Over or End
-            const btn = document.createElement('button');
-            btn.className = 'choice-btn';
-            btn.innerHTML = "Restart Legend";
-            btn.onclick = () => location.reload();
-            choiceDiv.appendChild(btn);
+            DOM.controls.innerHTML = btnHTML;
         }
-    }
 
-    function handleChoice(choice) {
-        // Effects from specific choices
-        if (choice.effect) choice.effect(player);
-        updateSidebar();
+        window.handleChoice = function(sceneId, choiceIndex) {
+            const scene = scenarios[sceneId];
+            const choice = scene.choices[choiceIndex];
 
-        // Logic
-        if (choice.type === 'check') {
-            const success = statCheck(choice.stat, choice.dc);
-            if (success) {
-                renderNode(choice.nextSuccess);
+            addLog(`> Output: ${choice.desc}`, "choice");
+
+            // Simple choice (no check)
+            if (!choice.stat) {
+                if (choice.result) addLog(choice.result);
+                if (choice.effect) choice.effect();
+                updateHUD();
+                setTimeout(() => loadScenario(choice.next), 800);
+                return;
+            }
+
+            // Stat Check
+            const passed = checkStat(choice.stat, choice.threshold);
+            
+            if (passed) {
+                addLog(`SUCCESS. ${choice.successText}`, "success");
+                if (choice.onSuccess) choice.onSuccess();
+                updateHUD();
+                setTimeout(() => loadScenario(choice.nextSuccess), 1000);
             } else {
-                renderNode(choice.nextFail);
-            }
-        } else {
-            renderNode(choice.next);
-        }
-    }
-
-    // --- Story Content ---
-
-    const storyNodes = {
-        "start": {
-            text: `The sun, a dying ember, bleeds across the horizon as you, [Name], reach the periphery of the Shadowwood. A colossal wall of twisted trees claws at the bruised twilight sky. The air is thick with the scent of damp earth and decay. <br><br>You clutch the black feather, the only clue to Princess Aurelia's fate. Three paths lie before you.`,
-            choices: [
-                {
-                    text: "Follow the faint, overgrown deer trail.",
-                    type: "check",
-                    stat: "agi",
-                    dc: 10,
-                    nextSuccess: "trail_success",
-                    nextFail: "trail_fail"
-                },
-                {
-                    text: "Push directly into the dense undergrowth (Brute Force).",
-                    type: "check",
-                    stat: "str",
-                    dc: 12,
-                    nextSuccess: "thicket_success",
-                    nextFail: "thicket_fail"
-                },
-                {
-                    text: "Circle the perimeter searching for clues.",
-                    type: "check",
-                    stat: "int",
-                    dc: 11,
-                    nextSuccess: "search_success",
-                    nextFail: "search_fail"
+                addLog(`FAILURE. ${choice.failText}`, "failure");
+                if (choice.onFail) choice.onFail();
+                updateHUD();
+                
+                if (gameState.player.integrity <= 0) {
+                    gameOver();
+                } else {
+                    setTimeout(() => loadScenario(choice.nextFail), 1000);
                 }
-            ]
-        },
-        
-        // --- Trail Branch ---
-        "trail_success": {
-            text: `Moving with the grace of a hunter, you navigate the deer trail. You avoid snapping twigs and step lightly over dry leaves. The path winds deeper, bypassing the outer thicket's worst thorns. You find a small clearing where the air feels slightly less oppressive.`,
-            choices: [
-                { text: "Press deeper into the woods.", next: "crossroads" }
-            ]
-        },
-        "trail_fail": {
-            text: `The trail is treacherous. A hidden root snags your boot, sending you tumbling down a steep embankment. You crash through brambles, the thorns tearing at your armor gaps before you come to a halt in a muddy ditch. <br><br><span class='danger'>You take 10 damage.</span>`,
-            choices: [
-                { text: "Climb out and continue.", next: "crossroads", effect: (p) => p.derived.hp -= 10 }
-            ]
-        },
-
-        // --- Thicket Branch ---
-        "thicket_success": {
-            text: `With a roar, you unsheathe your blade and hack at the gnarled vines. Your strength is undeniable. The forest seems to recoil from your fury, clearing a straight path through the choking vegetation. You emerge sweating but emboldened. <br><br><span class='success'>Resolve +1</span>`,
-            choices: [
-                { text: "Catch your breath and continue.", next: "crossroads", effect: (p) => p.derived.resolve += 1 }
-            ]
-        },
-        "thicket_fail": {
-            text: `The Shadowwood fights back. Vines seemingly lash out like whips, and the wood is hard as iron. Your sword gets stuck in a twisted trunk, and in wrestling it free, you wrench your shoulder. Exhausted, you finally break through. <br><br><span class='danger'>You take 5 damage and feel weary.</span>`,
-            choices: [
-                { text: "Grusgingly move forward.", next: "crossroads", effect: (p) => p.derived.hp -= 5 }
-            ]
-        },
-
-        // --- Search Branch ---
-        "search_success": {
-            text: `Your keen eyes spot disturbed earth near a weeping willow. Not only do you confirm tracks leading inward, but you find a dropped satchel half-buried in leaves. Inside is a potent healing draught left by a previous traveler. <br><br><span class='success'>Gained: Healing Potion</span>`,
-            choices: [
-                { text: "Pocket the potion and enter the woods.", next: "crossroads", effect: (p) => p.inventory.push("Healing Potion") }
-            ]
-        },
-        "search_fail": {
-            text: `You circle the perimeter for hours, but the shifting shadows play tricks on your mind. You find nothing but dead ends. Night has fully fallen by the time you finally decide to enter, and the forest is now pitch black. <br><br><span class='danger'>Morale decreases. Resolve -1.</span>`,
-            choices: [
-                { text: "Enter the darkness.", next: "crossroads", effect: (p) => p.derived.resolve = Math.max(0, p.derived.resolve - 1) }
-            ]
-        },
-
-        // --- Mid-Game Node ---
-        "crossroads": {
-            text: `You stand at a fork in the Shadowwood. To the left, the sound of rushing water echoes—a bridge, perhaps? To the right, a faint, eerie blue light pulses from within a hollowed-out giant oak. The path ahead is blocked by a massive obsidian boulder carved with runes.`,
-            choices: [
-                { text: "Investigate the rushing water (Bridge).", next: "bridge_encounter" },
-                { text: "Approach the glowing tree (Magic).", next: "tree_encounter" },
-                { text: "Decipher the runes on the boulder.", type: "check", stat: "int", dc: 14, nextSuccess: "rune_success", nextFail: "rune_fail" }
-            ]
-        },
-
-        // --- Rune Branch ---
-        "rune_success": {
-            text: `You recognize the dialect—Ancient Eldorian. It speaks of a password: "Whisper." You speak the word, and the boulder grinds aside, revealing a hidden tunnel that cuts straight toward the heart of the forest, bypassing dangers above.`,
-            choices: [
-                { text: "Enter the tunnel.", next: "finale" }
-            ]
-        },
-        "rune_fail": {
-            text: ` The runes make your head spin. As you touch them, a shockwave of necrotic energy blasts you backward. The boulder remains unmoved. You must choose another path. <br><br><span class='danger'>You take 15 damage.</span>`,
-            choices: [
-                { text: "Go to the Bridge instead.", next: "bridge_encounter", effect: (p) => p.derived.hp -= 15 }
-            ]
-        },
-
-        // --- Bridge Encounter ---
-        "bridge_encounter": {
-            text: `An ancient stone bridge arches over a river of black sludge. Standing in the center is a Shadow Knight, armor rusted and eyes glowing red. "None pass without toll," it hisses. The toll is blood or steel.`,
-            choices: [
-                { text: "Draw your sword and fight!", type: "check", stat: "str", dc: 13, nextSuccess: "fight_win", nextFail: "fight_loss" },
-                { text: "Attempt to intimidate the creature.", type: "check", stat: "cha", dc: 14, nextSuccess: "talk_win", nextFail: "fight_loss" },
-                { text: "Try to dash past it.", type: "check", stat: "agi", dc: 15, nextSuccess: "run_win", nextFail: "run_loss" }
-            ]
-        },
-        "fight_win": {
-            text: `Steel clashes against rusted iron. The Shadow Knight is strong, but your resolve is stronger. With a parry and a thrust, you strike the gap in its armor. It dissolves into smoke. The way is clear.`,
-            choices: [{ text: "Cross the bridge.", next: "finale" }]
-        },
-        "fight_loss": {
-            text: `The Shadow Knight is relentless. Its blade catches you in the side, piercing your armor. You manage to kick it into the river below, but the wound is deep. <br><br><span class='danger'>You take 25 damage.</span>`,
-            choices: [{ text: "Limp across the bridge.", next: "finale", effect: (p) => p.derived.hp -= 25 }]
-        },
-        "talk_win": {
-            text: `You loom over the creature, channeling the authority of the King's Guard. "I am death to shadows," you bellow. The creature hesitates, fear flickering in its red eyes. It steps aside, bowing its head.`,
-            choices: [{ text: "Walk past with head held high.", next: "finale", effect: (p) => p.derived.resolve += 1 }]
-        },
-        "run_win": {
-            text: `You feint left, then sprint right. The Knight swings heavily, but you are already gone, vaulting the railing and landing on the far bank.`,
-            choices: [{ text: "Don't look back.", next: "finale" }]
-        },
-        "run_loss": {
-            text: `You aren't fast enough. As you try to slip by, the Knight backhands you with a gauntleted fist. You go flying across the stones, battered and bruised, but on the other side. <br><br><span class='danger'>You take 15 damage.</span>`,
-            choices: [{ text: "Scramble to your feet.", next: "finale", effect: (p) => p.derived.hp -= 15 }]
-        },
-
-        // --- Tree Encounter ---
-        "tree_encounter": {
-            text: `Inside the hollow oak, a spirit bound in chains of shadow weeps. It looks up at you. "Free me... break the chains... and I will heal you." The chains look magical, but perhaps brute force could work too.`,
-            choices: [
-                { text: "Smash the chains.", type: "check", stat: "str", dc: 14, nextSuccess: "free_spirit", nextFail: "spirit_angry" },
-                { text: "Pick the spectral lock.", type: "check", stat: "agi", dc: 13, nextSuccess: "free_spirit", nextFail: "spirit_angry" },
-                { text: "Leave the spirit and move on.", next: "finale" }
-            ]
-        },
-        "free_spirit": {
-            text: `With a snap, the chains break. The spirit swirls around you in gratitude, knitting your wounds and filling you with warmth before fading away. <br><br><span class='success'>Health restored to max.</span>`,
-            choices: [{ text: "Thank the spirits.", next: "finale", effect: (p) => p.derived.hp = 100 }]
-        },
-        "spirit_angry": {
-            text: `You fail to break the binding. The magic backlash burns your hands. The spirit shrieks in despair, the sound piercing your mind. <br><br><span class='danger'>You take 10 damage and lose 1 Resolve.</span>`,
-            choices: [{ text: "Flee the tree.", next: "finale", effect: (p) => { p.derived.hp -= 10; p.derived.resolve -= 1; } }]
-        },
-
-        // --- Finale ---
-        "finale": {
-            text: `You have survived the outer perils of the Shadowwood. Before you stands the Obsidian Keep, a fortress of black stone where Princess Aurelia surely waits. But the drawbridge is raised, and a dragon made of shadows coils around the highest tower.<br><br><b>Your Health: [HP] | Your Resolve: [RES]</b><br><br>This is the end of the demo, Brave Knight. Will you conquer the darkness?`,
-            effect: (p) => {
-                const textDiv = document.getElementById('story-text');
-                let outcome = p.derived.hp > 0 ? "You stand ready." : "You are barely alive.";
-                textDiv.innerHTML = textDiv.innerHTML.replace("[HP]", p.derived.hp).replace("[RES]", p.derived.resolve) + " " + outcome;
             }
-        }
-    };
-</script>
+        };
 
+        function damagePlayer(amount) {
+            gameState.player.integrity -= amount;
+            if(gameState.player.integrity < 0) gameState.player.integrity = 0;
+            addLog(`WARNING: Integrity dropped by ${amount}%. Current: ${gameState.player.integrity}%`, "failure");
+        }
+
+        function gameOver() {
+            addLog("CRITICAL FAILURE. SYSTEM SHUTDOWN.", "failure");
+            DOM.controls.innerHTML = `<button onclick="location.reload()">REBOOT SYSTEM</button>`;
+        }
+
+        // --- Start ---
+        startCharacterCreation();
+
+    </script>
 </body>
 </html>
