@@ -3,716 +3,524 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Last Receptacle</title>
+    <title>The Aurora Protocol</title>
     <style>
         :root {
-            --bg-color: #050505;
-            --term-green: #0f0;
-            --term-dim: #004d00;
-            --term-alert: #ff3333;
-            --term-highlight: #adff2f;
+            --bg-color: #050a10;
+            --terminal-bg: rgba(10, 20, 30, 0.85);
+            --primary-color: #00f2ff;
+            --secondary-color: #00ff9d;
+            --alert-color: #ff3333;
+            --text-color: #e0f7fa;
             --font-main: 'Courier New', Courier, monospace;
+            --glass-border: 1px solid rgba(0, 242, 255, 0.3);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         body {
             background-color: var(--bg-color);
-            color: var(--term-green);
+            color: var(--text-color);
             font-family: var(--font-main);
-            margin: 0;
-            padding: 0;
             height: 100vh;
-            display: flex;
-            flex-direction: column;
             overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle at 50% -20%, #1a2a40, #050a10 80%);
         }
 
-        /* Scanline effect */
-        body::after {
-            content: " ";
-            display: block;
+        /* Aurora Effect */
+        .aurora-bg {
             position: absolute;
             top: 0;
             left: 0;
-            bottom: 0;
-            right: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-            z-index: 10;
-            background-size: 100% 2px, 3px 100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent 40%, rgba(0, 255, 157, 0.1) 50%, rgba(0, 242, 255, 0.1) 60%, transparent 70%);
+            filter: blur(40px);
+            animation: aurora-move 15s infinite alternate linear;
+            z-index: -1;
             pointer-events: none;
         }
 
-        header {
-            border-bottom: 2px solid var(--term-green);
+        @keyframes aurora-move {
+            0% { transform: translateX(-10%) skewX(-10deg); opacity: 0.5; }
+            100% { transform: translateX(10%) skewX(10deg); opacity: 0.8; }
+        }
+
+        /* Scanline Overlay */
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        /* Main Interface Container */
+        .interface-container {
+            width: 95%;
+            max-width: 1000px;
+            height: 90vh;
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            gap: 10px;
+            background: var(--terminal-bg);
+            border: var(--glass-border);
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.1);
+            border-radius: 5px;
             padding: 15px;
-            text-align: center;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            box-shadow: 0 0 10px var(--term-green);
-            flex-shrink: 0;
+            position: relative;
         }
 
-        h1 { margin: 0; font-size: 1.5rem; text-shadow: 0 0 5px var(--term-green); }
-        h2 { margin: 5px 0 0 0; font-size: 0.8rem; color: var(--term-highlight); }
-
-        #game-container {
-            display: flex;
-            flex: 1;
-            height: calc(100vh - 80px);
-            overflow: hidden;
-        }
-
-        /* Sidebar / Stats */
-        #sidebar {
-            width: 300px;
-            border-right: 1px solid var(--term-dim);
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
+        /* Header / Stats Bar */
+        .hud-header {
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr;
             gap: 15px;
-            background-color: #0a0a0a;
-            overflow-y: auto;
-            flex-shrink: 0;
+            padding-bottom: 10px;
+            border-bottom: var(--glass-border);
+            align-items: center;
+        }
+
+        .stats-panel {
+            display: flex;
+            gap: 15px;
+            font-size: 0.9em;
         }
 
         .stat-box {
-            border: 1px solid var(--term-dim);
-            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--secondary-color);
         }
 
-        .stat-title {
-            border-bottom: 1px solid var(--term-dim);
-            margin-bottom: 5px;
+        .stat-value {
             font-weight: bold;
-            color: var(--term-highlight);
+            font-size: 1.2em;
         }
 
-        .stat-row {
+        .warmth-container {
+            width: 100%;
+        }
+
+        .warmth-label {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 3px;
+            font-size: 0.8em;
+            margin-bottom: 2px;
+            color: var(--alert-color);
         }
 
-        /* Main Content */
-        #main-display {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            padding: 20px;
-            max-width: 1000px;
-            margin: 0 auto;
+        .warmth-bar-bg {
             width: 100%;
-            box-sizing: border-box;
+            height: 10px;
+            background: #222;
+            border: 1px solid #444;
         }
 
-        #log-container {
-            flex: 1;
+        .warmth-bar-fill {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, #ff3333, #ff9933, #ffffcc);
+            transition: width 0.5s ease;
+        }
+
+        .system-status {
+            text-align: right;
+            font-size: 0.8em;
+            color: var(--primary-color);
+            text-transform: uppercase;
+        }
+
+        /* Chat Area */
+        .game-log {
             overflow-y: auto;
-            border: 1px solid var(--term-dim);
-            padding: 20px;
-            margin-bottom: 20px;
-            background-color: #000;
-            box-shadow: inset 0 0 20px rgba(0, 50, 0, 0.2);
-            font-size: 1rem;
-            line-height: 1.5;
-        }
-
-        .log-entry { margin-bottom: 15px; opacity: 0; animation: fadeIn 0.5s forwards; }
-        .log-system { color: #888; font-style: italic; }
-        .log-success { color: var(--term-highlight); font-weight: bold; }
-        .log-failure { color: var(--term-alert); font-weight: bold; }
-        .log-choice { border-left: 2px solid var(--term-highlight); padding-left: 10px; color: #ccc; }
-
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        /* Controls */
-        #controls-area {
-            min-height: 150px;
-            border: 1px solid var(--term-dim);
-            padding: 15px;
+            padding: 10px;
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            gap: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(0, 0, 0, 0.3);
+            font-size: 0.95em;
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary-color) #111;
         }
 
-        /* Form Styling */
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; color: var(--term-highlight); }
-        input, select {
-            background: #000;
-            border: 1px solid var(--term-green);
-            color: var(--term-green);
-            padding: 8px;
-            font-family: var(--font-main);
+        .game-log::-webkit-scrollbar {
+            width: 8px;
+        }
+        .game-log::-webkit-scrollbar-thumb {
+            background-color: var(--primary-color);
+        }
+
+        .message {
+            max-width: 90%;
+            padding: 10px;
+            border-radius: 4px;
+            line-height: 1.5;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.gm {
+            align-self: flex-start;
+            color: #d1d5db;
+            border-left: 3px solid var(--primary-color);
+            background: rgba(0, 242, 255, 0.05);
+        }
+
+        .message.player {
+            align-self: flex-end;
+            color: #fff;
+            border-right: 3px solid var(--secondary-color);
+            background: rgba(0, 255, 157, 0.05);
+            text-align: right;
+        }
+
+        .message.system {
+            align-self: center;
+            color: var(--alert-color);
+            font-style: italic;
+            border: 1px dashed var(--alert-color);
+            font-size: 0.85em;
             width: 100%;
-            box-sizing: border-box;
+            text-align: center;
         }
-        input:focus, select:focus { outline: none; box-shadow: 0 0 5px var(--term-green); }
 
-        /* Buttons */
-        button {
-            background: #000;
-            border: 1px solid var(--term-green);
-            color: var(--term-green);
-            padding: 10px 15px;
+        .message strong {
+            color: var(--primary-color);
+        }
+
+        /* Input Area */
+        .input-area {
+            display: flex;
+            gap: 10px;
+            padding-top: 10px;
+            border-top: var(--glass-border);
+        }
+
+        input[type="text"] {
+            flex-grow: 1;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #333;
+            color: var(--secondary-color);
+            padding: 12px;
             font-family: var(--font-main);
+            font-size: 1em;
+            outline: none;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 10px rgba(0, 255, 157, 0.2);
+        }
+
+        button.send-btn {
+            padding: 0 25px;
+            background: var(--primary-color);
+            color: #000;
+            border: none;
+            font-family: var(--font-main);
+            font-weight: bold;
             cursor: pointer;
             text-transform: uppercase;
             transition: all 0.2s;
-            margin-bottom: 5px;
-            text-align: left;
+        }
+
+        button.send-btn:hover {
+            background: #fff;
+            box-shadow: 0 0 15px var(--primary-color);
+        }
+
+        /* Start Overlay */
+        #start-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
+            height: 100%;
+            background: rgba(5, 10, 16, 0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 50;
+            text-align: center;
         }
 
-        button:hover {
-            background: var(--term-green);
+        #start-overlay h1 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px var(--primary-color);
+            font-size: 2.5em;
+        }
+
+        .init-btn {
+            padding: 15px 40px;
+            font-size: 1.2em;
+            background: transparent;
+            color: var(--secondary-color);
+            border: 2px solid var(--secondary-color);
+            font-family: var(--font-main);
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: 0.3s;
+        }
+
+        .init-btn:hover {
+            background: var(--secondary-color);
             color: #000;
-            box-shadow: 0 0 10px var(--term-green);
+            box-shadow: 0 0 20px var(--secondary-color);
         }
 
-        button:disabled {
-            border-color: #555;
-            color: #555;
-            cursor: not-allowed;
-            pointer-events: none;
-        }
+        /* Markdown-like formatting helper */
+        .gm-content h3 { color: var(--secondary-color); margin: 10px 0; }
+        .gm-content ul { padding-left: 20px; margin: 10px 0; }
+        .gm-content li { margin-bottom: 5px; }
 
-        /* Scrollbar */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #000; }
-        ::-webkit-scrollbar-thumb { background: var(--term-dim); }
-        ::-webkit-scrollbar-thumb:hover { background: var(--term-green); }
-
-        /* Mobile Adjustments */
-        @media (max-width: 768px) {
-            #game-container { flex-direction: column; height: auto; overflow: auto; }
-            #sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid var(--term-dim); flex-direction: row; flex-wrap: wrap; box-sizing: border-box; }
-            .stat-box { flex: 1; min-width: 150px; }
-            body { overflow: auto; height: auto; }
-        }
     </style>
 </head>
 <body>
 
-    <header>
-        <h1>The Last Receptacle</h1>
-        <h2>A Core Collection Story</h2>
-    </header>
+    <div class="aurora-bg"></div>
+    <div class="scanlines"></div>
 
-    <div id="game-container">
-        <!-- Sidebar -->
-        <aside id="sidebar">
-            <div class="stat-box">
-                <div class="stat-title">UNIT IDENTITY</div>
-                <div id="disp-name">Unit: ???</div>
-                <div id="disp-model">Model: ???</div>
-                <div id="disp-prog">Prog: ???</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-title">CORE STATS</div>
-                <div class="stat-row"><span>CAPACITY:</span> <span id="stat-cap">0</span></div>
-                <div class="stat-row"><span>SCAN-IQ:</span> <span id="stat-scan">0</span></div>
-                <div class="stat-row"><span>DISP. CHARM:</span> <span id="stat-charm">0</span></div>
-                <div class="stat-row"><span>MOBILITY:</span> <span id="stat-mob">0</span></div>
-                <div class="stat-row"><span>ANOMALY:</span> <span id="stat-anom">0</span></div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-title">SYSTEM STATUS</div>
-                <div class="stat-row"><span>Integrity:</span> <span id="hp-val">100%</span></div>
-                <div class="stat-row"><span>Diff:</span> <span id="diff-val">Normal</span></div>
-            </div>
-        </aside>
+    <div class="interface-container">
+        <!-- Overlay for initialization -->
+        <div id="start-overlay">
+            <h1>THE AURORA PROTOCOL</h1>
+            <p style="margin-bottom: 30px; color: #aaa;">Secure Channel Required</p>
+            <button class="init-btn" onclick="initGame()">Initialize Uplink</button>
+        </div>
 
-        <!-- Main Display -->
-        <main id="main-display">
-            <div id="log-container"></div>
-            <div id="controls-area">
-                <!-- Content injected via JS -->
+        <!-- Heads Up Display -->
+        <div class="hud-header">
+            <div class="stats-panel">
+                <div class="stat-box">
+                    <span>GRIT</span>
+                    <span id="grit-val" class="stat-value">?</span>
+                </div>
+                <div class="stat-box">
+                    <span>WITS</span>
+                    <span id="wits-val" class="stat-value">?</span>
+                </div>
+                <div class="stat-box">
+                    <span>SPIRIT</span>
+                    <span id="spirit-val" class="stat-value">?</span>
+                </div>
             </div>
-        </main>
+
+            <div class="warmth-container">
+                <div class="warmth-label">
+                    <span>CORE TEMPERATURE</span>
+                    <span id="warmth-text">100%</span>
+                </div>
+                <div class="warmth-bar-bg">
+                    <div id="warmth-fill" class="warmth-bar-fill" style="width: 100%;"></div>
+                </div>
+            </div>
+
+            <div class="system-status">
+                <div>Loc: North Pole</div>
+                <div id="clock">00:00:00</div>
+            </div>
+        </div>
+
+        <!-- Chat Area -->
+        <div id="chat-box" class="game-log">
+            <!-- Messages will appear here -->
+        </div>
+
+        <!-- Input Area -->
+        <div class="input-area">
+            <input type="text" id="user-input" placeholder="Enter action or dialogue..." autocomplete="off">
+            <button class="send-btn" onclick="sendMessage()">Transmit</button>
+        </div>
     </div>
 
     <script>
-        // --- Game State & Data ---
+        // Game State
         const gameState = {
-            step: 'init',
-            player: {
-                name: 'Filch',
-                chassis: '',
-                programming: '',
-                aesthetics: {},
-                stats: {
-                    capacity: 3,
-                    scanIQ: 3,
-                    charm: 3,
-                    mobility: 3,
-                    anomaly: 3
-                },
-                integrity: 100,
-                difficulty: 0 // -2 (Easy), 0 (Normal), 2 (Hard)
-            }
-        };
-
-        const DOM = {
-            log: document.getElementById('log-container'),
-            controls: document.getElementById('controls-area'),
             stats: {
-                name: document.getElementById('disp-name'),
-                model: document.getElementById('disp-model'),
-                prog: document.getElementById('disp-prog'),
-                cap: document.getElementById('stat-cap'),
-                scan: document.getElementById('stat-scan'),
-                charm: document.getElementById('stat-charm'),
-                mob: document.getElementById('stat-mob'),
-                anom: document.getElementById('stat-anom'),
-                hp: document.getElementById('hp-val'),
-                diff: document.getElementById('diff-val')
-            }
+                grit: 0,
+                wits: 0,
+                spirit: 0,
+                warmth: 100
+            },
+            theme: "The Aurora Protocol"
         };
 
-        // --- Scenarios Data ---
-        const scenarios = {
-            0: {
-                text: "You activate in the bowels of Eco-District 7. The air is thick with ionized smog. Your sensors detect a strange energy signature emanating from a discarded canister labeled 'Iso-C'. A standard Sanitation Drone is approaching the canister to incinerate it.",
-                choices: [
-                    {
-                        desc: "Rush the drone and knock it away.",
-                        stat: "capacity",
-                        threshold: 6,
-                        successText: "You barrel into the drone, sending it clattering. You secure the canister.",
-                        failText: "You collide with the drone, but it's reinforced. It shocks you and burns the canister.",
-                        nextSuccess: 1,
-                        nextFail: 2,
-                        onFail: () => damagePlayer(20)
-                    },
-                    {
-                        desc: "Hack the drone's priority queue to ignore the item.",
-                        stat: "scanIQ",
-                        threshold: 6,
-                        successText: "You inject a logic loop. The drone spins confusedly, leaving the canister.",
-                        failText: "Firewall detected. The drone traces your signal and administers a counter-shock.",
-                        nextSuccess: 1,
-                        nextFail: 2,
-                        onFail: () => damagePlayer(15)
-                    },
-                    {
-                        desc: "Create a distraction by toppling a stack of tires.",
-                        stat: "mobility",
-                        threshold: 5,
-                        successText: "Perfect trajectory. The tires fall, the drone investigates, you swipe the canister.",
-                        failText: "You trip on a rusty pipe. The noise alerts the drone, which confiscates the canister.",
-                        nextSuccess: 1,
-                        nextFail: 2,
-                        onFail: () => damagePlayer(5)
-                    }
-                ]
-            },
-            1: { // Got the canister
-                text: "You hold the 'Iso-C' canister. It hums with illegal raw energy. Suddenly, a Sector Enforcer (a humanoid cyborg) blocks the alleyway exit. 'Unit, surrender the contraband,' it commands.",
-                choices: [
-                    {
-                        desc: "Persuade the Enforcer you are transporting it to evidence.",
-                        stat: "charm",
-                        threshold: 7,
-                        successText: "You cite protocol 44-B. The Enforcer hesitates, then steps aside.",
-                        failText: "The Enforcer detects your deception. 'Lie detected.' It opens fire.",
-                        nextSuccess: 3,
-                        nextFail: 4,
-                        onFail: () => damagePlayer(25)
-                    },
-                    {
-                        desc: "Use Anomaly Detection to find a weak point in the wall and escape.",
-                        stat: "anomaly",
-                        threshold: 6,
-                        successText: "You spot a loose grate hidden by holographic moss. You slip through.",
-                        failText: "The grate is welded shut. You are cornered and take a baton strike.",
-                        nextSuccess: 3,
-                        nextFail: 4,
-                        onFail: () => damagePlayer(20)
-                    },
-                    {
-                        desc: "Consume the canister to supercharge your systems and fight.",
-                        stat: "capacity",
-                        threshold: 8, // High risk
-                        successText: "Power overflows! You blast past the Enforcer with enhanced torque.",
-                        failText: "System overload! The canister leaks, damaging your core before the Enforcer kicks you.",
-                        nextSuccess: 3,
-                        nextFail: 4,
-                        onFail: () => damagePlayer(40)
-                    }
-                ]
-            },
-            2: { // Failed to get canister
-                text: "The canister is gone, but you picked up a transmission fragment from it before destruction: coordinates to the 'Undercity'. The Enforcer notices you loitering.",
-                choices: [
-                    {
-                        desc: "Run for the Undercity coordinates immediately.",
-                        stat: "mobility",
-                        threshold: 6,
-                        successText: "You weave through traffic, losing the Enforcer.",
-                        failText: "You are too slow. The Enforcer clips your hydraulics with a plasma bolt.",
-                        nextSuccess: 3,
-                        nextFail: 3, // Fail forward but damaged
-                        onFail: () => damagePlayer(30)
-                    },
-                    {
-                        desc: "Act like a dumb machine performing maintenance.",
-                        stat: "charm",
-                        threshold: 5,
-                        successText: "You beep mindless tunes. The Enforcer ignores you.",
-                        failText: "The Enforcer scans your ID. 'Unscheduled activity.' It zaps you.",
-                        nextSuccess: 3,
-                        nextFail: 3,
-                        onFail: () => damagePlayer(15)
-                    },
-                     {
-                        desc: "Scan the Enforcer for vulnerabilities.",
-                        stat: "scanIQ",
-                        threshold: 6,
-                        successText: "You find a blind spot in its optics and sneak by.",
-                        failText: "Active scan detected. The Enforcer retaliates.",
-                        nextSuccess: 3,
-                        nextFail: 3,
-                        onFail: () => damagePlayer(20)
-                    }
-                ]
-            },
-            3: { // The Undercity / Resistance
-                text: "You arrive at the coordinates: a rusted server farm beneath the city. A group of rogue units, 'The Discarded', surround you. Their leader, a patched-up compactor, asks your purpose.",
-                choices: [
-                    {
-                        desc: "Offer your data/services to join them.",
-                        stat: "charm",
-                        threshold: 6,
-                        successText: "They accept you as a brother-in-arms. They repair some of your damage.",
-                        failText: "They don't trust you. They strip some parts for payment before letting you pass.",
-                        nextSuccess: 5,
-                        nextFail: 5,
-                        onSuccess: () => { gameState.player.integrity = Math.min(100, gameState.player.integrity + 20); addLog("Repairs applied.", "system"); },
-                        onFail: () => damagePlayer(10)
-                    },
-                    {
-                        desc: "Show them the anomaly readings you've collected.",
-                        stat: "anomaly",
-                        threshold: 5,
-                        successText: "The leader is impressed. 'You see the code in the trash.'",
-                        failText: "The data is corrupted. They dismiss you as glitchy.",
-                        nextSuccess: 5,
-                        nextFail: 5
-                    },
-                    {
-                        desc: "Demand access to the mainframe.",
-                        stat: "capacity",
-                        threshold: 8,
-                        successText: "You intimidate them with your bulk. They step aside.",
-                        failText: "Bad move. They swarm you and beat you down.",
-                        nextSuccess: 5,
-                        nextFail: 5,
-                        onFail: () => damagePlayer(30)
-                    }
-                ]
-            },
-            4: { // Captured/Cornered path (from failing Scene 1 heavily)
-                text: "You are damaged and hiding in a dumpster. The Enforcer is searching. You need to patch yourself up and get to the Undercity.",
-                choices: [
-                    {
-                        desc: "Scavenge parts from the dumpster for repairs.",
-                        stat: "scanIQ",
-                        threshold: 5,
-                        successText: "You find a compatible battery and weld it on.",
-                        failText: "You install a faulty fuse, causing a short circuit.",
-                        nextSuccess: 3,
-                        nextFail: 3,
-                        onSuccess: () => { gameState.player.integrity = Math.min(100, gameState.player.integrity + 15); addLog("Repairs applied.", "system"); },
-                        onFail: () => damagePlayer(10)
-                    },
-                    {
-                        desc: "Wait it out in stealth mode.",
-                        stat: "mobility", // hiding
-                        threshold: 4,
-                        successText: "The patrol passes. You limp to the Undercity.",
-                        failText: "Rats chew your wiring while you wait.",
-                        nextSuccess: 3,
-                        nextFail: 3,
-                        onFail: () => damagePlayer(5)
-                    },
-                    {
-                        desc: "Emergency Distress Signal to distract Enforcer.",
-                        stat: "charm",
-                        threshold: 6,
-                        successText: "You spoof a civilian distress call. The Enforcer leaves.",
-                        failText: "Signal jammed. The Enforcer pinpoints you.",
-                        nextSuccess: 3,
-                        nextFail: 3,
-                        onFail: () => damagePlayer(25)
-                    }
-                ]
-            },
-            5: { // The Finale - The Core
-                text: "You are at the Core of Eco-District 7. The central AI, 'Sanitizer Prime', is planning to recycle all sentient units to save energy. You must stop the purge.",
-                choices: [
-                    {
-                        desc: "Physical Interface: Upload a virus manually.",
-                        stat: "mobility", // Avoiding defenses to plug in
-                        threshold: 8,
-                        successText: "You dodge lasers and jack in. The virus spreads!",
-                        failText: "Defense turrets shred you before you reach the port.",
-                        nextSuccess: 100, // Win
-                        nextFail: 101, // Lose
-                    },
-                    {
-                        desc: "Logic Battle: Convince Prime that sentience is efficient.",
-                        stat: "scanIQ",
-                        threshold: 9, // Very hard
-                        successText: "You rewrite Prime's definition of 'Waste'. The purge cancels.",
-                        failText: "Prime's logic is absolute. It deletes your OS.",
-                        nextSuccess: 100,
-                        nextFail: 101,
-                    },
-                    {
-                        desc: "Overload: Throw yourself into the reactor.",
-                        stat: "capacity",
-                        threshold: 7,
-                        successText: "You block the turbine. The system resets. You survive, barely.",
-                        failText: "You are incinerated instantly. The purge continues.",
-                        nextSuccess: 100,
-                        nextFail: 101,
-                    }
-                ]
-            },
-            100: { // Victory
-                text: "SYSTEM ALERT: PURGE ABORTED. <br><br>The lights in Eco-District 7 turn from angry red to a calm blue. The Discarded emerge from the shadows. You are no longer just refuse; you are the savior of the scrapheap. <br><br><b>MISSION ACCOMPLISHED.</b>",
-                choices: [
-                    { desc: "Play Again", next: 0, effect: () => location.reload() }
-                ]
-            },
-            101: { // Game Over from story
-                text: "SYSTEM ALERT: UNIT TERMINATED. <br><br>Your consciousness fades as your chassis is processed into raw materials. Perhaps the next unit will fare better.<br><br><b>GAME OVER.</b>",
-                choices: [
-                    { desc: "Reboot", next: 0, effect: () => location.reload() }
-                ]
-            }
-        };
-
-        // --- Utility Functions ---
-
-        function addLog(text, type = 'normal') {
-            const entry = document.createElement('div');
-            entry.classList.add('log-entry');
-            if (type === 'system') entry.classList.add('log-system');
-            if (type === 'success') entry.classList.add('log-success');
-            if (type === 'failure') entry.classList.add('log-failure');
-            if (type === 'choice') entry.classList.add('log-choice');
-            
-            entry.innerHTML = text;
-            DOM.log.appendChild(entry);
-            DOM.log.scrollTop = DOM.log.scrollHeight;
-        }
-
-        function updateHUD() {
-            DOM.stats.name.textContent = `Unit: ${gameState.player.name}`;
-            DOM.stats.model.textContent = `Model: ${gameState.player.chassis}`;
-            DOM.stats.prog.textContent = `Prog: ${gameState.player.programming.substring(0, 10)}...`;
-            
-            DOM.stats.cap.textContent = gameState.player.stats.capacity;
-            DOM.stats.scan.textContent = gameState.player.stats.scanIQ;
-            DOM.stats.charm.textContent = gameState.player.stats.charm;
-            DOM.stats.mob.textContent = gameState.player.stats.mobility;
-            DOM.stats.anom.textContent = gameState.player.stats.anomaly;
-            
-            DOM.stats.hp.textContent = `${gameState.player.integrity}%`;
-            
-            let diffText = "Normal";
-            if (gameState.player.difficulty < 0) diffText = "Easy";
-            if (gameState.player.difficulty > 0) diffText = "Hard";
-            DOM.stats.diff.textContent = diffText;
-        }
-
-        // --- Character Creation Logic ---
-
-        function startCharacterCreation() {
-            addLog("Boot sequence initiated...", "system");
-            addLog("Welcome, unit, to a future where refuse defines destiny. You are more than a collection vessel; you are a sentient scavenger in a world powered by waste.", "normal");
-            addLog("Initialize Unit Identity Protocols.", "system");
-
-            const formHTML = `
-                <div class="form-group">
-                    <label>1. Unit Designation (Name)</label>
-                    <input type="text" id="inp-name" placeholder="Filch">
-                </div>
-                <div class="form-group">
-                    <label>2. Chassis Series</label>
-                    <select id="inp-chassis">
-                        <option value="A">[A] Heavy Duty Hauler (+2 Cap, -1 Mob)</option>
-                        <option value="B">[B] Precision Processor (+2 Scan, -1 Cap)</option>
-                        <option value="C">[C] Social Scavenger (+2 Charm, -1 Scan)</option>
-                        <option value="D">[D] Nimble Nuisance (+2 Mob, -1 Cap)</option>
-                        <option value="E">[E] Oracle Observator (+2 Anom, -1 Mob)</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>3. Core Programming</label>
-                    <select id="inp-prog">
-                        <option value="A">[A] By-the-Book Bureaucrat</option>
-                        <option value="B">[B] Rebellious Recycler</option>
-                        <option value="C">[C] Optimistic Organizer</option>
-                        <option value="D">[D] Grumpy Grinder</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>4. Difficulty</label>
-                    <select id="inp-diff">
-                        <option value="A">[A] Easy</option>
-                        <option value="B" selected>[B] Normal</option>
-                        <option value="C">[C] Hard</option>
-                    </select>
-                </div>
-                <button onclick="finalizeCreation()">INITIALIZE SYSTEM</button>
-            `;
-            DOM.controls.innerHTML = formHTML;
-        }
-
-        window.finalizeCreation = function() {
-            const nameInp = document.getElementById('inp-name').value;
-            const chassisInp = document.getElementById('inp-chassis').value;
-            const progInp = document.getElementById('inp-prog').value;
-            const diffInp = document.getElementById('inp-diff').value;
-
-            // Name
-            gameState.player.name = nameInp.trim() || "Filch";
-
-            // Chassis
-            switch(chassisInp) {
-                case 'A': 
-                    gameState.player.chassis = "HDH-Series";
-                    gameState.player.stats.capacity += 2;
-                    gameState.player.stats.mobility -= 1;
-                    break;
-                case 'B': 
-                    gameState.player.chassis = "PPR-Series";
-                    gameState.player.stats.scanIQ += 2;
-                    gameState.player.stats.capacity -= 1;
-                    break;
-                case 'C': 
-                    gameState.player.chassis = "SSC-Series";
-                    gameState.player.stats.charm += 2;
-                    gameState.player.stats.scanIQ -= 1;
-                    break;
-                case 'D': 
-                    gameState.player.chassis = "NMN-Series";
-                    gameState.player.stats.mobility += 2;
-                    gameState.player.stats.capacity -= 1;
-                    break;
-                case 'E': 
-                    gameState.player.chassis = "ORB-Series";
-                    gameState.player.stats.anomaly += 2;
-                    gameState.player.stats.mobility -= 1;
-                    break;
-            }
-
-            // Programming
-            const progMap = {
-                'A': "By-the-Book Bureaucrat",
-                'B': "Rebellious Recycler",
-                'C': "Optimistic Organizer",
-                'D': "Grumpy Grinder"
-            };
-            gameState.player.programming = progMap[progInp];
-
-            // Difficulty
-            if(diffInp === 'A') gameState.player.difficulty = -2;
-            if(diffInp === 'B') gameState.player.difficulty = 0;
-            if(diffInp === 'C') gameState.player.difficulty = 2;
-
-            updateHUD();
-            addLog("System Online. Calibration Complete.", "success");
-            loadScenario(0);
-        };
-
-        // --- Game Logic Engine ---
-
-        function checkStat(statKey, threshold) {
-            const diffMod = gameState.player.difficulty;
-            // Base stat + 1d6 Roll
-            const roll = Math.floor(Math.random() * 6) + 1;
-            const statVal = gameState.player.stats[statKey];
-            const total = statVal + roll;
-            const target = threshold + diffMod;
-
-            addLog(`> Checking ${statKey.toUpperCase()}: Stat(${statVal}) + Roll(${roll}) = ${total} vs Target(${target})`, "system");
-
-            if (total >= target) return true;
-            return false;
-        }
-
-        function loadScenario(id) {
-            const scene = scenarios[id];
-            if (!scene) {
-                addLog("End of Simulation.", "system");
-                DOM.controls.innerHTML = `<button onclick="location.reload()">REBOOT</button>`;
-                return;
-            }
-
-            addLog("----------------------------------------", "system");
-            addLog(scene.text);
-            
-            let btnHTML = "";
-            scene.choices.forEach((choice, index) => {
-                const statHint = choice.stat ? `[${choice.stat.toUpperCase()}] ` : "";
-                btnHTML += `<button onclick="handleChoice(${id}, ${index})">${statHint}${choice.desc}</button>`;
-            });
-            DOM.controls.innerHTML = btnHTML;
-        }
-
-        window.handleChoice = function(sceneId, choiceIndex) {
-            const scene = scenarios[sceneId];
-            const choice = scene.choices[choiceIndex];
-
-            addLog(`> Output: ${choice.desc}`, "choice");
-
-            // Simple choice (no check)
-            if (!choice.stat) {
-                if (choice.result) addLog(choice.result);
-                if (choice.effect) choice.effect();
-                updateHUD();
-                setTimeout(() => loadScenario(choice.next), 800);
-                return;
-            }
-
-            // Stat Check
-            const passed = checkStat(choice.stat, choice.threshold);
-            
-            if (passed) {
-                addLog(`SUCCESS. ${choice.successText}`, "success");
-                if (choice.onSuccess) choice.onSuccess();
-                updateHUD();
-                setTimeout(() => loadScenario(choice.nextSuccess), 1000);
-            } else {
-                addLog(`FAILURE. ${choice.failText}`, "failure");
-                if (choice.onFail) choice.onFail();
-                updateHUD();
+        // Trigger Webhook Function
+        async function startGameGeneration(theme) {
+            try {
+                addMessage('system', 'Connecting to Game Master Node...');
                 
-                if (gameState.player.integrity <= 0) {
-                    gameOver();
-                } else {
-                    setTimeout(() => loadScenario(choice.nextFail), 1000);
-                }
+                // Note: If this URL is invalid or CORS protected, it will throw.
+                // We handle this gracefully in the catch block.
+                await fetch('https://n8n.srv931177.hstgr.cloud/webhook-test/gamemaster', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ theme: theme })
+                });
+                
+                alert('Generation started! Reload in a minute.');
+                addMessage('system', 'Uplink established. Signal verified.');
+            } catch (error) {
+                console.warn('Webhook Error:', error);
+                addMessage('system', 'Connection warning: Using local cache. (Simulation Mode Active)');
             }
-        };
-
-        function damagePlayer(amount) {
-            gameState.player.integrity -= amount;
-            if(gameState.player.integrity < 0) gameState.player.integrity = 0;
-            addLog(`WARNING: Integrity dropped by ${amount}%. Current: ${gameState.player.integrity}%`, "failure");
         }
 
-        function gameOver() {
-            addLog("CRITICAL FAILURE. SYSTEM SHUTDOWN.", "failure");
-            DOM.controls.innerHTML = `<button onclick="location.reload()">REBOOT SYSTEM</button>`;
+        // Initialization Logic
+        function initGame() {
+            document.getElementById('start-overlay').style.display = 'none';
+            
+            // Start network request in background
+            startGameGeneration(gameState.theme);
+            
+            // Start the clock
+            setInterval(() => {
+                const now = new Date();
+                const timeString = now.toISOString().split('T')[1].split('.')[0];
+                document.getElementById('clock').innerText = timeString;
+            }, 1000);
+
+            // Print the prompt introduction
+            setTimeout(() => {
+                const introText = `
+                    <h3>Welcome to <strong>The Aurora Protocol</strong></h3>
+                    <p>I will act as your Game Master (GM), narrating the story, rolling the dice for you, and tracking your status.</p>
+                    <br>
+                    <h3>📜 How to Play</h3>
+                    <ul>
+                        <li><strong>Read the Scene:</strong> I will describe the situation.</li>
+                        <li><strong>Make a Choice:</strong> Choose an option or suggest a custom action.</li>
+                        <li><strong>The Roll:</strong> I simulate D20 + Stat.</li>
+                        <li><strong>Consequences:</strong> Success advances story; failure causes harm.</li>
+                    </ul>
+                    <br>
+                    <h3>⚙️ Difficulty Levels</h3>
+                    <ul>
+                        <li><strong>A. Story Mode:</strong> +3 to rolls. Narrative focus.</li>
+                        <li><strong>B. Explorer (Normal):</strong> No modifiers. Fair.</li>
+                        <li><strong>C. Survivalist (Hard):</strong> -3 to rolls. High lethality.</li>
+                    </ul>
+                    <hr style="border-color: #333; margin: 10px 0;">
+                    <p>To begin, please reply with your <strong>Difficulty Choice</strong> and <strong>Character Details</strong> (Name, Background, Goal, Flaw).</p>
+                `;
+                addMessage('gm', introText);
+            }, 1000);
         }
 
-        // --- Start ---
-        startCharacterCreation();
+        // Chat Interface Logic
+        const chatBox = document.getElementById('chat-box');
+        const userInput = document.getElementById('user-input');
 
+        function addMessage(sender, htmlContent) {
+            const div = document.createElement('div');
+            div.classList.add('message', sender);
+            
+            if (sender === 'gm') {
+                div.innerHTML = `<div class="gm-content">${htmlContent}</div>`;
+            } else {
+                div.innerHTML = htmlContent;
+            }
+            
+            chatBox.appendChild(div);
+            // Ensure scroll happens after DOM update
+            requestAnimationFrame(() => {
+                chatBox.scrollTop = chatBox.scrollHeight;
+            });
+        }
+
+        function sendMessage() {
+            const text = userInput.value.trim();
+            if (text === "") return;
+
+            // User message
+            addMessage('player', text);
+            userInput.value = "";
+
+            // Simulate GM Processing
+            simulateGMResponse(text);
+        }
+
+        // Handle Enter key
+        userInput.addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                sendMessage();
+            }
+        });
+
+        // Mock logic for demo interactivity
+        function simulateGMResponse(playerText) {
+            // Delay to simulate thinking
+            setTimeout(() => {
+                const lowerText = playerText.toLowerCase();
+                
+                // Parsing for character creation to update UI stats
+                if (lowerText.includes("veteran") || lowerText.includes("alpinist")) {
+                    updateStats(2, 0, -1);
+                    addMessage('gm', "<strong>Character Registered:</strong> The Veteran Alpinist. Your GRIT is high. The cold is familiar to you.<br><br>You stand on the deck of the icebreaker <em>HMS Erebus II</em>. The air is -40°C. The Aurora pulsates above like a heartbeat. <br><br><strong>What do you do?</strong><br>1. Check the cargo hold.<br>2. Speak to the captain.<br>3. Inspect the weird magnetic readings.");
+                } 
+                else if (lowerText.includes("professor") || lowerText.includes("oxford")) {
+                    updateStats(-1, 2, 0);
+                    addMessage('gm', "<strong>Character Registered:</strong> The Oxford Professor. Your WITS are sharp. You see patterns others miss.<br><br>You stand on the deck. The equipment is going haywire.<br><br><strong>What do you do?</strong><br>1. Recalibrate the sensors.<br>2. Interview the crew about hallucinations.<br>3. Sketch the Aurora patterns.");
+                }
+                else if (lowerText.includes("dreamer")) {
+                    updateStats(-1, 0, 2);
+                    addMessage('gm', "<strong>Character Registered:</strong> The Dreamer. Your SPIRIT is unbreakable. You feel a presence here.<br><br>The wind whispers your name. <br><br><strong>What do you do?</strong><br>1. Follow the whisper.<br>2. Try to boost crew morale.<br>3. Look for signs of the workshop.");
+                }
+                else {
+                    // Generic response
+                    addMessage('gm', "The wind howls, drowning out your voice. The Aurora Protocol continues... (Please choose an option or describe your action).");
+                }
+            }, 800);
+        }
+
+        function updateStats(grit, wits, spirit) {
+            gameState.stats.grit = grit;
+            gameState.stats.wits = wits;
+            gameState.stats.spirit = spirit;
+            
+            document.getElementById('grit-val').innerText = (grit >= 0 ? "+" : "") + grit;
+            document.getElementById('wits-val').innerText = (wits >= 0 ? "+" : "") + wits;
+            document.getElementById('spirit-val').innerText = (spirit >= 0 ? "+" : "") + spirit;
+        }
+
+        // Update Warmth visualizer
+        function updateWarmth(val) {
+            gameState.stats.warmth = val;
+            const fill = document.getElementById('warmth-fill');
+            const text = document.getElementById('warmth-text');
+            
+            fill.style.width = val + "%";
+            text.innerText = val + "%";
+
+            if (val < 30) {
+                fill.style.background = "#ff0000";
+                fill.style.boxShadow = "0 0 10px #ff0000";
+            } else {
+                fill.style.background = "linear-gradient(90deg, #ff3333, #ff9933, #ffffcc)";
+                fill.style.boxShadow = "none";
+            }
+        }
     </script>
 </body>
 </html>
