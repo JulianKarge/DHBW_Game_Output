@@ -1,608 +1,930 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Echoes of the Jungle King</title>
+    <title>Barbie: The Dream Design Project</title>
     <style>
-        :root {
-            --bg-color: #0f140f;
-            --text-color: #cbbf95;
-            --accent-green: #2e4a2e;
-            --highlight: #6b8c42;
-            --danger: #8a3324;
-            --panel-bg: #1a221a;
-            --font-main: 'Courier New', Courier, monospace;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            font-family: var(--font-main);
+        * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #E0218A 0%, #00AEEF 100%);
+            color: #333;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
-            height: 100vh;
-            overflow: hidden;
-        }
-
-        #game-container {
-            display: grid;
-            grid-template-columns: 250px 1fr 300px;
-            width: 100%;
-            max-width: 1400px;
-            height: 100vh;
-            border-left: 1px solid #333;
-            border-right: 1px solid #333;
-        }
-
-        /* Sidebar: Stats & NPCs */
-        #sidebar-left {
-            background-color: var(--panel-bg);
+            align-items: center;
             padding: 20px;
-            border-right: 1px solid var(--accent-green);
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            overflow-y: auto;
         }
-
-        .stat-box {
-            border: 1px solid var(--accent-green);
+        
+        #game-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 50px rgba(0,0,0,0.3);
+            max-width: 800px;
+            width: 100%;
+            padding: 40px;
+            animation: fadeIn 0.5s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        h1 {
+            color: #E0218A;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        
+        h2 {
+            color: #00AEEF;
+            margin: 20px 0 10px 0;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+        
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #FFE0F0 0%, #E0F7FF 100%);
+            border-radius: 10px;
+        }
+        
+        .stat {
+            background: white;
             padding: 10px;
+            border-radius: 8px;
+            border: 2px solid #E0218A;
         }
-
+        
         .stat-label {
             font-weight: bold;
-            color: var(--highlight);
-            display: block;
-            margin-bottom: 5px;
+            color: #E0218A;
+            font-size: 0.9em;
         }
-
-        .bar-container {
-            background: #000;
-            height: 10px;
+        
+        .stat-value {
+            font-size: 1.5em;
+            color: #00AEEF;
+            font-weight: bold;
+        }
+        
+        .morale-bar {
             width: 100%;
-            border: 1px solid #333;
+            height: 30px;
+            background: #f0f0f0;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 20px 0;
+            border: 2px solid #E0218A;
         }
-
-        .bar-fill {
+        
+        .morale-fill {
             height: 100%;
-            transition: width 0.3s;
-        }
-
-        /* Main Content */
-        #main-stage {
-            padding: 40px;
+            background: linear-gradient(90deg, #E0218A 0%, #00AEEF 100%);
+            transition: width 0.5s;
             display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            position: relative;
-            background: radial-gradient(circle at center, #141a14 0%, #0a0e0a 100%);
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
         }
-
-        #narrative-display {
-            font-size: 1.1rem;
+        
+        .story-text {
+            background: #f9f9f9;
+            padding: 20px;
+            border-left: 4px solid #00AEEF;
+            margin: 20px 0;
             line-height: 1.6;
-            height: 60%;
-            overflow-y: auto;
-            margin-bottom: 20px;
-            white-space: pre-wrap;
-            border-bottom: 1px solid var(--accent-green);
-            padding-bottom: 20px;
+            border-radius: 5px;
         }
-
-        .choice-container {
+        
+        .choices {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 15px;
+            margin: 20px 0;
         }
-
-        button {
-            background-color: var(--accent-green);
-            color: var(--text-color);
-            border: 1px solid var(--highlight);
-            padding: 15px;
-            font-family: var(--font-main);
-            font-size: 1rem;
+        
+        .choice-btn {
+            background: linear-gradient(135deg, #E0218A 0%, #00AEEF 100%);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 10px;
             cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: transform 0.2s, box-shadow 0.2s;
             text-align: left;
-            transition: all 0.2s;
         }
-
-        button:hover {
-            background-color: var(--highlight);
-            color: #000;
+        
+        .choice-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(224, 33, 138, 0.4);
         }
-
-        button:disabled {
+        
+        .choice-btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
         }
-
-        /* Chat / System Log */
-        #sidebar-right {
-            background-color: var(--panel-bg);
-            border-left: 1px solid var(--accent-green);
+        
+        .choice-stat {
+            font-size: 0.85em;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 2px solid #E0218A;
+            border-radius: 8px;
+            font-size: 1em;
+        }
+        
+        .input-group {
+            margin: 15px 0;
+        }
+        
+        label {
+            display: block;
+            color: #E0218A;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .result-box {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            animation: slideIn 0.5s;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(-20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .result-success {
+            background: #d4edda;
+            border-color: #28a745;
+        }
+        
+        .result-fail {
+            background: #f8d7da;
+            border-color: #dc3545;
+        }
+        
+        .result-critical {
+            background: #d1ecf1;
+            border-color: #00AEEF;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .npc-affinity {
             display: flex;
-            flex-direction: column;
-        }
-
-        #chat-history {
-            flex-grow: 1;
-            padding: 15px;
-            overflow-y: auto;
-            font-size: 0.9rem;
-        }
-
-        .chat-msg {
-            margin-bottom: 10px;
-            padding-bottom: 5px;
-            border-bottom: 1px solid #333;
-        }
-
-        .chat-msg.system { color: #888; font-style: italic; }
-        .chat-msg.player { color: var(--highlight); }
-        .chat-msg.gm { color: #cd5c5c; }
-
-        #chat-input-area {
+            justify-content: space-between;
+            margin: 10px 0;
             padding: 10px;
-            border-top: 1px solid var(--accent-green);
-            display: flex;
+            background: white;
+            border-radius: 8px;
         }
-
-        #chat-input {
-            flex-grow: 1;
-            background: #000;
-            border: 1px solid var(--accent-green);
-            color: var(--text-color);
-            padding: 8px;
-            font-family: var(--font-main);
+        
+        .npc-name {
+            font-weight: bold;
+            color: #E0218A;
         }
-
-        /* Overlay */
-        #overlay {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.95);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 100;
+        
+        .npc-value {
+            color: #00AEEF;
+            font-weight: bold;
         }
-
-        .overlay-content {
-            max-width: 600px;
+        
+        .dice-roll {
             text-align: center;
+            font-size: 3em;
+            color: #E0218A;
+            margin: 20px 0;
+            animation: rollDice 0.5s;
         }
-
-        .title {
-            font-size: 3rem;
-            color: var(--highlight);
-            text-shadow: 0 0 10px var(--accent-green);
+        
+        @keyframes rollDice {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(10deg); }
+            75% { transform: rotate(-10deg); }
+        }
+        
+        .ending-screen {
+            text-align: center;
+            padding: 40px 20px;
+        }
+        
+        .ending-title {
+            font-size: 2em;
+            color: #E0218A;
             margin-bottom: 20px;
         }
-
-        .character-select-btn {
-            display: block;
-            width: 100%;
-            margin: 10px 0;
-            text-align: center;
+        
+        .ending-text {
+            font-size: 1.2em;
+            line-height: 1.6;
+            color: #666;
         }
-
-        .hidden { display: none !important; }
-
-        /* Utility Classes */
-        .text-danger { color: var(--danger); }
-        .text-highlight { color: var(--highlight); }
-
+        
+        .restart-btn {
+            background: #00AEEF;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 10px;
+            font-size: 1.2em;
+            cursor: pointer;
+            margin-top: 30px;
+            font-weight: bold;
+        }
+        
+        .restart-btn:hover {
+            background: #E0218A;
+        }
     </style>
 </head>
 <body>
-
-    <!-- Start / Character Creation Overlay -->
-    <div id="overlay">
-        <div id="start-screen" class="overlay-content">
-            <h1 class="title">ECHOES OF THE<br>JUNGLE KING</h1>
-            <p>An Interactive Survival Horror RPG</p>
-            <br>
-            <button onclick="showCharCreation()">Start Expedition</button>
-            <button onclick="triggerGeneration()" style="margin-top:20px; border-color: #555; background:#222;">[DEV] Generate New Adventure (Webhook)</button>
-        </div>
-
-        <div id="char-creation" class="overlay-content hidden">
-            <h2 id="cc-step-title">Step 1: Background</h2>
-            <div id="cc-options"></div>
-        </div>
-    </div>
-
     <div id="game-container">
-        <!-- LEFT: Stats -->
-        <div id="sidebar-left">
-            <div class="stat-box">
-                <span class="stat-label">HEALTH (HP)</span>
-                <div class="bar-container"><div id="hp-bar" class="bar-fill" style="width: 100%; background: #8a3324;"></div></div>
-                <span id="hp-val">100/100</span>
-            </div>
-            <div class="stat-box">
-                <span class="stat-label">SANITY (SP)</span>
-                <div class="bar-container"><div id="sp-bar" class="bar-fill" style="width: 100%; background: #4682b4;"></div></div>
-                <span id="sp-val">100/100</span>
-            </div>
-            <div class="stat-box">
-                <span class="stat-label">SUPPLIES</span>
-                <span id="supplies-val" style="font-size: 1.5rem;">50</span>
-            </div>
-            
-            <hr style="border-color:#333; width:100%;">
-
-            <div class="stat-box">
-                <span class="stat-label">ATTRIBUTES</span>
-                <div>MIGHT: <span id="stat-str">0</span></div>
-                <div>WITS: <span id="stat-int">0</span></div>
-                <div>GRIT: <span id="stat-wil">0</span></div>
-                <div>LUCK: <span id="stat-lck">0</span></div>
-            </div>
-
-            <div class="stat-box">
-                <span class="stat-label">COMPANIONS</span>
-                <div>Kaelo: <span id="rel-kaelo">5</span>/10</div>
-                <div>Dr. Thorne: <span id="rel-thorne">5</span>/10</div>
-            </div>
-        </div>
-
-        <!-- CENTER: Narrative -->
-        <div id="main-stage">
-            <div id="narrative-display"></div>
-            <div id="choices-area" class="choice-container"></div>
-        </div>
-
-        <!-- RIGHT: Chat -->
-        <div id="sidebar-right">
-            <div style="padding:10px; border-bottom:1px solid #333;">EXPEDITION LOG</div>
-            <div id="chat-history"></div>
-            <div id="chat-input-area">
-                <input type="text" id="chat-input" placeholder="Enter notes or discuss..." onkeypress="handleChat(event)">
-            </div>
-        </div>
+        <h1>✨ Barbie: The Dream Design Project ✨</h1>
+        <p class="subtitle">Save the Malibu Community Center and make your dreams come true!</p>
+        
+        <div id="game-content"></div>
     </div>
 
     <script>
-        // --- GAME CONFIGURATION & STATE ---
-        const webhookUrl = 'https://n8n.srv931177.hstgr.cloud/webhook-test/gamemaster';
-        
-        const gameState = {
-            hp: 100,
-            maxHp: 100,
-            sp: 100,
-            maxSp: 100,
-            supplies: 50,
-            stats: { str: 10, int: 10, wil: 10, lck: 10 }, 
+        const game = {
+            player: {
+                name: '',
+                origin: '',
+                stats: {
+                    spark: 5,
+                    chic: 5,
+                    heart: 5,
+                    hustle: 5
+                },
+                morale: 100,
+                flags: {
+                    scene1Success: false,
+                    scene1Method: '',
+                    befriendedRaquelle: false,
+                    communityCenterFlooded: false,
+                    hasHighChic: false
+                }
+            },
             npcs: {
-                kaelo: { name: "Kaelo", rel: 5, status: "Alive" },
-                thorne: { name: "Dr. Thorne", rel: 5, status: "Alive" }
+                ken: 50,
+                raquelle: 30,
+                teresa: 50
             },
-            modifiers: {
-                str: 0, int: 0, wil: 0, lck: 0
+            difficulty: 'normal',
+            difficultyThresholds: {
+                easy: 8,
+                normal: 12,
+                hard: 15
             },
-            diffMod: 0, 
-            act: 1,
-            scene: 'start'
+            currentScene: 'intro',
+            projectScore: 0
         };
 
-        // --- WEBHOOK TRIGGER ---
-        async function startGameGeneration(theme) {
-            try {
-                addLog("System", "Contacting Game Master server...");
-                await fetch(webhookUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ theme: theme })
-                });
-                alert('Generation started! Reload in a minute.');
-                addLog("GM", "World generation signal sent. The jungle shifts...");
-            } catch (e) {
-                alert('Connection failed (Dev Mode Only).');
-                addLog("System", "Error connecting to server.");
-            }
+        function render(content) {
+            document.getElementById('game-content').innerHTML = content;
         }
 
-        function triggerGeneration() {
-            startGameGeneration("Lovecraftian Jungle Horror");
+        function rollDice() {
+            return Math.floor(Math.random() * 20) + 1;
         }
 
-        // --- CHARACTER CREATION MODULE ---
-        let ccStep = 0;
+        function resolveAction(stat, isRisky = false) {
+            const roll = rollDice();
+            const statValue = game.player.stats[stat];
+            const threshold = game.difficultyThresholds[game.difficulty];
+            const adjustedThreshold = isRisky ? threshold + 3 : threshold;
+            const total = roll + statValue;
 
-        function showCharCreation() {
-            document.getElementById('start-screen').classList.add('hidden');
-            document.getElementById('char-creation').classList.remove('hidden');
-            renderCCStep();
-        }
+            let result = {
+                roll: roll,
+                total: total,
+                success: false,
+                critical: false,
+                statUsed: stat
+            };
 
-        const ccData = [
-            {
-                title: "Select Background",
-                options: [
-                    { label: "The Mercenary (High Might, Low Wits)", effect: () => { setStats(2, -1, 1, 0); } },
-                    { label: "The Professor (High Wits, Low Might)", effect: () => { setStats(-1, 2, 0, 1); } },
-                    { label: "The Survivor (High Grit, Balanced)", effect: () => { setStats(0, 0, 2, 0); } }
-                ]
-            },
-            {
-                title: "Select Personality",
-                options: [
-                    { label: "Aggressive (+1 Might)", effect: () => { gameState.modifiers.str++; } },
-                    { label: "Calculating (+1 Wits)", effect: () => { gameState.modifiers.int++; } },
-                    { label: "Superstitious (+1 Luck)", effect: () => { gameState.modifiers.lck++; } }
-                ]
-            },
-            {
-                title: "Select Goal",
-                options: [
-                    { label: "Slay the King", effect: () => {} },
-                    { label: "Steal the Heart", effect: () => {} },
-                    { label: "Document the Truth", effect: () => {} }
-                ]
-            }
-        ];
-
-        function setStats(s, i, w, l) {
-            gameState.modifiers.str = s;
-            gameState.modifiers.int = i;
-            gameState.modifiers.wil = w;
-            gameState.modifiers.lck = l;
-        }
-
-        function renderCCStep() {
-            const container = document.getElementById('cc-options');
-            const title = document.getElementById('cc-step-title');
-            container.innerHTML = '';
-            
-            if (ccStep >= ccData.length) {
-                startGame();
-                return;
-            }
-
-            title.innerText = ccData[ccStep].title;
-            ccData[ccStep].options.forEach(opt => {
-                const btn = document.createElement('button');
-                btn.className = 'character-select-btn';
-                btn.innerText = opt.label;
-                btn.onclick = () => {
-                    opt.effect();
-                    ccStep++;
-                    renderCCStep();
-                };
-                container.appendChild(btn);
-            });
-        }
-
-        // --- GAME ENGINE ---
-
-        function startGame() {
-            document.getElementById('overlay').classList.add('hidden');
-            updateHUD();
-            addLog("System", "Expedition started.");
-            loadScene("intro");
-        }
-
-        function updateHUD() {
-            // Stats
-            document.getElementById('stat-str').innerText = formatMod(gameState.modifiers.str);
-            document.getElementById('stat-int').innerText = formatMod(gameState.modifiers.int);
-            document.getElementById('stat-wil').innerText = formatMod(gameState.modifiers.wil);
-            document.getElementById('stat-lck').innerText = formatMod(gameState.modifiers.lck);
-
-            // Resources
-            const hpPct = Math.max(0, (gameState.hp / gameState.maxHp) * 100);
-            const spPct = Math.max(0, (gameState.sp / gameState.maxSp) * 100);
-            
-            document.getElementById('hp-bar').style.width = hpPct + "%";
-            document.getElementById('hp-val').innerText = `${Math.max(0, gameState.hp)}/${gameState.maxHp}`;
-            
-            document.getElementById('sp-bar').style.width = spPct + "%";
-            document.getElementById('sp-val').innerText = `${Math.max(0, gameState.sp)}/${gameState.maxSp}`;
-            
-            document.getElementById('supplies-val').innerText = gameState.supplies;
-
-            // NPCs
-            document.getElementById('rel-kaelo').innerText = gameState.npcs.kaelo.rel;
-            document.getElementById('rel-thorne').innerText = gameState.npcs.thorne.rel;
-
-            // FX
-            if (gameState.hp < 30) document.body.style.boxShadow = "inset 0 0 100px #500";
-            else document.body.style.boxShadow = "none";
-        }
-
-        function formatMod(val) {
-            return val >= 0 ? `+${val}` : val;
-        }
-
-        // Scene Database
-        const sceneDB = {
-            "intro": {
-                text: "ACT I: THE GREEN GATE\n\nThe humidity hits you like a physical wall. The canopy above is so thick that midday looks like twilight. Ahead lies the Serpent River.\n\nKaelo checks his machete. 'The King is watching,' he mutters.\nDr. Thorne scoffs, wiping his glasses. 'Superstitious nonsense. We are here for science.'",
-                choices: [
-                    { text: "Push forward towards the ravine.", action: "loadScene('bridge')" }
-                ]
-            },
-            "bridge": {
-                text: "SCENE: THE ROTTING BRIDGE\n\nA deep ravine cuts through the jungle path. A vine bridge spans the gap, swaying ominously in the wind. It smells of wet rot.\n\nKaelo refuses to cross first. Thorne looks at you expectantly.",
-                choices: [
-                    { text: "[MIGHT] Reinforce the bridge with rope and strength (DC 12).", type: "check", stat: "str", dc: 12, success: "bridge_str_s", fail: "bridge_str_f" },
-                    { text: "[WITS] Analyze the counter-weight mechanism (DC 14).", type: "check", stat: "int", dc: 14, success: "bridge_int_s", fail: "bridge_int_f" },
-                    { text: "[LUCK] Sprint across before it snaps (DC 10 - RISKY).", type: "check", stat: "lck", dc: 10, success: "bridge_lck_s", fail: "bridge_lck_f" }
-                ]
-            },
-            // Bridge Outcomes (Point to nightwatch)
-            "bridge_str_s": { text: "With a grunt of exertion, you lash the fraying vines. The bridge holds firm. Kaelo nods in respect.", effects: { kaelo: 1 }, next: "nightwatch" },
-            "bridge_str_f": { text: "You pull the vines tight, but wrench your back in the process. The bridge holds, barely.", effects: { hp: -5 }, next: "nightwatch" },
-            "bridge_int_s": { text: "You spot a hidden lever under the moss. The bridge stabilizes instantly. Thorne looks impressed despite himself.", effects: { int: 1 }, next: "nightwatch" },
-            "bridge_int_f": { text: "You pull the wrong vine. A trap triggers, sending your backpack tumbling into the ravine.", effects: { supplies: -10 }, next: "nightwatch" },
-            "bridge_lck_s": { text: "You run. Boards crack under your feet, but you dive to the other side just as a plank falls away. Adrenaline surges.", effects: { lck: 1 }, next: "nightwatch" },
-            "bridge_lck_f": { text: "CRACK. The bridge gives way. You fall, slamming into the cliff side before catching a root. You climb up, battered and shaken.", effects: { hp: -5, sp: -5 }, next: "nightwatch" },
-
-            "nightwatch": {
-                text: "ACT II: THE WHISPERING RUINS\n\nNight falls. You set camp near ancient stone ruins. Something stalks the perimeter. Two glowing eyes float in the darkness.\nThorne raises his revolver. 'I'll shoot it!'",
-                choices: [
-                    { text: "[GRIT] Stare down the darkness. Do not flinch (DC 15).", type: "check", stat: "wil", dc: 15, success: "night_wil_s", fail: "night_wil_f" },
-                    { text: "[WITS] Throw food to distract it (Cost: 15 Supplies).", type: "direct", next: "night_feed" },
-                    { text: "[MIGHT] Fire blindly into the bush (DC 12 - RISKY).", type: "check", stat: "lck", dc: 12, success: "night_agg_s", fail: "night_agg_f" }
-                ]
-            },
-            // Night Outcomes
-            "night_wil_s": { text: "You stare into the abyss. The eyes blink and retreat. You feel mentally fortified.", effects: { sp: 2 }, next: "end_demo" },
-            "night_wil_f": { text: "The eyes... they aren't eyes. They are floating lights. The trees are laughing. You close your eyes and scream silently.", effects: { sp: -5 }, next: "end_demo" },
-            "night_feed": { text: "You toss your rations. The beast eats and leaves. Thorne sneers at your wastefulness.", effects: { supplies: -15, thorne: -1 }, next: "end_demo" },
-            "night_agg_s": { text: "BANG! A yelp. You found a jaguar. Meat for tonight.", effects: { supplies: 10 }, next: "end_demo" },
-            "night_agg_f": { text: "BANG! Kaelo screams. You grazed his arm.", effects: { kaelo: -3 }, next: "end_demo" },
-
-            "end_demo": {
-                text: "ACT III: THE THRONE OF ROOTS\n\nYou have survived... for now. The demo ends here, but the Jungle King still waits.\n\nThank you for playing.",
-                choices: [
-                    { text: "Restart", action: "location.reload()" }
-                ]
-            },
-            "game_over": {
-                text: "DEATH\n\nThe Jungle claims another soul. Your bones will feed the roots.",
-                choices: [ { text: "Try Again", action: "location.reload()" } ]
-            },
-            "game_over_madness": {
-                text: "MADNESS\n\nYour mind shatters. You wander into the dark, laughing at jokes only the shadows whisper.",
-                choices: [ { text: "Try Again", action: "location.reload()" } ]
-            }
-        };
-
-        function loadScene(sceneId) {
-            // Supply consumption check (excluding outcomes with underscores or start/intro)
-            if (sceneId !== 'intro' && sceneId !== 'start' && !sceneId.includes('_')) {
-                gameState.supplies -= 5;
-                if(gameState.supplies < 0) {
-                    gameState.hp -= 10;
-                    addLog("System", "Starving! -10 HP");
+            if (roll === 20) {
+                result.success = true;
+                result.critical = true;
+            } else if (roll === 1) {
+                result.success = false;
+                result.critical = true;
+            } else if (total >= adjustedThreshold) {
+                result.success = true;
+            } else {
+                result.success = false;
+                if (game.difficulty === 'easy') {
+                    result.partial = true;
                 }
             }
 
-            // Death Checks
-            if (gameState.hp <= 0) { renderScene(sceneDB["game_over"]); return; }
-            if (gameState.sp <= 0) { renderScene(sceneDB["game_over_madness"]); return; }
+            return result;
+        }
 
-            const scene = sceneDB[sceneId];
-            if (!scene) {
-                console.error("Scene missing: " + sceneId);
+        function updateStats(changes) {
+            for (let stat in changes) {
+                if (stat === 'morale') {
+                    game.player.morale = Math.max(0, Math.min(100, game.player.morale + changes[stat]));
+                } else if (game.player.stats.hasOwnProperty(stat)) {
+                    game.player.stats[stat] = Math.max(0, Math.min(20, game.player.stats[stat] + changes[stat]));
+                }
+            }
+            
+            if (game.player.morale <= 0) {
+                showEnding('burnout');
+            }
+        }
+
+        function updateNPCAffinity(npc, change) {
+            game.npcs[npc] = Math.max(0, Math.min(100, game.npcs[npc] + change));
+        }
+
+        function showStats() {
+            return `
+                <div class="morale-bar">
+                    <div class="morale-fill" style="width: ${game.player.morale}%">
+                        Morale: ${game.player.morale}
+                    </div>
+                </div>
+                <div class="stats-container">
+                    <div class="stat">
+                        <div class="stat-label">✨ Spark (Creativity)</div>
+                        <div class="stat-value">${game.player.stats.spark}</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-label">👗 Chic (Style)</div>
+                        <div class="stat-value">${game.player.stats.chic}</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-label">💖 Heart (Empathy)</div>
+                        <div class="stat-value">${game.player.stats.heart}</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-label">💼 Hustle (Ambition)</div>
+                        <div class="stat-value">${game.player.stats.hustle}</div>
+                    </div>
+                </div>
+                <div class="stats-container">
+                    <div class="npc-affinity">
+                        <span class="npc-name">Ken:</span>
+                        <span class="npc-value">${game.npcs.ken}</span>
+                    </div>
+                    <div class="npc-affinity">
+                        <span class="npc-name">Raquelle:</span>
+                        <span class="npc-value">${game.npcs.raquelle}</span>
+                    </div>
+                    <div class="npc-affinity">
+                        <span class="npc-name">Teresa:</span>
+                        <span class="npc-value">${game.npcs.teresa}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        function startGame() {
+            render(`
+                <h2>Welcome to Malibu Dream Bay!</h2>
+                <div class="story-text">
+                    <p>You're about to embark on an incredible journey to save the Historic Malibu Community Center! But first, let's get to know you better...</p>
+                </div>
+                
+                <div class="input-group">
+                    <label>What's your name?</label>
+                    <input type="text" id="player-name" placeholder="Enter your fabulous name!">
+                </div>
+                
+                <div class="input-group">
+                    <label>Choose your difficulty:</label>
+                    <select id="difficulty">
+                        <option value="easy">Dreamer (Easy) - Forgiving and fun!</option>
+                        <option value="normal" selected>Icon (Normal) - Balanced challenge!</option>
+                        <option value="hard">Boss (Hard) - Only for the brave!</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label>What's your background?</label>
+                    <select id="origin">
+                        <option value="">Choose your origin story...</option>
+                        <option value="vet">The Vet - Caring and hardworking (+3 Heart, +1 Hustle)</option>
+                        <option value="fashionista">The Fashionista - Stylish and creative (+3 Chic, +1 Spark)</option>
+                        <option value="ceo">The CEO - Ambitious and sophisticated (+3 Hustle, +1 Chic)</option>
+                    </select>
+                </div>
+                
+                <button class="choice-btn" onclick="createCharacter()">Start Your Dream Journey! ✨</button>
+            `);
+        }
+
+        function createCharacter() {
+            const name = document.getElementById('player-name').value.trim();
+            const difficulty = document.getElementById('difficulty').value;
+            const origin = document.getElementById('origin').value;
+            
+            if (!name) {
+                alert('Please enter your name!');
                 return;
             }
-            renderScene(scene);
-        }
-
-        function renderScene(sceneData) {
-            const narrativeDiv = document.getElementById('narrative-display');
-            const choicesDiv = document.getElementById('choices-area');
-
-            // Dynamic Text Injection (Madness/Injury)
-            let displayText = sceneData.text;
-            if (gameState.sp < 30) displayText += "\n\n(The walls seem to be breathing. You hear crawling sounds inside your own ears.)";
-            if (gameState.hp < 30) displayText += "\n\n(Your vision blurs from pain. Blood drips steadily.)";
-
-            narrativeDiv.innerText = displayText;
-            narrativeDiv.scrollTop = 0;
-            choicesDiv.innerHTML = '';
-
-            // Handle immediate effects from transition scenes
-            if (sceneData.effects) {
-                applyEffects(sceneData.effects);
-                updateHUD();
-            }
-
-            // Detect available choices or create implicit "Continue"
-            let choices = sceneData.choices;
-            if (!choices && sceneData.next) {
-                choices = [{ text: "Continue...", type: "direct", next: sceneData.next }];
-            }
-
-            if (choices) {
-                choices.forEach(choice => {
-                    const btn = document.createElement('button');
-                    btn.innerText = choice.text;
-                    
-                    if (choice.action) {
-                        btn.onclick = () => eval(choice.action);
-                    } else if (choice.type === 'check') {
-                        btn.onclick = () => handleRoll(choice);
-                    } else if (choice.type === 'direct') {
-                        btn.onclick = () => loadScene(choice.next);
-                    }
-                    
-                    choicesDiv.appendChild(btn);
-                });
-            }
-        }
-
-        function handleRoll(choice) {
-            const roll = Math.floor(Math.random() * 20) + 1;
-            const mod = gameState.modifiers[choice.stat];
-            const total = roll + mod;
             
-            addLog("Dice", `Rolled ${roll} + ${mod} = ${total} (Target: ${choice.dc})`);
-
-            if (total >= choice.dc) {
-                loadScene(choice.success);
-            } else {
-                loadScene(choice.fail);
+            if (!origin) {
+                alert('Please choose your origin story!');
+                return;
             }
+            
+            game.player.name = name;
+            game.difficulty = difficulty;
+            game.player.origin = origin;
+            
+            switch(origin) {
+                case 'vet':
+                    game.player.stats.heart += 3;
+                    game.player.stats.hustle += 1;
+                    break;
+                case 'fashionista':
+                    game.player.stats.chic += 3;
+                    game.player.stats.spark += 1;
+                    break;
+                case 'ceo':
+                    game.player.stats.hustle += 3;
+                    game.player.stats.chic += 1;
+                    break;
+            }
+            
+            showScene1();
         }
 
-        function applyEffects(effects) {
-            if(effects.hp) gameState.hp += effects.hp;
-            if(effects.sp) gameState.sp += effects.sp;
-            if(effects.supplies) gameState.supplies += effects.supplies;
-            if(effects.str) gameState.modifiers.str += effects.str;
-            if(effects.int) gameState.modifiers.int += effects.int;
-            if(effects.lck) gameState.modifiers.lck += effects.lck;
-            if(effects.kaelo) gameState.npcs.kaelo.rel += effects.kaelo;
-            if(effects.thorne) gameState.npcs.thorne.rel += effects.thorne;
-        }
-
-        // --- CHAT SYSTEM ---
-
-        function handleChat(e) {
-            if (e.key === 'Enter') {
-                const input = document.getElementById('chat-input');
-                const text = input.value;
-                if (!text) return;
+        function showScene1() {
+            game.currentScene = 'scene1';
+            render(`
+                ${showStats()}
+                <h2>Scene 1: The Crumbling Center</h2>
+                <div class="story-text">
+                    <p>You stand before the dilapidated Community Center. The building that once hosted countless dreams and gatherings now looks tired and forgotten. The roof is leaking, paint is peeling, and the Mayor has just given you an ultimatum:</p>
+                    <p><strong>"${game.player.name}, you have 3 days to prove this place can be saved, or I'm selling it to the developers."</strong></p>
+                    <p>The press is watching. The community is counting on you. What's your first move?</p>
+                </div>
                 
-                addLog("You", text);
-                input.value = '';
-
-                setTimeout(() => {
-                    const responses = [
-                        "Kaelo sharpens his blade silently.",
-                        "Dr. Thorne scribbles in his journal, ignoring you.",
-                        "Something howls in the distance.",
-                        "The radio crackles with static."
-                    ];
-                    addLog("Game", responses[Math.floor(Math.random() * responses.length)]);
-                }, 1000);
-            }
+                <div class="choices">
+                    <button class="choice-btn" onclick="scene1Choice('hustle')">
+                        <div>🔨 The Logical Fix</div>
+                        <div class="choice-stat">Use HUSTLE to organize a volunteer crew</div>
+                    </button>
+                    <button class="choice-btn" onclick="scene1Choice('spark')">
+                        <div>💡 The Artistic Spin</div>
+                        <div class="choice-stat">Use SPARK to turn leaks into an art feature</div>
+                    </button>
+                    <button class="choice-btn" onclick="scene1Choice('chic')">
+                        <div>✨ The Risky Gala (RISKY!)</div>
+                        <div class="choice-stat">Use CHIC for a bold "Distressed Chic" runway show</div>
+                    </button>
+                </div>
+            `);
         }
 
-        function addLog(sender, msg) {
-            const history = document.getElementById('chat-history');
-            const div = document.createElement('div');
+        function scene1Choice(stat) {
+            const isRisky = stat === 'chic';
+            const result = resolveAction(stat, isRisky);
             
-            let cssClass = "system";
-            if (sender === "You") cssClass = "player";
-            if (sender === "GM" || sender === "Game") cssClass = "gm";
+            let resultText = '';
+            let resultClass = '';
+            
+            if (stat === 'hustle') {
+                if (result.success) {
+                    resultText = `<h3>Success! 🎉</h3>
+                        <p>The dice showed ${result.roll}! With your amazing hustle (${game.player.stats[stat]}), you organized the most efficient volunteer crew Malibu has ever seen!</p>
+                        <p>The roof is patched, the community is energized, and you feel accomplished!</p>`;
+                    resultClass = 'result-success';
+                    updateStats({ hustle: 2, morale: 10 });
+                    game.player.flags.scene1Success = true;
+                    game.player.flags.scene1Method = 'hustle';
+                    game.projectScore += 20;
+                } else {
+                    resultText = `<h3>Partial Success...</h3>
+                        <p>The dice showed ${result.roll}. You tried hard, but the work was overwhelming.</p>
+                        <p>The roof is patched, but you're exhausted from doing too much yourself.</p>`;
+                    resultClass = 'result-fail';
+                    updateStats({ morale: -10 });
+                    game.projectScore += 5;
+                }
+            } else if (stat === 'spark') {
+                if (result.success) {
+                    resultText = `<h3>Creative Genius! ✨</h3>
+                        <p>The dice showed ${result.roll}! Your artistic vision transformed disaster into beauty!</p>
+                        <p>You turned the leaking roof into a stunning indoor waterfall feature using recycled glass. It goes viral on social media! Even Raquelle is impressed!</p>`;
+                    resultClass = 'result-success';
+                    updateStats({ spark: 3, morale: 10 });
+                    updateNPCAffinity('raquelle', 10);
+                    updateNPCAffinity('teresa', 15);
+                    game.player.flags.scene1Success = true;
+                    game.player.flags.scene1Method = 'spark';
+                    game.projectScore += 25;
+                } else {
+                    resultText = `<h3>Flooded Dreams... 💧</h3>
+                        <p>The dice showed ${result.roll}. Your artistic vision didn't quite work out...</p>
+                        <p>The waterfall feature flooded the entire lobby! You'll need to clean this up and rethink your approach.</p>`;
+                    resultClass = 'result-fail';
+                    updateStats({ chic: -2, morale: -15 });
+                    game.player.flags.communityCenterFlooded = true;
+                    game.projectScore -= 10;
+                }
+            } else if (stat === 'chic') {
+                if (result.critical && result.roll === 20) {
+                    resultText = `<h3>CRITICAL SUCCESS! 🌟👗🌟</h3>
+                        <p>NAT 20! You rolled a perfect ${result.roll}!</p>
+                        <p>The "Distressed Chic" runway show amidst the ruins becomes legendary! Investors are calling immediately! You've secured early funding and made headlines!</p>`;
+                    resultClass = 'result-critical';
+                    updateStats({ chic: 5, hustle: 5, morale: 20 });
+                    game.player.flags.scene1Success = true;
+                    game.player.flags.scene1Method = 'chic';
+                    game.player.flags.hasHighChic = true;
+                    game.projectScore += 50;
+                } else if (result.success) {
+                    resultText = `<h3>Bold Success! 👗</h3>
+                        <p>The dice showed ${result.roll}! Your risky gamble paid off!</p>
+                        <p>The runway show was stunning and got people talking about the center!</p>`;
+                    resultClass = 'result-success';
+                    updateStats({ chic: 3, morale: 15 });
+                    game.player.flags.scene1Success = true;
+                    game.player.flags.scene1Method = 'chic';
+                    game.projectScore += 30;
+                } else {
+                    const moraleHit = game.difficulty === 'hard' ? -40 : -20;
+                    const statHit = game.difficulty === 'hard' ? -5 : -2;
+                    resultText = `<h3>Disaster! 😱</h3>
+                        <p>The dice showed ${result.roll}. The risk was too great...</p>
+                        <p>During the show, a piece of ceiling fell onto the runway! ${game.difficulty === 'hard' ? 'This is a major setback!' : 'The press is not impressed.'}</p>`;
+                    resultClass = 'result-fail';
+                    updateStats({ morale: moraleHit, chic: statHit, spark: statHit });
+                    game.projectScore -= 20;
+                }
+            }
+            
+            // If morale hit 0 during updateStats, showEnding was called.
+            // We must return here to prevent overwriting the ending screen.
+            if (game.player.morale <= 0) return;
 
-            div.className = `chat-msg ${cssClass}`;
-            div.innerHTML = `<strong>${sender}:</strong> ${msg}`;
-            history.appendChild(div);
-            history.scrollTop = history.scrollHeight;
+            render(`
+                ${showStats()}
+                <h2>Scene 1: The Crumbling Center</h2>
+                <div class="dice-roll">🎲 ${result.roll}</div>
+                <div class="result-box ${resultClass}">
+                    ${resultText}
+                </div>
+                <button class="choice-btn" onclick="showScene2()">Continue to Scene 2 →</button>
+            `);
         }
 
+        function showScene2() {
+            game.currentScene = 'scene2';
+            render(`
+                ${showStats()}
+                <h2>Scene 2: The Sabotage</h2>
+                <div class="story-text">
+                    <p>Your Grand Opening is in 2 days! Everything is coming together beautifully... until you get a phone call.</p>
+                    <p><strong>"I'm so sorry,"</strong> says the caterer, <strong>"but Raquelle has booked us for her party on the same night. We can't do both..."</strong></p>
+                    <p>You have no food for your event! Raquelle's competitive streak is showing. How will you handle this?</p>
+                </div>
+                
+                <div class="choices">
+                    <button class="choice-btn" onclick="scene2Choice('heart')">
+                        <div>💖 Kill Them with Kindness</div>
+                        <div class="choice-stat">Use HEART to ask Raquelle to combine parties</div>
+                    </button>
+                    <button class="choice-btn" onclick="scene2Choice('spark')">
+                        <div>🌱 DIY Buffet</div>
+                        <div class="choice-stat">Use SPARK to cook from the community garden</div>
+                    </button>
+                    <button class="choice-btn" onclick="scene2Choice('hustle')">
+                        <div>🚁 The Risky Heist (RISKY!)</div>
+                        <div class="choice-stat">Use HUSTLE to helicopter in pizza from New York</div>
+                    </button>
+                </div>
+            `);
+        }
+
+        function scene2Choice(stat) {
+            const isRisky = stat === 'hustle';
+            const result = resolveAction(stat, isRisky);
+            
+            let resultText = '';
+            let resultClass = '';
+            
+            if (stat === 'heart') {
+                if (result.success) {
+                    resultText = `<h3>Friendship Wins! 💖</h3>
+                        <p>The dice showed ${result.roll}! Your genuine kindness touched Raquelle's heart!</p>
+                        <p>She agrees to combine the parties! It becomes the biggest social event of the season! Raquelle is now your ally!</p>`;
+                    resultClass = 'result-success';
+                    updateStats({ heart: 3, morale: 15 });
+                    updateNPCAffinity('raquelle', 40);
+                    game.player.flags.befriendedRaquelle = true;
+                    game.projectScore += 30;
+                } else {
+                    resultText = `<h3>Rejected... 😢</h3>
+                        <p>The dice showed ${result.roll}. Raquelle wasn't ready to make peace.</p>
+                        <p>She laughs at your proposal and says her party will be better. You've lost valuable time.</p>`;
+                    resultClass = 'result-fail';
+                    updateStats({ morale: -10 });
+                    updateNPCAffinity('raquelle', -10);
+                    game.projectScore += 5;
+                }
+            } else if (stat === 'spark') {
+                if (result.success) {
+                    resultText = `<h3>Rustic Charm! 🌱</h3>
+                        <p>The dice showed ${result.roll}! Your creative cooking is a hit!</p>
+                        <p>The farm-to-table buffet using the community garden becomes a talking point! Ken especially loves your authentic approach!</p>`;
+                    resultClass = 'result-success';
+                    updateStats({ spark: 2, morale: 10 });
+                    updateNPCAffinity('ken', 15);
+                    updateNPCAffinity('teresa', 10);
+                    game.projectScore += 20;
+                } else {
+                    resultText = `<h3>Food Scare! 🤢</h3>
+                        <p>The dice showed ${result.roll}. Your cooking didn't go as planned...</p>
+                        <p>There's a minor food poisoning scare (nothing serious, but embarrassing). Your reputation takes a small hit.</p>`;
+                    resultClass = 'result-fail';
+                    updateStats({ hustle: -3, morale: -10 });
+                    game.projectScore -= 10;
+                }
+            } else if (stat === 'hustle') {
+                if (result.critical && result.roll === 20) {
+                    resultText = `<h3>LEGENDARY MOMENT! 🚁🍕</h3>
+                        <p>NATURAL 20! You rolled ${result.roll}!</p>
+                        <p>The helicopter arrives with authentic New York pizza! It becomes the most talked-about moment in Malibu history! You've trending worldwide!</p>`;
+                    resultClass = 'result-critical';
+                    updateStats({ hustle: 5, morale: 20 });
+                    game.projectScore += 40;
+                } else if (result.success) {
+                    resultText = `<h3>Audacious Success! 🚁</h3>
+                        <p>The dice showed ${result.roll}! Your bold plan worked!</p>
+                        <p>The helicopter pizza delivery is a hit! People can't believe you pulled it off!</p>`;
+                    resultClass = 'result-success';
+                    updateStats({ hustle: 3, morale: 15 });
+                    game.projectScore += 25;
+                } else {
+                    resultText = `<h3>Grounded! ⛈️</h3>
+                        <p>The dice showed ${result.roll}. Weather conditions grounded the helicopter...</p>
+                        <p>No pizza, no food at all! The party is awkward and people leave early. This is a major setback!</p>`;
+                    resultClass = 'result-fail';
+                    updateStats({ morale: -30, hustle: -3 });
+                    game.projectScore -= 20;
+                }
+            }
+            
+            if (game.player.morale <= 0) return;
+
+            render(`
+                ${showStats()}
+                <h2>Scene 2: The Sabotage</h2>
+                <div class="dice-roll">🎲 ${result.roll}</div>
+                <div class="result-box ${resultClass}">
+                    ${resultText}
+                </div>
+                <button class="choice-btn" onclick="showScene3()">Continue to the Grand Finale →</button>
+            `);
+        }
+
+        function showScene3() {
+            game.currentScene = 'scene3';
+            
+            const scene1Requirement = game.player.flags.scene1Success;
+            const chicRequirement = game.player.stats.chic >= 15;
+            
+            render(`
+                ${showStats()}
+                <h2>Scene 3: The Grand Finale - The Runway!</h2>
+                <div class="story-text">
+                    <p>Tonight is the night! The Grand Opening of the reimagined Malibu Community Center!</p>
+                    <p>The Mayor is in the front row. Investors are watching. The entire community has gathered. You need to present your vision for the new center in the most impactful way possible.</p>
+                    <p>This is your moment to shine, ${game.player.name}! How will you close the show?</p>
+                </div>
+                
+                <div class="choices">
+                    <button class="choice-btn" onclick="scene3Choice('heart')" ${!scene1Requirement ? 'disabled' : ''}>
+                        <div>👨‍👩‍👧‍👦 The Community Speech</div>
+                        <div class="choice-stat">Use HEART - Walk with the children of Malibu</div>
+                        ${!scene1Requirement ? '<div class="choice-stat">⚠️ Requires success in Scene 1</div>' : ''}
+                    </button>
+                    <button class="choice-btn" onclick="scene3Choice('chic')" ${!chicRequirement ? 'disabled' : ''}>
+                        <div>👗 The High Fashion Show</div>
+                        <div class="choice-stat">Use CHIC - Wear your self-designed "Dream Dress"</div>
+                        ${!chicRequirement ? '<div class="choice-stat">⚠️ Requires Chic 15+</div>' : ''}
+                    </button>
+                    <button class="choice-btn" onclick="scene3Choice('spark')">
+                        <div>🌟 The Holographic Projection (RISKY!)</div>
+                        <div class="choice-stat">Use SPARK - Attempt never-before-seen tech</div>
+                    </button>
+                </div>
+            `);
+        }
+
+        function scene3Choice(stat) {
+            const isRisky = stat === 'spark';
+            const result = resolveAction(stat, isRisky);
+            
+            let resultText = '';
+            let resultClass = '';
+            
+            if (stat === 'heart') {
+                if (result.success) {
+                    resultText = `<h3>Heartwarming Triumph! 💖</h3>
+                        <p>The dice showed ${result.roll}! Your emotional intelligence saved the day!</p>
+                        <p>The children of Malibu walk the runway with you, each sharing what the community center means to them. There's not a dry eye in the house. The Mayor is moved to tears and immediately approves the project!</p>`;
+                    resultClass = 'result-success';
+                    updateStats({ heart: 4, morale: 20 });
+                    game.projectScore += 40;
+                } else {
+                    resultText = `<h3>Touching but Mixed...</h3>
+                        <p>The dice showed ${result.roll}. The moment was sweet but not quite perfect.</p>
+                        <p>The children's presentation is adorable, but some technical issues diminish the impact.</p>`;
+                    resultClass = 'result-fail';
+                    updateStats({ morale: -5 });
+                    game.projectScore += 15;
+                }
+            } else if (stat === 'chic') {
+                if (result.critical && result.roll === 20) {
+                    resultText = `<h3>FASHION ICON MOMENT! 👗✨</h3>
+                        <p>PERFECT 20! You rolled ${result.roll}!</p>
+                        <p>Your "Dream Dress" is breathtaking! It perfectly embodies everything the community center represents - creativity, hope, and transformation! Fashion magazines are already calling! The Mayor not only approves the project but increases the budget!</p>`;
+                    resultClass = 'result-critical';
+                    updateStats({ chic: 5, morale: 25 });
+                    game.projectScore += 60;
+                } else if (result.success) {
+                    resultText = `<h3>Stunning Success! 👗</h3>
+                        <p>The dice showed ${result.roll}! Your fashion prowess shines!</p>
+                        <p>The "Dream Dress" is gorgeous and represents your vision perfectly! The crowd loves it!</p>`;
+                    resultClass = 'result-success';
+                    updateStats({ chic: 3, morale: 15 });
+                    game.projectScore += 35;
+                } else {
+                    resultText = `<h3>Wardrobe Malfunction! 😬</h3>
+                        <p>The dice showed ${result.roll}. Fashion can be unpredictable...</p>
+                        <p>A strap breaks during the walk! You handle it with grace, but it's not the triumphant moment you hoped for.</p>`;
+                    resultClass = 'result-fail';
+                    updateStats({ morale: -10 });
+                    game.projectScore += 10;
+                }
+            } else if (stat === 'spark') {
+                if (result.critical && result.roll === 20) {
+                    resultText = `<h3>TECHNOLOGICAL MIRACLE! 🌟✨🌟</h3>
+                        <p>CRITICAL SUCCESS! Natural 20!</p>
+                        <p>The holographic projection is FLAWLESS! You've created a fully immersive 3D experience showing the past, present, and future of the community center! People think they're in a dream! Tech companies are offering partnerships! This is revolutionary!</p>`;
+                    resultClass = 'result-critical';
+                    updateStats({ spark: 6, morale: 30 });
+                    updateNPCAffinity('teresa', 30);
+                    game.projectScore += 70;
+                } else if (result.success) {
+                    resultText = `<h3>Innovation Triumph! 🌟</h3>
+                        <p>The dice showed ${result.roll}! Your creativity knows no bounds!</p>
+                        <p>The holographic tech works! It's impressive and futuristic, showing everyone what's possible!</p>`;
+                    resultClass = 'result-success';
+                    updateStats({ spark: 4, morale: 20 });
+                    updateNPCAffinity('teresa', 20);
+                    game.projectScore += 45;
+                } else {
+                    resultText = `<h3>Technical Difficulties! ⚠️</h3>
+                        <p>The dice showed ${result.roll}. The tech wasn't quite ready...</p>
+                        <p>The holographic projection glitches and shows distorted images. It's embarrassing, but you recover by giving an impromptu speech about how even setbacks are part of the creative process.</p>`;
+                    resultClass = 'result-fail';
+                    updateStats({ morale: -15, spark: -2 });
+                    game.projectScore += 5;
+                }
+            }
+            
+            if (game.player.morale <= 0) return;
+
+            render(`
+                ${showStats()}
+                <h2>Scene 3: The Grand Finale</h2>
+                <div class="dice-roll">🎲 ${result.roll}</div>
+                <div class="result-box ${resultClass}">
+                    ${resultText}
+                </div>
+                <button class="choice-btn" onclick="showEnding()">See Your Ending! ✨</button>
+            `);
+        }
+
+        function showEnding(forceType = null) {
+            let endingTitle = '';
+            let endingText = '';
+            let endingClass = 'result-success';
+            
+            if (forceType === 'burnout' || game.player.morale <= 0) {
+                endingTitle = '😴 The Burnout Ending 😴';
+                endingText = `
+                    <p>You gave everything to this project, ${game.player.name}, but you pushed yourself too hard.</p>
+                    <p>The community center project is postponed while you take a much-needed vacation to recharge. Ken books you a spa retreat in the Malibu hills.</p>
+                    <p><strong>"Even icons need to rest,"</strong> he reminds you.</p>
+                    <p>Sometimes the dream requires us to take care of ourselves first. You'll come back stronger! 💖</p>
+                `;
+                endingClass = 'result-fail';
+            } else if (game.player.flags.befriendedRaquelle && game.npcs.raquelle >= 80) {
+                endingTitle = '👯‍♀️ The Best Friends Forever Ending! 👯‍♀️';
+                endingText = `
+                    <p>Incredible, ${game.player.name}! Not only did you save the community center, but you turned your rival into your best friend!</p>
+                    <p>Raquelle approaches you after the finale: <strong>"I've been so impressed by your vision. What do you say we go into business together?"</strong></p>
+                    <p>You and Raquelle launch "Dream & Design," a creative consultancy that transforms communities across the country! The Malibu Community Center becomes your flagship success story!</p>
+                    <p><strong>Project Score: ${game.projectScore}</strong></p>
+                    <p>You've proven that collaboration beats competition every time! 💕✨</p>
+                `;
+                endingClass = 'result-critical';
+            } else if (game.projectScore >= 100) {
+                endingTitle = '🌟 The DREAM ICON Ending! 🌟';
+                endingText = `
+                    <p>PHENOMENAL, ${game.player.name}! You didn't just save the community center - you revolutionized it!</p>
+                    <p>The Mayor cuts the ribbon personally and announces: <strong>"This is the future of community spaces! We're creating a fund to replicate this model across the state!"</strong></p>
+                    <p>Your innovation, style, heart, and hustle have created something truly special. The center becomes a landmark destination, featured in magazines and architectural tours!</p>
+                    <p><strong>Final Project Score: ${game.projectScore}</strong></p>
+                    <p>You're not just an icon - you're a legend! Dream big, achieve bigger! 💖✨🌟</p>
+                `;
+                endingClass = 'result-critical';
+            } else if (game.projectScore >= 60) {
+                endingTitle = '✨ The Success Story Ending! ✨';
+                endingText = `
+                    <p>Congratulations, ${game.player.name}! You saved the Malibu Community Center!</p>
+                    <p>The Mayor approves the project, and the community celebrates your achievement! The center opens to huge crowds and becomes a beloved neighborhood hub!</p>
+                    <p><strong>Final Project Score: ${game.projectScore}</strong></p>
+                    <p>You've proven that with creativity, style, empathy, and hard work, dreams really do come true! The center will serve the community for generations to come! 💖</p>
+                `;
+                endingClass = 'result-success';
+            } else {
+                endingTitle = '🌤️ The Learning Experience Ending 🌤️';
+                endingText = `
+                    <p>You tried your best, ${game.player.name}, and that takes courage!</p>
+                    <p>The community center project didn't go exactly as planned, but the Mayor was impressed by your dedication. She gives you another chance with a smaller pilot program.</p>
+                    <p><strong>Final Project Score: ${game.projectScore}</strong></p>
+                    <p>You've learned valuable lessons about creativity, teamwork, and resilience. Sometimes the journey is more important than the destination! Ken, Teresa, and even Raquelle offer to help with the next phase. 💕</p>
+                    <p><em>"Every setback is a setup for a comeback!"</em></p>
+                `;
+                endingClass = 'result-fail';
+            }
+            
+            render(`
+                <div class="ending-screen">
+                    <div class="ending-title">${endingTitle}</div>
+                    <div class="ending-text">${endingText}</div>
+                    <div class="stats-container" style="margin-top: 30px;">
+                        <h3 style="grid-column: 1 / -1; text-align: center; color: #E0218A;">Final Stats</h3>
+                        <div class="stat">
+                            <div class="stat-label">✨ Spark</div>
+                            <div class="stat-value">${game.player.stats.spark}</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-label">👗 Chic</div>
+                            <div class="stat-value">${game.player.stats.chic}</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-label">💖 Heart</div>
+                            <div class="stat-value">${game.player.stats.heart}</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-label">💼 Hustle</div>
+                            <div class="stat-value">${game.player.stats.hustle}</div>
+                        </div>
+                    </div>
+                    <button class="restart-btn" onclick="location.reload()">Play Again! 💕</button>
+                </div>
+            `);
+        }
+
+        // Start the game
+        startGame();
     </script>
 </body>
 </html>
+```
