@@ -1,930 +1,597 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Barbie: The Dream Design Project</title>
+    <title>STATIC: 1980</title>
     <style>
-        * {
+        @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+
+        :root {
+            --phosphor-main: #33ff33;
+            --phosphor-dim: #1a801a;
+            --phosphor-alert: #ff3333;
+            --phosphor-signal: #d500f9;
+            --bg-color: #050505;
+            --screen-curve: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+        }
+
+        body {
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #E0218A 0%, #00AEEF 100%);
-            color: #333;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-        
-        #game-container {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 10px 50px rgba(0,0,0,0.3);
-            max-width: 800px;
-            width: 100%;
-            padding: 40px;
-            animation: fadeIn 0.5s;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        h1 {
-            color: #E0218A;
-            text-align: center;
-            margin-bottom: 10px;
-            font-size: 2.5em;
-        }
-        
-        h2 {
-            color: #00AEEF;
-            margin: 20px 0 10px 0;
-        }
-        
-        .subtitle {
-            text-align: center;
-            color: #666;
-            margin-bottom: 30px;
-            font-style: italic;
-        }
-        
-        .stats-container {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin: 20px 0;
-            padding: 20px;
-            background: linear-gradient(135deg, #FFE0F0 0%, #E0F7FF 100%);
-            border-radius: 10px;
-        }
-        
-        .stat {
-            background: white;
-            padding: 10px;
-            border-radius: 8px;
-            border: 2px solid #E0218A;
-        }
-        
-        .stat-label {
-            font-weight: bold;
-            color: #E0218A;
-            font-size: 0.9em;
-        }
-        
-        .stat-value {
-            font-size: 1.5em;
-            color: #00AEEF;
-            font-weight: bold;
-        }
-        
-        .morale-bar {
-            width: 100%;
-            height: 30px;
-            background: #f0f0f0;
-            border-radius: 15px;
+            background-color: #000;
+            color: var(--phosphor-main);
+            font-family: 'VT323', monospace;
+            height: 100vh;
             overflow: hidden;
-            margin: 20px 0;
-            border: 2px solid #E0218A;
-        }
-        
-        .morale-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #E0218A 0%, #00AEEF 100%);
-            transition: width 0.5s;
             display: flex;
-            align-items: center;
             justify-content: center;
-            color: white;
-            font-weight: bold;
+            align-items: center;
         }
-        
-        .story-text {
-            background: #f9f9f9;
-            padding: 20px;
-            border-left: 4px solid #00AEEF;
-            margin: 20px 0;
-            line-height: 1.6;
-            border-radius: 5px;
-        }
-        
-        .choices {
+
+        /* CRT EFFECT CONTAINER */
+        #crt-container {
+            width: 100%;
+            max-width: 900px;
+            height: 95vh;
+            background-color: var(--bg-color);
+            border: 2px solid #333;
+            border-radius: 20px;
+            position: relative;
+            box-shadow: 0 0 20px rgba(51, 255, 51, 0.2);
+            overflow: hidden;
             display: flex;
             flex-direction: column;
-            gap: 15px;
-            margin: 20px 0;
         }
-        
-        .choice-btn {
-            background: linear-gradient(135deg, #E0218A 0%, #00AEEF 100%);
-            color: white;
-            border: none;
-            padding: 15px 25px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 1em;
-            font-weight: bold;
-            transition: transform 0.2s, box-shadow 0.2s;
-            text-align: left;
-        }
-        
-        .choice-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(224, 33, 138, 0.4);
-        }
-        
-        .choice-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        
-        .choice-stat {
-            font-size: 0.85em;
-            opacity: 0.9;
-            margin-top: 5px;
-        }
-        
-        input, select {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            border: 2px solid #E0218A;
-            border-radius: 8px;
-            font-size: 1em;
-        }
-        
-        .input-group {
-            margin: 15px 0;
-        }
-        
-        label {
+
+        /* SCANLINES & FLICKER */
+        #crt-container::before {
+            content: " ";
             display: block;
-            color: #E0218A;
-            font-weight: bold;
-            margin-bottom: 5px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 10;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
         }
-        
-        .result-box {
-            background: #fff3cd;
-            border: 2px solid #ffc107;
-            padding: 20px;
-            border-radius: 10px;
-            margin: 20px 0;
-            animation: slideIn 0.5s;
+
+        #crt-container::after {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: rgba(18, 16, 16, 0.1);
+            opacity: 0;
+            z-index: 10;
+            pointer-events: none;
+            animation: flicker 0.15s infinite;
         }
-        
-        @keyframes slideIn {
-            from { transform: translateX(-20px); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
+
+        @keyframes flicker {
+            0% { opacity: 0.027; }
+            5% { opacity: 0.04; }
+            10% { opacity: 0.02; }
+            15% { opacity: 0.04; }
+            20% { opacity: 0.02; }
+            100% { opacity: 0.02; }
         }
-        
-        .result-success {
-            background: #d4edda;
-            border-color: #28a745;
+
+        /* UI LAYOUT */
+        header {
+            border-bottom: 2px solid var(--phosphor-dim);
+            padding: 15px;
+            text-align: center;
+            text-shadow: 0 0 5px var(--phosphor-main);
+            flex-shrink: 0;
         }
-        
-        .result-fail {
-            background: #f8d7da;
-            border-color: #dc3545;
+
+        h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            letter-spacing: 5px;
+            animation: textFlicker 3s infinite;
         }
-        
-        .result-critical {
-            background: #d1ecf1;
-            border-color: #00AEEF;
-        }
-        
-        .hidden {
-            display: none;
-        }
-        
-        .npc-affinity {
+
+        #hud {
             display: flex;
-            justify-content: space-between;
-            margin: 10px 0;
+            justify-content: space-around;
             padding: 10px;
-            background: white;
-            border-radius: 8px;
+            border-bottom: 1px dashed var(--phosphor-dim);
+            font-size: 1.2rem;
+            flex-shrink: 0;
         }
-        
-        .npc-name {
-            font-weight: bold;
-            color: #E0218A;
-        }
-        
-        .npc-value {
-            color: #00AEEF;
+
+        .stat-box span {
             font-weight: bold;
         }
-        
-        .dice-roll {
-            text-align: center;
-            font-size: 3em;
-            color: #E0218A;
-            margin: 20px 0;
-            animation: rollDice 0.5s;
+
+        #game-output {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+            font-size: 1.2rem;
+            line-height: 1.4;
+            scrollbar-width: thin;
+            scrollbar-color: var(--phosphor-dim) var(--bg-color);
         }
-        
-        @keyframes rollDice {
-            0%, 100% { transform: rotate(0deg); }
-            25% { transform: rotate(10deg); }
-            75% { transform: rotate(-10deg); }
+
+        #game-output::-webkit-scrollbar {
+            width: 8px;
         }
-        
-        .ending-screen {
-            text-align: center;
-            padding: 40px 20px;
+        #game-output::-webkit-scrollbar-thumb {
+            background-color: var(--phosphor-dim);
         }
-        
-        .ending-title {
-            font-size: 2em;
-            color: #E0218A;
+
+        .log-entry {
             margin-bottom: 20px;
+            opacity: 0;
+            animation: fadeIn 0.5s forwards;
         }
-        
-        .ending-text {
-            font-size: 1.2em;
-            line-height: 1.6;
-            color: #666;
+
+        .narrative {
+            color: #ddd;
+            text-shadow: 0 0 2px #fff;
         }
-        
-        .restart-btn {
-            background: #00AEEF;
-            color: white;
-            border: none;
-            padding: 15px 40px;
-            border-radius: 10px;
-            font-size: 1.2em;
+
+        .signal-text {
+            color: var(--phosphor-signal);
+            text-shadow: 0 0 5px var(--phosphor-signal);
+            font-style: italic;
+        }
+
+        .success { color: var(--phosphor-main); }
+        .failure { color: var(--phosphor-alert); }
+        .info { color: #ffff00; }
+
+        #controls {
+            padding: 20px;
+            border-top: 2px solid var(--phosphor-dim);
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            flex-shrink: 0;
+            min-height: 150px;
+        }
+
+        button {
+            background: transparent;
+            border: 1px solid var(--phosphor-main);
+            color: var(--phosphor-main);
+            font-family: 'VT323', monospace;
+            font-size: 1.2rem;
+            padding: 10px;
             cursor: pointer;
-            margin-top: 30px;
-            font-weight: bold;
+            text-align: left;
+            transition: all 0.2s;
+            text-transform: uppercase;
         }
-        
-        .restart-btn:hover {
-            background: #E0218A;
+
+        button:hover {
+            background: var(--phosphor-main);
+            color: #000;
+            box-shadow: 0 0 10px var(--phosphor-main);
         }
+
+        button:disabled {
+            border-color: #555;
+            color: #555;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .hidden { display: none !important; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes textFlicker {
+            0% { opacity: 1; text-shadow: 0 0 5px var(--phosphor-main); }
+            5% { opacity: 0.5; text-shadow: none; }
+            10% { opacity: 1; text-shadow: 0 0 5px var(--phosphor-main); }
+            100% { opacity: 1; text-shadow: 0 0 5px var(--phosphor-main); }
+        }
+
     </style>
 </head>
 <body>
-    <div id="game-container">
-        <h1>✨ Barbie: The Dream Design Project ✨</h1>
-        <p class="subtitle">Save the Malibu Community Center and make your dreams come true!</p>
-        
-        <div id="game-content"></div>
+
+<div id="crt-container">
+    <header>
+        <h1>STATIC: 1980</h1>
+    </header>
+    
+    <div id="hud" class="hidden">
+        <div class="stat-box">HP: <span id="hp-val">3</span>/3</div>
+        <div class="stat-box">GRIT: <span id="grit-val">4</span></div>
+        <div class="stat-box">TECH: <span id="tech-val">5</span></div>
+        <div class="stat-box">HEART: <span id="heart-val">2</span></div>
     </div>
 
-    <script>
-        const game = {
-            player: {
-                name: '',
-                origin: '',
-                stats: {
-                    spark: 5,
-                    chic: 5,
-                    heart: 5,
-                    hustle: 5
+    <div id="game-output">
+        <div class="log-entry" style="text-align: center; margin-top: 50px;">
+            <p>ECHO POINT, OREGON. NOVEMBER 12, 1980.</p>
+            <p class="signal-text">A psychotronic signal has begun broadcasting.</p>
+            <br>
+            <p>SELECT DIFFICULTY:</p>
+        </div>
+    </div>
+
+    <div id="controls">
+        <button onclick="startGame('vhs')">VHS (EASY)</button>
+        <button onclick="startGame('broadcast')">BROADCAST (NORMAL)</button>
+        <button onclick="startGame('noise')">WHITE NOISE (HARD)</button>
+    </div>
+</div>
+
+<script>
+    // GAME STATE
+    const state = {
+        difficulty: 'broadcast',
+        stats: {
+            hp: 3,
+            grit: 4,
+            tech: 5,
+            heart: 2
+        },
+        hidden: {
+            lindaTrust: 0,
+            mikeyStatus: 'Alive',
+            luck: 0
+        },
+        sceneIndex: 0,
+        gameOver: false
+    };
+
+    // DOM ELEMENTS
+    const outputDiv = document.getElementById('game-output');
+    const controlsDiv = document.getElementById('controls');
+    const hudDiv = document.getElementById('hud');
+    
+    const uiStats = {
+        hp: document.getElementById('hp-val'),
+        grit: document.getElementById('grit-val'),
+        tech: document.getElementById('tech-val'),
+        heart: document.getElementById('heart-val')
+    };
+
+    // SCENE DATA
+    const scenes = [
+        {
+            id: 1,
+            title: "SCENE 1: The Repair Shop",
+            text: "It is raining outside your repair shop. You are fixing an old VCR when suddenly, every TV in the shop screams with a <span class='signal-text'>screeching purple static</span>. The front window smashes inward. Your neighbor, Mr. Henderson, eyes rolled back white, lunges over the counter.",
+            choices: [
+                {
+                    text: "[COMBAT] Smash him with the heavy VCR (Req: GRIT)",
+                    stat: "grit",
+                    baseReq: 4,
+                    type: "check",
+                    success: {
+                        text: "You swing the VCR with brute force. Sparks fly as it connects with Henderson's skull. He drops cold.",
+                        effect: (s) => { s.stats.grit++; },
+                        resultText: "+1 GRIT"
+                    },
+                    fail: {
+                        text: "You hesitate. Henderson bites your arm before you can kick him off. Pain sears through you.",
+                        effect: (s) => { s.stats.hp--; },
+                        resultText: "-1 HP"
+                    }
                 },
-                morale: 100,
-                flags: {
-                    scene1Success: false,
-                    scene1Method: '',
-                    befriendedRaquelle: false,
-                    communityCenterFlooded: false,
-                    hasHighChic: false
+                {
+                    text: "[TECH] Crank the Ham Radio to a counter-frequency (Req: TECH)",
+                    stat: "tech",
+                    baseReq: 5,
+                    type: "check",
+                    success: {
+                        text: "You spin the dial. A high-pitched whine cuts through the static. Henderson screams, clutching his ears, and flees into the rain.",
+                        effect: (s) => { s.stats.tech++; },
+                        resultText: "+1 TECH"
+                    },
+                    fail: {
+                        text: "You fumble the dial. The radio shorts out in a shower of sparks. Henderson is distracted, but you lost your equipment.",
+                        effect: (s) => { s.stats.tech--; },
+                        resultText: "-1 TECH"
+                    }
+                },
+                {
+                    text: "[RUN] Grab gear and dive out the back window.",
+                    stat: null,
+                    type: "action",
+                    success: {
+                        text: "You don't wait to find out what he wants. You grab your toolkit and dive into the alleyway glass.",
+                        effect: (s) => { s.stats.grit--; s.hidden.luck++; },
+                        resultText: "-1 GRIT (Cowardice), +1 LUCK"
+                    }
                 }
-            },
-            npcs: {
-                ken: 50,
-                raquelle: 30,
-                teresa: 50
-            },
-            difficulty: 'normal',
-            difficultyThresholds: {
-                easy: 8,
-                normal: 12,
-                hard: 15
-            },
-            currentScene: 'intro',
-            projectScore: 0
-        };
+            ]
+        },
+        {
+            id: 2,
+            title: "SCENE 2: Neon Avenue",
+            text: "The streets are chaos. Cars crashed into storefronts. Neon signs flicker in the rain. You spot Mikey, the arcade kid, trapped in a phone booth surrounded by three <span class='signal-text'>Listeners</span>. Sheriff Linda pulls up, gun drawn, shaking. She aims at YOU.",
+            choices: [
+                {
+                    text: "[DIPLOMACY] Reason with Linda (Req: HEART)",
+                    stat: "heart",
+                    baseReq: 4,
+                    type: "check",
+                    success: {
+                        text: "\"Linda! It's the signal! We need to save the kid!\" Her eyes clear. She lowers the gun. \"Get in.\"",
+                        effect: (s) => { s.hidden.lindaTrust++; s.stats.heart++; },
+                        resultText: "+1 HEART, +1 Linda Trust"
+                    },
+                    fail: {
+                        text: "She fires a warning shot. You dive, saving Mikey but twisting your ankle badly.",
+                        effect: (s) => { s.stats.grit--; },
+                        resultText: "-1 GRIT"
+                    }
+                },
+                {
+                    text: "[ACTION] Throw a brick and grab Mikey (Req: GRIT)",
+                    stat: "grit",
+                    baseReq: 5,
+                    type: "check",
+                    success: {
+                        text: "You hurl a brick through a windshield. The noise draws the Listeners. You grab Mikey and slide over the hood of Linda's car.",
+                        effect: (s) => { s.hidden.mikeyStatus = 'Alive'; s.stats.grit++; },
+                        resultText: "+1 GRIT, Mikey Saved"
+                    },
+                    fail: {
+                        text: "You save Mikey, but Linda panics and hits you with the car door.",
+                        effect: (s) => { s.stats.hp--; },
+                        resultText: "-1 HP"
+                    }
+                },
+                {
+                    text: "[TECH] Hotwire the police cruiser siren (Req: TECH - Hard)",
+                    stat: "tech",
+                    baseReq: 6,
+                    type: "check",
+                    success: {
+                        text: "You bypass the relay. The siren wails. The Listeners chase the car. Linda is stunned by your skill.",
+                        effect: (s) => { s.hidden.lindaTrust += 2; s.stats.tech++; },
+                        resultText: "+1 TECH, +2 Linda Trust"
+                    },
+                    fail: {
+                        text: "You trigger the horn instead. Every Listener on the block turns to look at you.",
+                        effect: (s) => { 
+                            if(s.difficulty === 'noise') { s.stats.hp = 0; } 
+                            else { s.stats.hp -= 2; }
+                        },
+                        resultText: "CRITICAL FAILURE. Massive Damage."
+                    }
+                }
+            ]
+        },
+        {
+            id: 3,
+            title: "SCENE 3: The Radio Tower",
+            text: "You reach the KVHS Tower. Thick <span class='signal-text'>purple fog</span> chokes the air. Linda is holding the door against a horde. Mikey is twitching—the signal is getting to him. The console is fried. You need to override the broadcast NOW.",
+            choices: [
+                {
+                    text: "[TECH] Solder the connections alone (Req: TECH)",
+                    stat: "tech",
+                    baseReq: 7,
+                    type: "check",
+                    success: {
+                        text: "Your hands are steady. You bridge the connection. The signal screeches and dies.",
+                        effect: (s) => { endGame("static_hero"); },
+                        resultText: ""
+                    },
+                    fail: {
+                        text: "It takes too long. The door gives way.",
+                        effect: (s) => { endGame("hollow"); },
+                        resultText: ""
+                    }
+                },
+                {
+                    text: "[HEART] Snap Mikey out of it to help (Req: HEART)",
+                    stat: "heart",
+                    baseReq: 6,
+                    type: "check",
+                    success: {
+                        text: "You calm Mikey down. He connects the secondary wires while you handle the main board. Together, you jam the signal.",
+                        effect: (s) => { s.stats.heart += 2; endGame("static_hero"); },
+                        resultText: ""
+                    },
+                    fail: {
+                        text: "Mikey screams and attacks you. You have to knock him out, wasting precious time.",
+                        effect: (s) => { s.stats.hp--; s.hidden.mikeyStatus = 'Infected'; endGame("hollow"); },
+                        resultText: "-1 HP, Mikey Infected"
+                    }
+                },
+                {
+                    text: "[GRIT] Use your body to complete the circuit (Req: GRIT)",
+                    stat: "grit",
+                    baseReq: 7,
+                    type: "check",
+                    success: {
+                        text: "You grab the live wires. Agony rips through you, but the signal stops.",
+                        effect: (s) => { s.stats.hp -= 2; endGame("martyr"); },
+                        resultText: ""
+                    },
+                    fail: {
+                        text: "The current is too strong. You die before the signal jams.",
+                        effect: (s) => { s.stats.hp = 0; },
+                        resultText: ""
+                    }
+                }
+            ]
+        }
+    ];
 
-        function render(content) {
-            document.getElementById('game-content').innerHTML = content;
+    // ENGINE FUNCTIONS
+
+    function log(html, type = 'narrative') {
+        const div = document.createElement('div');
+        div.className = `log-entry ${type}`;
+        div.innerHTML = html;
+        outputDiv.appendChild(div);
+        outputDiv.scrollTop = outputDiv.scrollHeight;
+    }
+
+    function updateHUD() {
+        uiStats.hp.textContent = state.stats.hp;
+        uiStats.grit.textContent = state.stats.grit;
+        uiStats.tech.textContent = state.stats.tech;
+        uiStats.heart.textContent = state.stats.heart;
+        
+        if (state.stats.hp <= 0 && !state.gameOver) {
+            endGame("dead_air");
+        }
+    }
+
+    function startGame(diff) {
+        state.difficulty = diff;
+        
+        // Reset Stats
+        state.stats = { hp: 3, grit: 4, tech: 5, heart: 2 };
+        state.hidden = { lindaTrust: 0, mikeyStatus: 'Alive', luck: 0 };
+        state.sceneIndex = 0;
+        state.gameOver = false;
+
+        // Modifier explanation
+        let modifierText = "";
+        if (diff === 'vhs') modifierText = "DIFFICULTY: VHS (Checks -2)";
+        if (diff === 'broadcast') modifierText = "DIFFICULTY: BROADCAST (Standard)";
+        if (diff === 'noise') modifierText = "DIFFICULTY: WHITE NOISE (Checks +2, Fail = Damage)";
+
+        // Clear Intro
+        outputDiv.innerHTML = "";
+        hudDiv.classList.remove('hidden');
+        
+        log(modifierText, "info");
+        updateHUD();
+        renderScene();
+    }
+
+    function getDifficultyModifier() {
+        if (state.difficulty === 'vhs') return -2;
+        if (state.difficulty === 'broadcast') return 0;
+        if (state.difficulty === 'noise') return 2;
+        return 0;
+    }
+
+    function renderScene() {
+        if (state.gameOver) return;
+
+        const scene = scenes[state.sceneIndex];
+        
+        // Render Scene Text
+        log(`<hr style="border-color: #1a801a"><h3>${scene.title}</h3><p>${scene.text}</p>`);
+
+        // Render Buttons
+        controlsDiv.innerHTML = "";
+        
+        scene.choices.forEach((choice, index) => {
+            const btn = document.createElement('button');
+            
+            // Calculate Threshold for display
+            let thresholdDisplay = "";
+            if (choice.type === 'check') {
+                const req = choice.baseReq + getDifficultyModifier();
+                const current = state.stats[choice.stat];
+                const chance = current >= req ? "LIKELY" : "RISKY";
+                thresholdDisplay = ` <br><span style="font-size:0.8em; color: #888">[Check: ${req} | You: ${current}]</span>`;
+            }
+
+            btn.innerHTML = `${index + 1}. ${choice.text} ${thresholdDisplay}`;
+            btn.onclick = () => handleChoice(choice);
+            controlsDiv.appendChild(btn);
+        });
+    }
+
+    function handleChoice(choice) {
+        // Disable controls temporarily
+        const buttons = controlsDiv.querySelectorAll('button');
+        buttons.forEach(b => b.disabled = true);
+
+        let success = true;
+
+        if (choice.type === 'check') {
+            const req = choice.baseReq + getDifficultyModifier();
+            const val = state.stats[choice.stat];
+            if (val < req) success = false;
         }
 
-        function rollDice() {
-            return Math.floor(Math.random() * 20) + 1;
+        if (success) {
+            log(`> ${choice.success.text}`, 'success');
+            choice.success.effect(state);
+            if(choice.success.resultText) log(choice.success.resultText, 'info');
+        } else {
+            log(`> ${choice.fail.text}`, 'failure');
+            choice.fail.effect(state);
+            if(choice.fail.resultText) log(choice.fail.resultText, 'failure');
+            
+            // Hard mode penalty logic if not already handled inside effect
+            if (state.difficulty === 'noise' && choice.type === 'check') {
+                // Check if effect already reduced HP, if not, reduce it
+                if (!choice.fail.resultText.includes("HP")) {
+                    state.stats.hp--;
+                    log("HARD MODE PENALTY: -1 HP", 'failure');
+                }
+            }
         }
 
-        function resolveAction(stat, isRisky = false) {
-            const roll = rollDice();
-            const statValue = game.player.stats[stat];
-            const threshold = game.difficultyThresholds[game.difficulty];
-            const adjustedThreshold = isRisky ? threshold + 3 : threshold;
-            const total = roll + statValue;
+        updateHUD();
 
-            let result = {
-                roll: roll,
-                total: total,
-                success: false,
-                critical: false,
-                statUsed: stat
-            };
-
-            if (roll === 20) {
-                result.success = true;
-                result.critical = true;
-            } else if (roll === 1) {
-                result.success = false;
-                result.critical = true;
-            } else if (total >= adjustedThreshold) {
-                result.success = true;
+        if (!state.gameOver) {
+            if (state.stats.hp <= 0) {
+                endGame("dead_air");
             } else {
-                result.success = false;
-                if (game.difficulty === 'easy') {
-                    result.partial = true;
+                state.sceneIndex++;
+                if (state.sceneIndex < scenes.length) {
+                    setTimeout(renderScene, 1500); // Small delay for reading
+                } else if (!state.gameOver) {
+                    // Logic handled in Scene 3
                 }
             }
+        }
+    }
 
-            return result;
+    function endGame(endingType) {
+        state.gameOver = true;
+        controlsDiv.innerHTML = "<button onclick='location.reload()'>RESET SYSTEM</button>";
+        
+        let title = "";
+        let desc = "";
+        let color = "var(--phosphor-main)";
+
+        switch(endingType) {
+            case "dead_air":
+                title = "SIGNAL RECEIVED";
+                desc = "You have succumbed to the broadcast. Your mind is no longer your own. You stand still, waiting for a sound.";
+                color = "var(--phosphor-signal)";
+                break;
+            case "static_hero":
+                title = "THE STATIC HERO";
+                desc = "The signal dies. Silence falls over Echo Point. Linda claps you on the shoulder. Mikey is safe. You did it.";
+                break;
+            case "hollow":
+                title = "A HOLLOW VICTORY";
+                desc = "The signal is jammed, but the cost was too high. The town is saved, but you look at the devastation and feel nothing.";
+                color = "#ffff00";
+                break;
+            case "martyr":
+                title = "THE MARTYR";
+                desc = "Your heart stops as the last pulse of the signal fades. You saved them all. In 1981, they build a statue in the town square.";
+                break;
         }
 
-        function updateStats(changes) {
-            for (let stat in changes) {
-                if (stat === 'morale') {
-                    game.player.morale = Math.max(0, Math.min(100, game.player.morale + changes[stat]));
-                } else if (game.player.stats.hasOwnProperty(stat)) {
-                    game.player.stats[stat] = Math.max(0, Math.min(20, game.player.stats[stat] + changes[stat]));
-                }
-            }
-            
-            if (game.player.morale <= 0) {
-                showEnding('burnout');
-            }
-        }
+        setTimeout(() => {
+            log(`<br><br><h1 style="color: ${color}">${title}</h1><p>${desc}</p>`, 'narrative');
+        }, 1000);
+    }
 
-        function updateNPCAffinity(npc, change) {
-            game.npcs[npc] = Math.max(0, Math.min(100, game.npcs[npc] + change));
-        }
-
-        function showStats() {
-            return `
-                <div class="morale-bar">
-                    <div class="morale-fill" style="width: ${game.player.morale}%">
-                        Morale: ${game.player.morale}
-                    </div>
-                </div>
-                <div class="stats-container">
-                    <div class="stat">
-                        <div class="stat-label">✨ Spark (Creativity)</div>
-                        <div class="stat-value">${game.player.stats.spark}</div>
-                    </div>
-                    <div class="stat">
-                        <div class="stat-label">👗 Chic (Style)</div>
-                        <div class="stat-value">${game.player.stats.chic}</div>
-                    </div>
-                    <div class="stat">
-                        <div class="stat-label">💖 Heart (Empathy)</div>
-                        <div class="stat-value">${game.player.stats.heart}</div>
-                    </div>
-                    <div class="stat">
-                        <div class="stat-label">💼 Hustle (Ambition)</div>
-                        <div class="stat-value">${game.player.stats.hustle}</div>
-                    </div>
-                </div>
-                <div class="stats-container">
-                    <div class="npc-affinity">
-                        <span class="npc-name">Ken:</span>
-                        <span class="npc-value">${game.npcs.ken}</span>
-                    </div>
-                    <div class="npc-affinity">
-                        <span class="npc-name">Raquelle:</span>
-                        <span class="npc-value">${game.npcs.raquelle}</span>
-                    </div>
-                    <div class="npc-affinity">
-                        <span class="npc-name">Teresa:</span>
-                        <span class="npc-value">${game.npcs.teresa}</span>
-                    </div>
-                </div>
-            `;
-        }
-
-        function startGame() {
-            render(`
-                <h2>Welcome to Malibu Dream Bay!</h2>
-                <div class="story-text">
-                    <p>You're about to embark on an incredible journey to save the Historic Malibu Community Center! But first, let's get to know you better...</p>
-                </div>
-                
-                <div class="input-group">
-                    <label>What's your name?</label>
-                    <input type="text" id="player-name" placeholder="Enter your fabulous name!">
-                </div>
-                
-                <div class="input-group">
-                    <label>Choose your difficulty:</label>
-                    <select id="difficulty">
-                        <option value="easy">Dreamer (Easy) - Forgiving and fun!</option>
-                        <option value="normal" selected>Icon (Normal) - Balanced challenge!</option>
-                        <option value="hard">Boss (Hard) - Only for the brave!</option>
-                    </select>
-                </div>
-                
-                <div class="input-group">
-                    <label>What's your background?</label>
-                    <select id="origin">
-                        <option value="">Choose your origin story...</option>
-                        <option value="vet">The Vet - Caring and hardworking (+3 Heart, +1 Hustle)</option>
-                        <option value="fashionista">The Fashionista - Stylish and creative (+3 Chic, +1 Spark)</option>
-                        <option value="ceo">The CEO - Ambitious and sophisticated (+3 Hustle, +1 Chic)</option>
-                    </select>
-                </div>
-                
-                <button class="choice-btn" onclick="createCharacter()">Start Your Dream Journey! ✨</button>
-            `);
-        }
-
-        function createCharacter() {
-            const name = document.getElementById('player-name').value.trim();
-            const difficulty = document.getElementById('difficulty').value;
-            const origin = document.getElementById('origin').value;
-            
-            if (!name) {
-                alert('Please enter your name!');
-                return;
-            }
-            
-            if (!origin) {
-                alert('Please choose your origin story!');
-                return;
-            }
-            
-            game.player.name = name;
-            game.difficulty = difficulty;
-            game.player.origin = origin;
-            
-            switch(origin) {
-                case 'vet':
-                    game.player.stats.heart += 3;
-                    game.player.stats.hustle += 1;
-                    break;
-                case 'fashionista':
-                    game.player.stats.chic += 3;
-                    game.player.stats.spark += 1;
-                    break;
-                case 'ceo':
-                    game.player.stats.hustle += 3;
-                    game.player.stats.chic += 1;
-                    break;
-            }
-            
-            showScene1();
-        }
-
-        function showScene1() {
-            game.currentScene = 'scene1';
-            render(`
-                ${showStats()}
-                <h2>Scene 1: The Crumbling Center</h2>
-                <div class="story-text">
-                    <p>You stand before the dilapidated Community Center. The building that once hosted countless dreams and gatherings now looks tired and forgotten. The roof is leaking, paint is peeling, and the Mayor has just given you an ultimatum:</p>
-                    <p><strong>"${game.player.name}, you have 3 days to prove this place can be saved, or I'm selling it to the developers."</strong></p>
-                    <p>The press is watching. The community is counting on you. What's your first move?</p>
-                </div>
-                
-                <div class="choices">
-                    <button class="choice-btn" onclick="scene1Choice('hustle')">
-                        <div>🔨 The Logical Fix</div>
-                        <div class="choice-stat">Use HUSTLE to organize a volunteer crew</div>
-                    </button>
-                    <button class="choice-btn" onclick="scene1Choice('spark')">
-                        <div>💡 The Artistic Spin</div>
-                        <div class="choice-stat">Use SPARK to turn leaks into an art feature</div>
-                    </button>
-                    <button class="choice-btn" onclick="scene1Choice('chic')">
-                        <div>✨ The Risky Gala (RISKY!)</div>
-                        <div class="choice-stat">Use CHIC for a bold "Distressed Chic" runway show</div>
-                    </button>
-                </div>
-            `);
-        }
-
-        function scene1Choice(stat) {
-            const isRisky = stat === 'chic';
-            const result = resolveAction(stat, isRisky);
-            
-            let resultText = '';
-            let resultClass = '';
-            
-            if (stat === 'hustle') {
-                if (result.success) {
-                    resultText = `<h3>Success! 🎉</h3>
-                        <p>The dice showed ${result.roll}! With your amazing hustle (${game.player.stats[stat]}), you organized the most efficient volunteer crew Malibu has ever seen!</p>
-                        <p>The roof is patched, the community is energized, and you feel accomplished!</p>`;
-                    resultClass = 'result-success';
-                    updateStats({ hustle: 2, morale: 10 });
-                    game.player.flags.scene1Success = true;
-                    game.player.flags.scene1Method = 'hustle';
-                    game.projectScore += 20;
-                } else {
-                    resultText = `<h3>Partial Success...</h3>
-                        <p>The dice showed ${result.roll}. You tried hard, but the work was overwhelming.</p>
-                        <p>The roof is patched, but you're exhausted from doing too much yourself.</p>`;
-                    resultClass = 'result-fail';
-                    updateStats({ morale: -10 });
-                    game.projectScore += 5;
-                }
-            } else if (stat === 'spark') {
-                if (result.success) {
-                    resultText = `<h3>Creative Genius! ✨</h3>
-                        <p>The dice showed ${result.roll}! Your artistic vision transformed disaster into beauty!</p>
-                        <p>You turned the leaking roof into a stunning indoor waterfall feature using recycled glass. It goes viral on social media! Even Raquelle is impressed!</p>`;
-                    resultClass = 'result-success';
-                    updateStats({ spark: 3, morale: 10 });
-                    updateNPCAffinity('raquelle', 10);
-                    updateNPCAffinity('teresa', 15);
-                    game.player.flags.scene1Success = true;
-                    game.player.flags.scene1Method = 'spark';
-                    game.projectScore += 25;
-                } else {
-                    resultText = `<h3>Flooded Dreams... 💧</h3>
-                        <p>The dice showed ${result.roll}. Your artistic vision didn't quite work out...</p>
-                        <p>The waterfall feature flooded the entire lobby! You'll need to clean this up and rethink your approach.</p>`;
-                    resultClass = 'result-fail';
-                    updateStats({ chic: -2, morale: -15 });
-                    game.player.flags.communityCenterFlooded = true;
-                    game.projectScore -= 10;
-                }
-            } else if (stat === 'chic') {
-                if (result.critical && result.roll === 20) {
-                    resultText = `<h3>CRITICAL SUCCESS! 🌟👗🌟</h3>
-                        <p>NAT 20! You rolled a perfect ${result.roll}!</p>
-                        <p>The "Distressed Chic" runway show amidst the ruins becomes legendary! Investors are calling immediately! You've secured early funding and made headlines!</p>`;
-                    resultClass = 'result-critical';
-                    updateStats({ chic: 5, hustle: 5, morale: 20 });
-                    game.player.flags.scene1Success = true;
-                    game.player.flags.scene1Method = 'chic';
-                    game.player.flags.hasHighChic = true;
-                    game.projectScore += 50;
-                } else if (result.success) {
-                    resultText = `<h3>Bold Success! 👗</h3>
-                        <p>The dice showed ${result.roll}! Your risky gamble paid off!</p>
-                        <p>The runway show was stunning and got people talking about the center!</p>`;
-                    resultClass = 'result-success';
-                    updateStats({ chic: 3, morale: 15 });
-                    game.player.flags.scene1Success = true;
-                    game.player.flags.scene1Method = 'chic';
-                    game.projectScore += 30;
-                } else {
-                    const moraleHit = game.difficulty === 'hard' ? -40 : -20;
-                    const statHit = game.difficulty === 'hard' ? -5 : -2;
-                    resultText = `<h3>Disaster! 😱</h3>
-                        <p>The dice showed ${result.roll}. The risk was too great...</p>
-                        <p>During the show, a piece of ceiling fell onto the runway! ${game.difficulty === 'hard' ? 'This is a major setback!' : 'The press is not impressed.'}</p>`;
-                    resultClass = 'result-fail';
-                    updateStats({ morale: moraleHit, chic: statHit, spark: statHit });
-                    game.projectScore -= 20;
-                }
-            }
-            
-            // If morale hit 0 during updateStats, showEnding was called.
-            // We must return here to prevent overwriting the ending screen.
-            if (game.player.morale <= 0) return;
-
-            render(`
-                ${showStats()}
-                <h2>Scene 1: The Crumbling Center</h2>
-                <div class="dice-roll">🎲 ${result.roll}</div>
-                <div class="result-box ${resultClass}">
-                    ${resultText}
-                </div>
-                <button class="choice-btn" onclick="showScene2()">Continue to Scene 2 →</button>
-            `);
-        }
-
-        function showScene2() {
-            game.currentScene = 'scene2';
-            render(`
-                ${showStats()}
-                <h2>Scene 2: The Sabotage</h2>
-                <div class="story-text">
-                    <p>Your Grand Opening is in 2 days! Everything is coming together beautifully... until you get a phone call.</p>
-                    <p><strong>"I'm so sorry,"</strong> says the caterer, <strong>"but Raquelle has booked us for her party on the same night. We can't do both..."</strong></p>
-                    <p>You have no food for your event! Raquelle's competitive streak is showing. How will you handle this?</p>
-                </div>
-                
-                <div class="choices">
-                    <button class="choice-btn" onclick="scene2Choice('heart')">
-                        <div>💖 Kill Them with Kindness</div>
-                        <div class="choice-stat">Use HEART to ask Raquelle to combine parties</div>
-                    </button>
-                    <button class="choice-btn" onclick="scene2Choice('spark')">
-                        <div>🌱 DIY Buffet</div>
-                        <div class="choice-stat">Use SPARK to cook from the community garden</div>
-                    </button>
-                    <button class="choice-btn" onclick="scene2Choice('hustle')">
-                        <div>🚁 The Risky Heist (RISKY!)</div>
-                        <div class="choice-stat">Use HUSTLE to helicopter in pizza from New York</div>
-                    </button>
-                </div>
-            `);
-        }
-
-        function scene2Choice(stat) {
-            const isRisky = stat === 'hustle';
-            const result = resolveAction(stat, isRisky);
-            
-            let resultText = '';
-            let resultClass = '';
-            
-            if (stat === 'heart') {
-                if (result.success) {
-                    resultText = `<h3>Friendship Wins! 💖</h3>
-                        <p>The dice showed ${result.roll}! Your genuine kindness touched Raquelle's heart!</p>
-                        <p>She agrees to combine the parties! It becomes the biggest social event of the season! Raquelle is now your ally!</p>`;
-                    resultClass = 'result-success';
-                    updateStats({ heart: 3, morale: 15 });
-                    updateNPCAffinity('raquelle', 40);
-                    game.player.flags.befriendedRaquelle = true;
-                    game.projectScore += 30;
-                } else {
-                    resultText = `<h3>Rejected... 😢</h3>
-                        <p>The dice showed ${result.roll}. Raquelle wasn't ready to make peace.</p>
-                        <p>She laughs at your proposal and says her party will be better. You've lost valuable time.</p>`;
-                    resultClass = 'result-fail';
-                    updateStats({ morale: -10 });
-                    updateNPCAffinity('raquelle', -10);
-                    game.projectScore += 5;
-                }
-            } else if (stat === 'spark') {
-                if (result.success) {
-                    resultText = `<h3>Rustic Charm! 🌱</h3>
-                        <p>The dice showed ${result.roll}! Your creative cooking is a hit!</p>
-                        <p>The farm-to-table buffet using the community garden becomes a talking point! Ken especially loves your authentic approach!</p>`;
-                    resultClass = 'result-success';
-                    updateStats({ spark: 2, morale: 10 });
-                    updateNPCAffinity('ken', 15);
-                    updateNPCAffinity('teresa', 10);
-                    game.projectScore += 20;
-                } else {
-                    resultText = `<h3>Food Scare! 🤢</h3>
-                        <p>The dice showed ${result.roll}. Your cooking didn't go as planned...</p>
-                        <p>There's a minor food poisoning scare (nothing serious, but embarrassing). Your reputation takes a small hit.</p>`;
-                    resultClass = 'result-fail';
-                    updateStats({ hustle: -3, morale: -10 });
-                    game.projectScore -= 10;
-                }
-            } else if (stat === 'hustle') {
-                if (result.critical && result.roll === 20) {
-                    resultText = `<h3>LEGENDARY MOMENT! 🚁🍕</h3>
-                        <p>NATURAL 20! You rolled ${result.roll}!</p>
-                        <p>The helicopter arrives with authentic New York pizza! It becomes the most talked-about moment in Malibu history! You've trending worldwide!</p>`;
-                    resultClass = 'result-critical';
-                    updateStats({ hustle: 5, morale: 20 });
-                    game.projectScore += 40;
-                } else if (result.success) {
-                    resultText = `<h3>Audacious Success! 🚁</h3>
-                        <p>The dice showed ${result.roll}! Your bold plan worked!</p>
-                        <p>The helicopter pizza delivery is a hit! People can't believe you pulled it off!</p>`;
-                    resultClass = 'result-success';
-                    updateStats({ hustle: 3, morale: 15 });
-                    game.projectScore += 25;
-                } else {
-                    resultText = `<h3>Grounded! ⛈️</h3>
-                        <p>The dice showed ${result.roll}. Weather conditions grounded the helicopter...</p>
-                        <p>No pizza, no food at all! The party is awkward and people leave early. This is a major setback!</p>`;
-                    resultClass = 'result-fail';
-                    updateStats({ morale: -30, hustle: -3 });
-                    game.projectScore -= 20;
-                }
-            }
-            
-            if (game.player.morale <= 0) return;
-
-            render(`
-                ${showStats()}
-                <h2>Scene 2: The Sabotage</h2>
-                <div class="dice-roll">🎲 ${result.roll}</div>
-                <div class="result-box ${resultClass}">
-                    ${resultText}
-                </div>
-                <button class="choice-btn" onclick="showScene3()">Continue to the Grand Finale →</button>
-            `);
-        }
-
-        function showScene3() {
-            game.currentScene = 'scene3';
-            
-            const scene1Requirement = game.player.flags.scene1Success;
-            const chicRequirement = game.player.stats.chic >= 15;
-            
-            render(`
-                ${showStats()}
-                <h2>Scene 3: The Grand Finale - The Runway!</h2>
-                <div class="story-text">
-                    <p>Tonight is the night! The Grand Opening of the reimagined Malibu Community Center!</p>
-                    <p>The Mayor is in the front row. Investors are watching. The entire community has gathered. You need to present your vision for the new center in the most impactful way possible.</p>
-                    <p>This is your moment to shine, ${game.player.name}! How will you close the show?</p>
-                </div>
-                
-                <div class="choices">
-                    <button class="choice-btn" onclick="scene3Choice('heart')" ${!scene1Requirement ? 'disabled' : ''}>
-                        <div>👨‍👩‍👧‍👦 The Community Speech</div>
-                        <div class="choice-stat">Use HEART - Walk with the children of Malibu</div>
-                        ${!scene1Requirement ? '<div class="choice-stat">⚠️ Requires success in Scene 1</div>' : ''}
-                    </button>
-                    <button class="choice-btn" onclick="scene3Choice('chic')" ${!chicRequirement ? 'disabled' : ''}>
-                        <div>👗 The High Fashion Show</div>
-                        <div class="choice-stat">Use CHIC - Wear your self-designed "Dream Dress"</div>
-                        ${!chicRequirement ? '<div class="choice-stat">⚠️ Requires Chic 15+</div>' : ''}
-                    </button>
-                    <button class="choice-btn" onclick="scene3Choice('spark')">
-                        <div>🌟 The Holographic Projection (RISKY!)</div>
-                        <div class="choice-stat">Use SPARK - Attempt never-before-seen tech</div>
-                    </button>
-                </div>
-            `);
-        }
-
-        function scene3Choice(stat) {
-            const isRisky = stat === 'spark';
-            const result = resolveAction(stat, isRisky);
-            
-            let resultText = '';
-            let resultClass = '';
-            
-            if (stat === 'heart') {
-                if (result.success) {
-                    resultText = `<h3>Heartwarming Triumph! 💖</h3>
-                        <p>The dice showed ${result.roll}! Your emotional intelligence saved the day!</p>
-                        <p>The children of Malibu walk the runway with you, each sharing what the community center means to them. There's not a dry eye in the house. The Mayor is moved to tears and immediately approves the project!</p>`;
-                    resultClass = 'result-success';
-                    updateStats({ heart: 4, morale: 20 });
-                    game.projectScore += 40;
-                } else {
-                    resultText = `<h3>Touching but Mixed...</h3>
-                        <p>The dice showed ${result.roll}. The moment was sweet but not quite perfect.</p>
-                        <p>The children's presentation is adorable, but some technical issues diminish the impact.</p>`;
-                    resultClass = 'result-fail';
-                    updateStats({ morale: -5 });
-                    game.projectScore += 15;
-                }
-            } else if (stat === 'chic') {
-                if (result.critical && result.roll === 20) {
-                    resultText = `<h3>FASHION ICON MOMENT! 👗✨</h3>
-                        <p>PERFECT 20! You rolled ${result.roll}!</p>
-                        <p>Your "Dream Dress" is breathtaking! It perfectly embodies everything the community center represents - creativity, hope, and transformation! Fashion magazines are already calling! The Mayor not only approves the project but increases the budget!</p>`;
-                    resultClass = 'result-critical';
-                    updateStats({ chic: 5, morale: 25 });
-                    game.projectScore += 60;
-                } else if (result.success) {
-                    resultText = `<h3>Stunning Success! 👗</h3>
-                        <p>The dice showed ${result.roll}! Your fashion prowess shines!</p>
-                        <p>The "Dream Dress" is gorgeous and represents your vision perfectly! The crowd loves it!</p>`;
-                    resultClass = 'result-success';
-                    updateStats({ chic: 3, morale: 15 });
-                    game.projectScore += 35;
-                } else {
-                    resultText = `<h3>Wardrobe Malfunction! 😬</h3>
-                        <p>The dice showed ${result.roll}. Fashion can be unpredictable...</p>
-                        <p>A strap breaks during the walk! You handle it with grace, but it's not the triumphant moment you hoped for.</p>`;
-                    resultClass = 'result-fail';
-                    updateStats({ morale: -10 });
-                    game.projectScore += 10;
-                }
-            } else if (stat === 'spark') {
-                if (result.critical && result.roll === 20) {
-                    resultText = `<h3>TECHNOLOGICAL MIRACLE! 🌟✨🌟</h3>
-                        <p>CRITICAL SUCCESS! Natural 20!</p>
-                        <p>The holographic projection is FLAWLESS! You've created a fully immersive 3D experience showing the past, present, and future of the community center! People think they're in a dream! Tech companies are offering partnerships! This is revolutionary!</p>`;
-                    resultClass = 'result-critical';
-                    updateStats({ spark: 6, morale: 30 });
-                    updateNPCAffinity('teresa', 30);
-                    game.projectScore += 70;
-                } else if (result.success) {
-                    resultText = `<h3>Innovation Triumph! 🌟</h3>
-                        <p>The dice showed ${result.roll}! Your creativity knows no bounds!</p>
-                        <p>The holographic tech works! It's impressive and futuristic, showing everyone what's possible!</p>`;
-                    resultClass = 'result-success';
-                    updateStats({ spark: 4, morale: 20 });
-                    updateNPCAffinity('teresa', 20);
-                    game.projectScore += 45;
-                } else {
-                    resultText = `<h3>Technical Difficulties! ⚠️</h3>
-                        <p>The dice showed ${result.roll}. The tech wasn't quite ready...</p>
-                        <p>The holographic projection glitches and shows distorted images. It's embarrassing, but you recover by giving an impromptu speech about how even setbacks are part of the creative process.</p>`;
-                    resultClass = 'result-fail';
-                    updateStats({ morale: -15, spark: -2 });
-                    game.projectScore += 5;
-                }
-            }
-            
-            if (game.player.morale <= 0) return;
-
-            render(`
-                ${showStats()}
-                <h2>Scene 3: The Grand Finale</h2>
-                <div class="dice-roll">🎲 ${result.roll}</div>
-                <div class="result-box ${resultClass}">
-                    ${resultText}
-                </div>
-                <button class="choice-btn" onclick="showEnding()">See Your Ending! ✨</button>
-            `);
-        }
-
-        function showEnding(forceType = null) {
-            let endingTitle = '';
-            let endingText = '';
-            let endingClass = 'result-success';
-            
-            if (forceType === 'burnout' || game.player.morale <= 0) {
-                endingTitle = '😴 The Burnout Ending 😴';
-                endingText = `
-                    <p>You gave everything to this project, ${game.player.name}, but you pushed yourself too hard.</p>
-                    <p>The community center project is postponed while you take a much-needed vacation to recharge. Ken books you a spa retreat in the Malibu hills.</p>
-                    <p><strong>"Even icons need to rest,"</strong> he reminds you.</p>
-                    <p>Sometimes the dream requires us to take care of ourselves first. You'll come back stronger! 💖</p>
-                `;
-                endingClass = 'result-fail';
-            } else if (game.player.flags.befriendedRaquelle && game.npcs.raquelle >= 80) {
-                endingTitle = '👯‍♀️ The Best Friends Forever Ending! 👯‍♀️';
-                endingText = `
-                    <p>Incredible, ${game.player.name}! Not only did you save the community center, but you turned your rival into your best friend!</p>
-                    <p>Raquelle approaches you after the finale: <strong>"I've been so impressed by your vision. What do you say we go into business together?"</strong></p>
-                    <p>You and Raquelle launch "Dream & Design," a creative consultancy that transforms communities across the country! The Malibu Community Center becomes your flagship success story!</p>
-                    <p><strong>Project Score: ${game.projectScore}</strong></p>
-                    <p>You've proven that collaboration beats competition every time! 💕✨</p>
-                `;
-                endingClass = 'result-critical';
-            } else if (game.projectScore >= 100) {
-                endingTitle = '🌟 The DREAM ICON Ending! 🌟';
-                endingText = `
-                    <p>PHENOMENAL, ${game.player.name}! You didn't just save the community center - you revolutionized it!</p>
-                    <p>The Mayor cuts the ribbon personally and announces: <strong>"This is the future of community spaces! We're creating a fund to replicate this model across the state!"</strong></p>
-                    <p>Your innovation, style, heart, and hustle have created something truly special. The center becomes a landmark destination, featured in magazines and architectural tours!</p>
-                    <p><strong>Final Project Score: ${game.projectScore}</strong></p>
-                    <p>You're not just an icon - you're a legend! Dream big, achieve bigger! 💖✨🌟</p>
-                `;
-                endingClass = 'result-critical';
-            } else if (game.projectScore >= 60) {
-                endingTitle = '✨ The Success Story Ending! ✨';
-                endingText = `
-                    <p>Congratulations, ${game.player.name}! You saved the Malibu Community Center!</p>
-                    <p>The Mayor approves the project, and the community celebrates your achievement! The center opens to huge crowds and becomes a beloved neighborhood hub!</p>
-                    <p><strong>Final Project Score: ${game.projectScore}</strong></p>
-                    <p>You've proven that with creativity, style, empathy, and hard work, dreams really do come true! The center will serve the community for generations to come! 💖</p>
-                `;
-                endingClass = 'result-success';
-            } else {
-                endingTitle = '🌤️ The Learning Experience Ending 🌤️';
-                endingText = `
-                    <p>You tried your best, ${game.player.name}, and that takes courage!</p>
-                    <p>The community center project didn't go exactly as planned, but the Mayor was impressed by your dedication. She gives you another chance with a smaller pilot program.</p>
-                    <p><strong>Final Project Score: ${game.projectScore}</strong></p>
-                    <p>You've learned valuable lessons about creativity, teamwork, and resilience. Sometimes the journey is more important than the destination! Ken, Teresa, and even Raquelle offer to help with the next phase. 💕</p>
-                    <p><em>"Every setback is a setup for a comeback!"</em></p>
-                `;
-                endingClass = 'result-fail';
-            }
-            
-            render(`
-                <div class="ending-screen">
-                    <div class="ending-title">${endingTitle}</div>
-                    <div class="ending-text">${endingText}</div>
-                    <div class="stats-container" style="margin-top: 30px;">
-                        <h3 style="grid-column: 1 / -1; text-align: center; color: #E0218A;">Final Stats</h3>
-                        <div class="stat">
-                            <div class="stat-label">✨ Spark</div>
-                            <div class="stat-value">${game.player.stats.spark}</div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-label">👗 Chic</div>
-                            <div class="stat-value">${game.player.stats.chic}</div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-label">💖 Heart</div>
-                            <div class="stat-value">${game.player.stats.heart}</div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-label">💼 Hustle</div>
-                            <div class="stat-value">${game.player.stats.hustle}</div>
-                        </div>
-                    </div>
-                    <button class="restart-btn" onclick="location.reload()">Play Again! 💕</button>
-                </div>
-            `);
-        }
-
-        // Start the game
-        startGame();
-    </script>
+</script>
 </body>
 </html>
-```
