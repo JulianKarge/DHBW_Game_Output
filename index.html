@@ -3,594 +3,561 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>STATIC: 1980</title>
+    <title>Operation: Get Active</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Bangers&family=Roboto:wght@400;700&display=swap');
 
         :root {
-            --phosphor-main: #33ff33;
-            --phosphor-dim: #1a801a;
-            --phosphor-alert: #ff3333;
-            --phosphor-signal: #d500f9;
-            --bg-color: #050505;
-            --screen-curve: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+            --lazy-pink: #ff69b4;
+            --lazy-orange: #ffa500;
+            --storm-purple: #4b0082;
+            --storm-light: #9370db;
+            --fn-yellow: #fefe00;
+            --fn-blue: #00bfff;
+            --text-color: #ffffff;
+            --bg-dark: #1a0b2e;
         }
 
         body {
+            background: radial-gradient(circle at center, var(--storm-light), var(--bg-dark));
+            font-family: 'Roboto', sans-serif;
+            color: var(--text-color);
             margin: 0;
             padding: 0;
-            background-color: #000;
-            color: var(--phosphor-main);
-            font-family: 'VT323', monospace;
             height: 100vh;
-            overflow: hidden;
             display: flex;
             justify-content: center;
             align-items: center;
+            overflow: hidden;
         }
 
-        /* CRT EFFECT CONTAINER */
-        #crt-container {
-            width: 100%;
-            max-width: 900px;
-            height: 95vh;
-            background-color: var(--bg-color);
-            border: 2px solid #333;
-            border-radius: 20px;
+        #game-container {
+            width: 90%;
+            max-width: 800px;
+            height: 90vh;
+            background: rgba(0, 0, 0, 0.85);
+            border: 4px solid var(--lazy-pink);
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 30px var(--storm-purple);
             position: relative;
-            box-shadow: 0 0 20px rgba(51, 255, 51, 0.2);
-            overflow: hidden;
+        }
+
+        /* HUD Styling */
+        #hud {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-bottom: 2px solid var(--fn-blue);
+        }
+
+        .stat-box {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 5px;
+            text-align: center;
+            border-radius: 5px;
+            border: 1px solid var(--fn-blue);
+        }
+
+        .stat-label {
+            font-family: 'Bangers', cursive;
+            font-size: 1.2rem;
+            color: var(--fn-yellow);
+            letter-spacing: 1px;
+            text-shadow: 1px 1px 0 #000;
+        }
+
+        .stat-val {
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        /* Main Content Area */
+        #main-display {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
             display: flex;
             flex-direction: column;
         }
 
-        /* SCANLINES & FLICKER */
-        #crt-container::before {
-            content: " ";
-            display: block;
-            position: absolute;
-            top: 0;
-            left: 0;
-            bottom: 0;
-            right: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-            z-index: 10;
-            background-size: 100% 2px, 3px 100%;
-            pointer-events: none;
-        }
-
-        #crt-container::after {
-            content: " ";
-            display: block;
-            position: absolute;
-            top: 0;
-            left: 0;
-            bottom: 0;
-            right: 0;
-            background: rgba(18, 16, 16, 0.1);
-            opacity: 0;
-            z-index: 10;
-            pointer-events: none;
-            animation: flicker 0.15s infinite;
-        }
-
-        @keyframes flicker {
-            0% { opacity: 0.027; }
-            5% { opacity: 0.04; }
-            10% { opacity: 0.02; }
-            15% { opacity: 0.04; }
-            20% { opacity: 0.02; }
-            100% { opacity: 0.02; }
-        }
-
-        /* UI LAYOUT */
-        header {
-            border-bottom: 2px solid var(--phosphor-dim);
-            padding: 15px;
-            text-align: center;
-            text-shadow: 0 0 5px var(--phosphor-main);
-            flex-shrink: 0;
-        }
-
-        h1 {
-            margin: 0;
-            font-size: 2.5rem;
-            letter-spacing: 5px;
-            animation: textFlicker 3s infinite;
-        }
-
-        #hud {
-            display: flex;
-            justify-content: space-around;
-            padding: 10px;
-            border-bottom: 1px dashed var(--phosphor-dim);
-            font-size: 1.2rem;
-            flex-shrink: 0;
-        }
-
-        .stat-box span {
-            font-weight: bold;
-        }
-
-        #game-output {
-            flex-grow: 1;
-            padding: 20px;
-            overflow-y: auto;
-            font-size: 1.2rem;
-            line-height: 1.4;
-            scrollbar-width: thin;
-            scrollbar-color: var(--phosphor-dim) var(--bg-color);
-        }
-
-        #game-output::-webkit-scrollbar {
-            width: 8px;
-        }
-        #game-output::-webkit-scrollbar-thumb {
-            background-color: var(--phosphor-dim);
-        }
-
         .log-entry {
-            margin-bottom: 20px;
-            opacity: 0;
-            animation: fadeIn 0.5s forwards;
+            margin-bottom: 15px;
+            padding: 10px;
+            border-left: 4px solid var(--lazy-orange);
+            background: rgba(255, 165, 0, 0.1);
+            animation: fadeIn 0.5s ease;
         }
 
-        .narrative {
-            color: #ddd;
-            text-shadow: 0 0 2px #fff;
-        }
-
-        .signal-text {
-            color: var(--phosphor-signal);
-            text-shadow: 0 0 5px var(--phosphor-signal);
+        .log-entry.system {
+            border-left-color: var(--fn-blue);
+            background: rgba(0, 191, 255, 0.1);
             font-style: italic;
         }
 
-        .success { color: var(--phosphor-main); }
-        .failure { color: var(--phosphor-alert); }
-        .info { color: #ffff00; }
+        .log-entry.bad {
+            border-left-color: red;
+            background: rgba(255, 0, 0, 0.1);
+        }
 
+        .log-entry.good {
+            border-left-color: var(--fn-yellow);
+            background: rgba(254, 254, 0, 0.1);
+        }
+
+        h2 {
+            font-family: 'Bangers', cursive;
+            color: var(--lazy-pink);
+            font-size: 2rem;
+            margin-top: 0;
+            text-shadow: 2px 2px 0 var(--storm-purple);
+        }
+
+        /* Controls */
         #controls {
             padding: 20px;
-            border-top: 2px solid var(--phosphor-dim);
-            display: grid;
-            grid-template-columns: 1fr;
+            display: flex;
+            flex-direction: column;
             gap: 10px;
-            flex-shrink: 0;
-            min-height: 150px;
+            background: rgba(0, 0, 0, 0.9);
+            border-top: 2px solid var(--fn-blue);
+            border-radius: 0 0 12px 12px;
         }
 
         button {
-            background: transparent;
-            border: 1px solid var(--phosphor-main);
-            color: var(--phosphor-main);
-            font-family: 'VT323', monospace;
+            background: linear-gradient(45deg, var(--fn-blue), #0077be);
+            border: none;
+            color: white;
+            padding: 15px;
+            font-family: 'Bangers', cursive;
             font-size: 1.2rem;
-            padding: 10px;
             cursor: pointer;
-            text-align: left;
+            transform: skew(-10deg);
             transition: all 0.2s;
-            text-transform: uppercase;
+            border: 2px solid white;
+            text-shadow: 1px 1px 0 #000;
         }
 
         button:hover {
-            background: var(--phosphor-main);
-            color: #000;
-            box-shadow: 0 0 10px var(--phosphor-main);
+            transform: skew(-10deg) scale(1.02);
+            background: linear-gradient(45deg, var(--fn-yellow), #d4d400);
+            color: black;
+            text-shadow: none;
         }
 
         button:disabled {
-            border-color: #555;
-            color: #555;
+            background: #555;
             cursor: not-allowed;
-            box-shadow: none;
+            opacity: 0.6;
+            color: #ccc;
         }
 
-        .hidden { display: none !important; }
+        .relationship-tracker {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 0.8rem;
+            color: var(--lazy-pink);
+            text-align: right;
+            pointer-events: none;
+        }
 
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        @keyframes textFlicker {
-            0% { opacity: 1; text-shadow: 0 0 5px var(--phosphor-main); }
-            5% { opacity: 0.5; text-shadow: none; }
-            10% { opacity: 1; text-shadow: 0 0 5px var(--phosphor-main); }
-            100% { opacity: 1; text-shadow: 0 0 5px var(--phosphor-main); }
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
         }
-
+        ::-webkit-scrollbar-track {
+            background: #1a0b2e; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--lazy-pink); 
+            border-radius: 4px;
+        }
     </style>
 </head>
 <body>
 
-<div id="crt-container">
-    <header>
-        <h1>STATIC: 1980</h1>
-    </header>
-    
-    <div id="hud" class="hidden">
-        <div class="stat-box">HP: <span id="hp-val">3</span>/3</div>
-        <div class="stat-box">GRIT: <span id="grit-val">4</span></div>
-        <div class="stat-box">TECH: <span id="tech-val">5</span></div>
-        <div class="stat-box">HEART: <span id="heart-val">2</span></div>
+<div id="game-container">
+    <div class="relationship-tracker">
+        Sportacus: <span id="rel-sport">0</span> | Stephanie: <span id="rel-steph">0</span>
     </div>
 
-    <div id="game-output">
-        <div class="log-entry" style="text-align: center; margin-top: 50px;">
-            <p>ECHO POINT, OREGON. NOVEMBER 12, 1980.</p>
-            <p class="signal-text">A psychotronic signal has begun broadcasting.</p>
-            <br>
-            <p>SELECT DIFFICULTY:</p>
+    <div id="hud">
+        <div class="stat-box">
+            <div class="stat-label">HYPE</div>
+            <div class="stat-val" id="val-hype">20</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-label">BUILD</div>
+            <div class="stat-val" id="val-build">20</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-label">TACTICS</div>
+            <div class="stat-val" id="val-tactics">20</div>
+        </div>
+        <div class="stat-box" style="border-color: red;">
+            <div class="stat-label" style="color: #ff6666;">ENERGY</div>
+            <div class="stat-val" id="val-energy">20</div>
         </div>
     </div>
 
+    <div id="main-display"></div>
+
     <div id="controls">
-        <button onclick="startGame('vhs')">VHS (EASY)</button>
-        <button onclick="startGame('broadcast')">BROADCAST (NORMAL)</button>
-        <button onclick="startGame('noise')">WHITE NOISE (HARD)</button>
+        <!-- Buttons generated by JS -->
     </div>
 </div>
 
 <script>
-    // GAME STATE
+    // --- GAME STATE ---
     const state = {
-        difficulty: 'broadcast',
         stats: {
-            hp: 3,
-            grit: 4,
-            tech: 5,
-            heart: 2
+            hype: 20,
+            build: 20,
+            tactics: 20,
+            energy: 20
         },
-        hidden: {
-            lindaTrust: 0,
-            mikeyStatus: 'Alive',
-            luck: 0
+        relationships: {
+            sportacus: 0,
+            stephanie: 0
         },
-        sceneIndex: 0,
+        difficulty: 'normal', // creative, normal, sweat
+        diffMod: 0, // Stat threshold modifier
+        penaltyMod: 1, // Damage multiplier
         gameOver: false
     };
 
-    // DOM ELEMENTS
-    const outputDiv = document.getElementById('game-output');
-    const controlsDiv = document.getElementById('controls');
-    const hudDiv = document.getElementById('hud');
-    
-    const uiStats = {
-        hp: document.getElementById('hp-val'),
-        grit: document.getElementById('grit-val'),
-        tech: document.getElementById('tech-val'),
-        heart: document.getElementById('heart-val')
+    // --- DOM ELEMENTS ---
+    const dom = {
+        hype: document.getElementById('val-hype'),
+        build: document.getElementById('val-build'),
+        tactics: document.getElementById('val-tactics'),
+        energy: document.getElementById('val-energy'),
+        relSport: document.getElementById('rel-sport'),
+        relSteph: document.getElementById('rel-steph'),
+        display: document.getElementById('main-display'),
+        controls: document.getElementById('controls')
     };
 
-    // SCENE DATA
-    const scenes = [
-        {
-            id: 1,
-            title: "SCENE 1: The Repair Shop",
-            text: "It is raining outside your repair shop. You are fixing an old VCR when suddenly, every TV in the shop screams with a <span class='signal-text'>screeching purple static</span>. The front window smashes inward. Your neighbor, Mr. Henderson, eyes rolled back white, lunges over the counter.",
-            choices: [
-                {
-                    text: "[COMBAT] Smash him with the heavy VCR (Req: GRIT)",
-                    stat: "grit",
-                    baseReq: 4,
-                    type: "check",
-                    success: {
-                        text: "You swing the VCR with brute force. Sparks fly as it connects with Henderson's skull. He drops cold.",
-                        effect: (s) => { s.stats.grit++; },
-                        resultText: "+1 GRIT"
-                    },
-                    fail: {
-                        text: "You hesitate. Henderson bites your arm before you can kick him off. Pain sears through you.",
-                        effect: (s) => { s.stats.hp--; },
-                        resultText: "-1 HP"
-                    }
-                },
-                {
-                    text: "[TECH] Crank the Ham Radio to a counter-frequency (Req: TECH)",
-                    stat: "tech",
-                    baseReq: 5,
-                    type: "check",
-                    success: {
-                        text: "You spin the dial. A high-pitched whine cuts through the static. Henderson screams, clutching his ears, and flees into the rain.",
-                        effect: (s) => { s.stats.tech++; },
-                        resultText: "+1 TECH"
-                    },
-                    fail: {
-                        text: "You fumble the dial. The radio shorts out in a shower of sparks. Henderson is distracted, but you lost your equipment.",
-                        effect: (s) => { s.stats.tech--; },
-                        resultText: "-1 TECH"
-                    }
-                },
-                {
-                    text: "[RUN] Grab gear and dive out the back window.",
-                    stat: null,
-                    type: "action",
-                    success: {
-                        text: "You don't wait to find out what he wants. You grab your toolkit and dive into the alleyway glass.",
-                        effect: (s) => { s.stats.grit--; s.hidden.luck++; },
-                        resultText: "-1 GRIT (Cowardice), +1 LUCK"
-                    }
-                }
-            ]
-        },
-        {
-            id: 2,
-            title: "SCENE 2: Neon Avenue",
-            text: "The streets are chaos. Cars crashed into storefronts. Neon signs flicker in the rain. You spot Mikey, the arcade kid, trapped in a phone booth surrounded by three <span class='signal-text'>Listeners</span>. Sheriff Linda pulls up, gun drawn, shaking. She aims at YOU.",
-            choices: [
-                {
-                    text: "[DIPLOMACY] Reason with Linda (Req: HEART)",
-                    stat: "heart",
-                    baseReq: 4,
-                    type: "check",
-                    success: {
-                        text: "\"Linda! It's the signal! We need to save the kid!\" Her eyes clear. She lowers the gun. \"Get in.\"",
-                        effect: (s) => { s.hidden.lindaTrust++; s.stats.heart++; },
-                        resultText: "+1 HEART, +1 Linda Trust"
-                    },
-                    fail: {
-                        text: "She fires a warning shot. You dive, saving Mikey but twisting your ankle badly.",
-                        effect: (s) => { s.stats.grit--; },
-                        resultText: "-1 GRIT"
-                    }
-                },
-                {
-                    text: "[ACTION] Throw a brick and grab Mikey (Req: GRIT)",
-                    stat: "grit",
-                    baseReq: 5,
-                    type: "check",
-                    success: {
-                        text: "You hurl a brick through a windshield. The noise draws the Listeners. You grab Mikey and slide over the hood of Linda's car.",
-                        effect: (s) => { s.hidden.mikeyStatus = 'Alive'; s.stats.grit++; },
-                        resultText: "+1 GRIT, Mikey Saved"
-                    },
-                    fail: {
-                        text: "You save Mikey, but Linda panics and hits you with the car door.",
-                        effect: (s) => { s.stats.hp--; },
-                        resultText: "-1 HP"
-                    }
-                },
-                {
-                    text: "[TECH] Hotwire the police cruiser siren (Req: TECH - Hard)",
-                    stat: "tech",
-                    baseReq: 6,
-                    type: "check",
-                    success: {
-                        text: "You bypass the relay. The siren wails. The Listeners chase the car. Linda is stunned by your skill.",
-                        effect: (s) => { s.hidden.lindaTrust += 2; s.stats.tech++; },
-                        resultText: "+1 TECH, +2 Linda Trust"
-                    },
-                    fail: {
-                        text: "You trigger the horn instead. Every Listener on the block turns to look at you.",
-                        effect: (s) => { 
-                            if(s.difficulty === 'noise') { s.stats.hp = 0; } 
-                            else { s.stats.hp -= 2; }
-                        },
-                        resultText: "CRITICAL FAILURE. Massive Damage."
-                    }
-                }
-            ]
-        },
-        {
-            id: 3,
-            title: "SCENE 3: The Radio Tower",
-            text: "You reach the KVHS Tower. Thick <span class='signal-text'>purple fog</span> chokes the air. Linda is holding the door against a horde. Mikey is twitching—the signal is getting to him. The console is fried. You need to override the broadcast NOW.",
-            choices: [
-                {
-                    text: "[TECH] Solder the connections alone (Req: TECH)",
-                    stat: "tech",
-                    baseReq: 7,
-                    type: "check",
-                    success: {
-                        text: "Your hands are steady. You bridge the connection. The signal screeches and dies.",
-                        effect: (s) => { endGame("static_hero"); },
-                        resultText: ""
-                    },
-                    fail: {
-                        text: "It takes too long. The door gives way.",
-                        effect: (s) => { endGame("hollow"); },
-                        resultText: ""
-                    }
-                },
-                {
-                    text: "[HEART] Snap Mikey out of it to help (Req: HEART)",
-                    stat: "heart",
-                    baseReq: 6,
-                    type: "check",
-                    success: {
-                        text: "You calm Mikey down. He connects the secondary wires while you handle the main board. Together, you jam the signal.",
-                        effect: (s) => { s.stats.heart += 2; endGame("static_hero"); },
-                        resultText: ""
-                    },
-                    fail: {
-                        text: "Mikey screams and attacks you. You have to knock him out, wasting precious time.",
-                        effect: (s) => { s.stats.hp--; s.hidden.mikeyStatus = 'Infected'; endGame("hollow"); },
-                        resultText: "-1 HP, Mikey Infected"
-                    }
-                },
-                {
-                    text: "[GRIT] Use your body to complete the circuit (Req: GRIT)",
-                    stat: "grit",
-                    baseReq: 7,
-                    type: "check",
-                    success: {
-                        text: "You grab the live wires. Agony rips through you, but the signal stops.",
-                        effect: (s) => { s.stats.hp -= 2; endGame("martyr"); },
-                        resultText: ""
-                    },
-                    fail: {
-                        text: "The current is too strong. You die before the signal jams.",
-                        effect: (s) => { s.stats.hp = 0; },
-                        resultText: ""
-                    }
-                }
-            ]
-        }
-    ];
+    // --- CORE LOGIC ---
 
-    // ENGINE FUNCTIONS
-
-    function log(html, type = 'narrative') {
+    function log(text, type = 'normal') {
         const div = document.createElement('div');
         div.className = `log-entry ${type}`;
-        div.innerHTML = html;
-        outputDiv.appendChild(div);
-        outputDiv.scrollTop = outputDiv.scrollHeight;
+        div.innerHTML = text;
+        dom.display.appendChild(div);
+        dom.display.scrollTop = dom.display.scrollHeight;
     }
 
-    function updateHUD() {
-        uiStats.hp.textContent = state.stats.hp;
-        uiStats.grit.textContent = state.stats.grit;
-        uiStats.tech.textContent = state.stats.tech;
-        uiStats.heart.textContent = state.stats.heart;
-        
-        if (state.stats.hp <= 0 && !state.gameOver) {
-            endGame("dead_air");
+    function updateStats(hypeChange, buildChange, tacticsChange, energyChange) {
+        // Apply multipliers based on Difficulty for negative values
+        if (state.difficulty === 'creative' && energyChange < 0) energyChange = Math.floor(energyChange * 0.5);
+        if (state.difficulty === 'sweat' && energyChange < 0) energyChange = Math.floor(energyChange * 1.5);
+
+        // Apply
+        state.stats.hype += hypeChange;
+        state.stats.build += buildChange;
+        state.stats.tactics += tacticsChange;
+        state.stats.energy += energyChange;
+
+        // Caps
+        for (let key in state.stats) {
+            if (state.stats[key] > 100) state.stats[key] = 100;
         }
-    }
 
-    function startGame(diff) {
-        state.difficulty = diff;
+        // Render
+        dom.hype.innerText = state.stats.hype;
+        dom.build.innerText = state.stats.build;
+        dom.tactics.innerText = state.stats.tactics;
+        dom.energy.innerText = state.stats.energy;
+
+        // Check Death
+        if (state.stats.energy <= 0) {
+            triggerGameOver("You have run out of Energy and fallen asleep.");
+            return false;
+        }
         
-        // Reset Stats
-        state.stats = { hp: 3, grit: 4, tech: 5, heart: 2 };
-        state.hidden = { lindaTrust: 0, mikeyStatus: 'Alive', luck: 0 };
-        state.sceneIndex = 0;
-        state.gameOver = false;
+        // Sweat Mode Death Condition
+        if (state.difficulty === 'sweat') {
+            if (state.stats.hype <= 0 || state.stats.build <= 0 || state.stats.tactics <= 0) {
+                triggerGameOver("SWEAT MODE FAIL: A stat reached zero. You got boxed like a fish.");
+                return false;
+            }
+        }
 
-        // Modifier explanation
-        let modifierText = "";
-        if (diff === 'vhs') modifierText = "DIFFICULTY: VHS (Checks -2)";
-        if (diff === 'broadcast') modifierText = "DIFFICULTY: BROADCAST (Standard)";
-        if (diff === 'noise') modifierText = "DIFFICULTY: WHITE NOISE (Checks +2, Fail = Damage)";
-
-        // Clear Intro
-        outputDiv.innerHTML = "";
-        hudDiv.classList.remove('hidden');
-        
-        log(modifierText, "info");
-        updateHUD();
-        renderScene();
+        return true;
     }
 
-    function getDifficultyModifier() {
-        if (state.difficulty === 'vhs') return -2;
-        if (state.difficulty === 'broadcast') return 0;
-        if (state.difficulty === 'noise') return 2;
-        return 0;
+    function updateRel(char, amount) {
+        state.relationships[char] += amount;
+        if (state.relationships[char] > 10) state.relationships[char] = 10;
+        document.getElementById(`rel-${char === 'sportacus' ? 'sport' : 'steph'}`).innerText = state.relationships[char];
     }
 
-    function renderScene() {
+    function statCheck(statName, threshold) {
+        const adjustedThreshold = threshold + state.diffMod;
+        const roll = state.stats[statName];
+        return roll >= adjustedThreshold;
+    }
+
+    function triggerGameOver(reason) {
+        state.gameOver = true;
+        dom.controls.innerHTML = '';
+        log(`<h2>GAME OVER</h2><p>${reason}</p>`, 'bad');
+        const btn = document.createElement('button');
+        btn.innerText = "Return to Lobby (Restart)";
+        btn.onclick = () => location.reload();
+        dom.controls.appendChild(btn);
+    }
+
+    function createButtons(choices) {
+        dom.controls.innerHTML = '';
         if (state.gameOver) return;
 
-        const scene = scenes[state.sceneIndex];
-        
-        // Render Scene Text
-        log(`<hr style="border-color: #1a801a"><h3>${scene.title}</h3><p>${scene.text}</p>`);
-
-        // Render Buttons
-        controlsDiv.innerHTML = "";
-        
-        scene.choices.forEach((choice, index) => {
+        choices.forEach(choice => {
             const btn = document.createElement('button');
             
-            // Calculate Threshold for display
-            let thresholdDisplay = "";
-            if (choice.type === 'check') {
-                const req = choice.baseReq + getDifficultyModifier();
-                const current = state.stats[choice.stat];
-                const chance = current >= req ? "LIKELY" : "RISKY";
-                thresholdDisplay = ` <br><span style="font-size:0.8em; color: #888">[Check: ${req} | You: ${current}]</span>`;
+            // Check visibility conditions
+            if (choice.condition && !choice.condition()) {
+                return; // Don't show this button
             }
 
-            btn.innerHTML = `${index + 1}. ${choice.text} ${thresholdDisplay}`;
-            btn.onclick = () => handleChoice(choice);
-            controlsDiv.appendChild(btn);
+            // Check disable conditions (visible but greyed out)
+            if (choice.requirementText) {
+                const reqMet = choice.check ? choice.check() : true;
+                btn.innerHTML = `${choice.text} <br><small style='font-size:0.8rem'>(${choice.requirementText})</small>`;
+                if (!reqMet) {
+                    btn.disabled = true;
+                }
+            } else {
+                btn.innerText = choice.text;
+            }
+
+            btn.onclick = () => {
+                choice.action();
+            };
+            dom.controls.appendChild(btn);
         });
     }
 
-    function handleChoice(choice) {
-        // Disable controls temporarily
-        const buttons = controlsDiv.querySelectorAll('button');
-        buttons.forEach(b => b.disabled = true);
+    // --- SCENES ---
 
-        let success = true;
-
-        if (choice.type === 'check') {
-            const req = choice.baseReq + getDifficultyModifier();
-            const val = state.stats[choice.stat];
-            if (val < req) success = false;
-        }
-
-        if (success) {
-            log(`> ${choice.success.text}`, 'success');
-            choice.success.effect(state);
-            if(choice.success.resultText) log(choice.success.resultText, 'info');
-        } else {
-            log(`> ${choice.fail.text}`, 'failure');
-            choice.fail.effect(state);
-            if(choice.fail.resultText) log(choice.fail.resultText, 'failure');
+    const scenes = {
+        start: () => {
+            log(`<h2>Initialize Operation "Get Active"</h2>
+            <p>Welcome to a glitched server. Select your difficulty.</p>`);
             
-            // Hard mode penalty logic if not already handled inside effect
-            if (state.difficulty === 'noise' && choice.type === 'check') {
-                // Check if effect already reduced HP, if not, reduce it
-                if (!choice.fail.resultText.includes("HP")) {
-                    state.stats.hp--;
-                    log("HARD MODE PENALTY: -1 HP", 'failure');
+            createButtons([
+                {
+                    text: "Creative Mode (Easy)",
+                    action: () => {
+                        state.difficulty = 'creative';
+                        state.diffMod = -10;
+                        state.penaltyMod = 0.5;
+                        log("Difficulty Set: Creative. Stat Checks -10. Damage 50%.", 'system');
+                        scenes.intro();
+                    }
+                },
+                {
+                    text: "Battle Royale (Normal)",
+                    action: () => {
+                        state.difficulty = 'normal';
+                        state.diffMod = 0;
+                        state.penaltyMod = 1;
+                        log("Difficulty Set: Battle Royale. Standard Rules.", 'system');
+                        scenes.intro();
+                    }
+                },
+                {
+                    text: "Sweat Mode (Hard)",
+                    action: () => {
+                        state.difficulty = 'sweat';
+                        state.diffMod = 10;
+                        state.penaltyMod = 1.5;
+                        log("Difficulty Set: Sweat Mode. Stat Checks +10. Any 0 Stat = Game Over.", 'system');
+                        scenes.intro();
+                    }
                 }
-            }
-        }
+            ]);
+        },
 
-        updateHUD();
+        intro: () => {
+            log(`<p>The Battle Bus honks, but the melody is 'Bing Bang'. You drop not onto an island, but into a neon-colored suburb surrounded by a purple Storm. Everyone is asleep... except you.</p>`);
+            setTimeout(scenes.scene1, 1500);
+        },
 
-        if (!state.gameOver) {
-            if (state.stats.hp <= 0) {
-                endGame("dead_air");
-            } else {
-                state.sceneIndex++;
-                if (state.sceneIndex < scenes.length) {
-                    setTimeout(renderScene, 1500); // Small delay for reading
-                } else if (!state.gameOver) {
-                    // Logic handled in Scene 3
+        scene1: () => {
+            log(`<h2>Scene 1: The Drop</h2>
+            <p>You are gliding down. You spot <strong>Sportacus</strong> hanging precariously from the crashed Airship lodged in a Clock Tower.</p>`);
+
+            createButtons([
+                {
+                    text: "Land Safe & Loot (TACTICS)",
+                    action: () => {
+                        updateStats(0, 0, 10, 5);
+                        log("You stick the landing. You find a stash of Apples (Sports Candy). +10 TACTICS, +5 ENERGY.", 'good');
+                        scenes.scene2();
+                    }
+                },
+                {
+                    text: "Emote Mid-Air (HYPE)",
+                    action: () => {
+                        updateStats(15, 0, 0, -5);
+                        updateRel('stephanie', 1);
+                        log("You 'Floss' mid-air to generate updraft. Stephanie sees you from a window and cheers. +15 HYPE, -5 ENERGY, +1 Steph.", 'good');
+                        scenes.scene2();
+                    }
+                },
+                {
+                    text: "Dive Bomb Save (BUILD)",
+                    requirementText: `Requires ${25 + state.diffMod} BUILD`,
+                    check: () => statCheck('build', 25),
+                    action: () => {
+                        if (statCheck('build', 25)) {
+                            updateStats(0, 20, 0, 0);
+                            updateRel('sportacus', 2);
+                            log("You catch him! +20 BUILD, +2 Sportacus.", 'good');
+                        } else {
+                            updateStats(0, 0, 0, -15);
+                            log("You crash into a billboard. Sportacus saves you. Embarrassing. -15 ENERGY.", 'bad');
+                        }
+                        if(!state.gameOver) scenes.scene2();
+                    }
                 }
-            }
+            ]);
+        },
+
+        scene2: () => {
+            log(`<h2>Scene 2: The Loot Phase</h2>
+            <p>Sportacus explains Robbie Rotten has hacked the Storm. You encounter 'Sleepy Henchmen' (robots in pajamas) blocking the path to the lair.</p>`);
+
+            createButtons([
+                {
+                    text: "Crank 90s (BUILD)",
+                    requirementText: `Requires ${30 + state.diffMod} BUILD`,
+                    check: () => true, // Player can always TRY, pass/fail is inside
+                    action: () => {
+                        if (statCheck('build', 30)) {
+                            updateStats(0, 0, 10, 0);
+                            log("You build a tower over them. Clean edits. +10 TACTICS.", 'good');
+                        } else {
+                            updateStats(0, -10, 0, -10);
+                            log("Your tower collapses. You take fall damage. -10 BUILD, -10 ENERGY.", 'bad');
+                        }
+                        if(!state.gameOver) scenes.scene3();
+                    }
+                },
+                {
+                    text: "Dance Battle (HYPE)",
+                    requirementText: `Requires ${30 + state.diffMod} HYPE`,
+                    check: () => true,
+                    action: () => {
+                        if (statCheck('hype', 30)) {
+                            updateStats(20, 0, 0, 0);
+                            updateRel('stephanie', 2);
+                            log("You out-dance the robots. Stephanie is impressed. +20 HYPE, +2 Steph.", 'good');
+                        } else {
+                            updateStats(-15, 0, 0, -10);
+                            log("Your moves are cringe. They throw tomatoes. -15 HYPE, -10 ENERGY.", 'bad');
+                        }
+                        if(!state.gameOver) scenes.scene3();
+                    }
+                },
+                {
+                    text: "Hack Nap-Time (TACTICS)",
+                    requirementText: "Risky Logic Puzzle",
+                    check: () => true,
+                    action: () => {
+                        // Logic puzzle result based on current tactic stat vs fixed number
+                        if (state.stats.tactics > 25) {
+                            updateStats(0, 0, 20, 0);
+                            log("You upload a lullaby virus. The robots sleep. +20 TACTICS.", 'good');
+                        } else {
+                            updateStats(0, 0, 0, -20);
+                            log("Hack failed. Robots enter Tantrum Mode. -20 ENERGY.", 'bad');
+                        }
+                        if(!state.gameOver) scenes.scene3();
+                    }
+                }
+            ]);
+        },
+
+        scene3: () => {
+            // Storm Effect
+            if(!updateStats(0, 0, 0, -2)) return; // -2 Energy drain immediately
+
+            log(`<h2>Scene 3: The Storm Circle</h2>
+            <p>You reach Robbie’s Lair. He is piloting a giant Mech Suit made of recliner chairs. The Storm is shrinking! (-2 Energy).</p>`);
+
+            createButtons([
+                {
+                    text: "Throw Sports Apple (TEAMWORK)",
+                    requirementText: `Need Sportacus Rel > 3 & ${30 + state.diffMod} TACTICS`,
+                    check: () => state.relationships.sportacus > 3 && statCheck('tactics', 30),
+                    action: () => {
+                        log(`<h2>VICTORY ROYALE!</h2>
+                        <p>Sportacus eats the apple, powers up, and flips onto the mech to disable it. You acted as the perfect squad leader.</p>
+                        <p style='color:gold'>ENDING: THE TRUE HERO</p>`, 'good');
+                        scenes.endGame();
+                    }
+                },
+                {
+                    text: "Pump Shotgun / Build Fight (SOLO)",
+                    requirementText: `Need ${50 + state.diffMod} BUILD`,
+                    check: () => true,
+                    action: () => {
+                        if (statCheck('build', 50)) {
+                            log(`<h2>VICTORY ROYALE!</h2>
+                            <p>You box Robbie in, edit a window, and destroy the controls with a Noise Maker. Robbie cries.</p>
+                            <p style='color:silver'>ENDING: SWEATY VICTORY</p>`, 'good');
+                        } else {
+                            triggerGameOver("You ran out of materials. Robbie blasts you with the Laziness Ray.");
+                            return;
+                        }
+                        scenes.endGame();
+                    }
+                },
+                {
+                    text: "Diplomacy (HYPE)",
+                    requirementText: `Need ${60 + state.diffMod} HYPE`,
+                    check: () => true,
+                    action: () => {
+                        if (statCheck('hype', 60)) {
+                            log(`<h2>VICTORY ROYALE!</h2>
+                            <p>You convince Robbie that ruling the world is too much work. He agrees and goes to take a nap.</p>
+                            <p style='color:pink'>ENDING: DIPLOMATIC VICTORY</p>`, 'good');
+                        } else {
+                            updateStats(0,0,0,-100); // Instant kill
+                            triggerGameOver("Robbie laughs at you. 'I have automated everything!' He blasts you.");
+                            return;
+                        }
+                        scenes.endGame();
+                    }
+                }
+            ]);
+        },
+
+        endGame: () => {
+            dom.controls.innerHTML = '';
+            const btn = document.createElement('button');
+            btn.innerText = "Play Again";
+            btn.style.marginTop = "20px";
+            btn.onclick = () => location.reload();
+            dom.display.appendChild(btn);
+            dom.display.scrollTop = dom.display.scrollHeight;
         }
-    }
+    };
 
-    function endGame(endingType) {
-        state.gameOver = true;
-        controlsDiv.innerHTML = "<button onclick='location.reload()'>RESET SYSTEM</button>";
-        
-        let title = "";
-        let desc = "";
-        let color = "var(--phosphor-main)";
-
-        switch(endingType) {
-            case "dead_air":
-                title = "SIGNAL RECEIVED";
-                desc = "You have succumbed to the broadcast. Your mind is no longer your own. You stand still, waiting for a sound.";
-                color = "var(--phosphor-signal)";
-                break;
-            case "static_hero":
-                title = "THE STATIC HERO";
-                desc = "The signal dies. Silence falls over Echo Point. Linda claps you on the shoulder. Mikey is safe. You did it.";
-                break;
-            case "hollow":
-                title = "A HOLLOW VICTORY";
-                desc = "The signal is jammed, but the cost was too high. The town is saved, but you look at the devastation and feel nothing.";
-                color = "#ffff00";
-                break;
-            case "martyr":
-                title = "THE MARTYR";
-                desc = "Your heart stops as the last pulse of the signal fades. You saved them all. In 1981, they build a statue in the town square.";
-                break;
-        }
-
-        setTimeout(() => {
-            log(`<br><br><h1 style="color: ${color}">${title}</h1><p>${desc}</p>`, 'narrative');
-        }, 1000);
-    }
+    // --- INIT ---
+    scenes.start();
 
 </script>
 </body>
