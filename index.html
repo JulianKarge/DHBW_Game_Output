@@ -3,562 +3,421 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Operation: Get Active</title>
+    <title>Ali Mario and the Forty Koopas</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Bangers&family=Roboto:wght@400;700&display=swap');
-
         :root {
-            --lazy-pink: #ff69b4;
-            --lazy-orange: #ffa500;
-            --storm-purple: #4b0082;
-            --storm-light: #9370db;
-            --fn-yellow: #fefe00;
-            --fn-blue: #00bfff;
-            --text-color: #ffffff;
-            --bg-dark: #1a0b2e;
+            --sand: #edc9af;
+            --gold: #ffd700;
+            --mario-red: #e52521;
+            --luigi-green: #43b047;
+            --dark-desert: #2c1e16;
+            --text-color: #f4e4bc;
         }
 
         body {
-            background: radial-gradient(circle at center, var(--storm-light), var(--bg-dark));
-            font-family: 'Roboto', sans-serif;
+            background-color: var(--dark-desert);
+            background-image: radial-gradient(circle, #3e2b1f 1px, transparent 1px);
+            background-size: 20px 20px;
             color: var(--text-color);
+            font-family: 'Courier New', Courier, monospace;
             margin: 0;
-            padding: 0;
-            height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            overflow: hidden;
+            min-height: 100vh;
         }
 
         #game-container {
             width: 90%;
-            max-width: 800px;
-            height: 90vh;
-            background: rgba(0, 0, 0, 0.85);
-            border: 4px solid var(--lazy-pink);
+            max-width: 700px;
+            background: rgba(44, 30, 22, 0.95);
+            border: 4px solid var(--sand);
             border-radius: 15px;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 0 30px var(--storm-purple);
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
             position: relative;
         }
 
-        /* HUD Styling */
-        #hud {
+        header {
+            text-align: center;
+            border-bottom: 2px solid var(--gold);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+        }
+
+        h1 {
+            color: var(--gold);
+            text-shadow: 2px 2px #000;
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        #stats-bar {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 10px;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.1);
-            border-bottom: 2px solid var(--fn-blue);
+            background: #1a110a;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
         }
 
-        .stat-box {
-            background: rgba(0, 0, 0, 0.5);
-            padding: 5px;
-            text-align: center;
-            border-radius: 5px;
-            border: 1px solid var(--fn-blue);
-        }
-
-        .stat-label {
-            font-family: 'Bangers', cursive;
-            font-size: 1.2rem;
-            color: var(--fn-yellow);
-            letter-spacing: 1px;
-            text-shadow: 1px 1px 0 #000;
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         .stat-val {
             font-weight: bold;
+            color: var(--gold);
+        }
+
+        #narrative {
+            line-height: 1.6;
+            margin-bottom: 20px;
+            min-height: 150px;
             font-size: 1.1rem;
         }
 
-        /* Main Content Area */
-        #main-display {
-            flex-grow: 1;
-            padding: 20px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .log-entry {
-            margin-bottom: 15px;
-            padding: 10px;
-            border-left: 4px solid var(--lazy-orange);
-            background: rgba(255, 165, 0, 0.1);
-            animation: fadeIn 0.5s ease;
-        }
-
-        .log-entry.system {
-            border-left-color: var(--fn-blue);
-            background: rgba(0, 191, 255, 0.1);
-            font-style: italic;
-        }
-
-        .log-entry.bad {
-            border-left-color: red;
-            background: rgba(255, 0, 0, 0.1);
-        }
-
-        .log-entry.good {
-            border-left-color: var(--fn-yellow);
-            background: rgba(254, 254, 0, 0.1);
-        }
-
-        h2 {
-            font-family: 'Bangers', cursive;
-            color: var(--lazy-pink);
-            font-size: 2rem;
-            margin-top: 0;
-            text-shadow: 2px 2px 0 var(--storm-purple);
-        }
-
-        /* Controls */
-        #controls {
-            padding: 20px;
+        #choices-container {
             display: flex;
             flex-direction: column;
             gap: 10px;
-            background: rgba(0, 0, 0, 0.9);
-            border-top: 2px solid var(--fn-blue);
-            border-radius: 0 0 12px 12px;
         }
 
         button {
-            background: linear-gradient(45deg, var(--fn-blue), #0077be);
-            border: none;
+            background: #3e2b1f;
             color: white;
-            padding: 15px;
-            font-family: 'Bangers', cursive;
-            font-size: 1.2rem;
+            border: 2px solid var(--sand);
+            padding: 12px;
             cursor: pointer;
-            transform: skew(-10deg);
-            transition: all 0.2s;
-            border: 2px solid white;
-            text-shadow: 1px 1px 0 #000;
+            text-align: left;
+            font-size: 1rem;
+            transition: 0.2s;
+            border-radius: 5px;
         }
 
-        button:hover {
-            transform: skew(-10deg) scale(1.02);
-            background: linear-gradient(45deg, var(--fn-yellow), #d4d400);
-            color: black;
-            text-shadow: none;
+        button:hover:not(:disabled) {
+            background: var(--sand);
+            color: #000;
         }
 
         button:disabled {
-            background: #555;
+            opacity: 0.5;
             cursor: not-allowed;
-            opacity: 0.6;
-            color: #ccc;
         }
 
-        .relationship-tracker {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            font-size: 0.8rem;
-            color: var(--lazy-pink);
-            text-align: right;
-            pointer-events: none;
+        .risky {
+            border-color: #ff4500;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        .risky:hover {
+            background: #ff4500;
+            color: white;
         }
 
-        /* Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
+        #feedback {
+            margin-top: 20px;
+            font-style: italic;
+            color: var(--gold);
+            height: 40px;
+            text-align: center;
         }
-        ::-webkit-scrollbar-track {
-            background: #1a0b2e; 
-        }
-        ::-webkit-scrollbar-thumb {
-            background: var(--lazy-pink); 
-            border-radius: 4px;
+
+        .hidden {
+            display: none;
         }
     </style>
 </head>
 <body>
 
 <div id="game-container">
-    <div class="relationship-tracker">
-        Sportacus: <span id="rel-sport">0</span> | Stephanie: <span id="rel-steph">0</span>
+    <header>
+        <h1 id="title-text">Ali Mario and the Forty Koopas</h1>
+    </header>
+
+    <div id="stats-bar" class="hidden">
+        <div class="stat-item">PWR <span id="pwr-val" class="stat-val">10</span></div>
+        <div class="stat-item">WIT <span id="wit-val" class="stat-val">10</span></div>
+        <div class="stat-item">SPR <span id="spr-val" class="stat-val">10</span></div>
+        <div class="stat-item">FOR <span id="for-val" class="stat-val">10</span></div>
     </div>
 
-    <div id="hud">
-        <div class="stat-box">
-            <div class="stat-label">HYPE</div>
-            <div class="stat-val" id="val-hype">20</div>
-        </div>
-        <div class="stat-box">
-            <div class="stat-label">BUILD</div>
-            <div class="stat-val" id="val-build">20</div>
-        </div>
-        <div class="stat-box">
-            <div class="stat-label">TACTICS</div>
-            <div class="stat-val" id="val-tactics">20</div>
-        </div>
-        <div class="stat-box" style="border-color: red;">
-            <div class="stat-label" style="color: #ff6666;">ENERGY</div>
-            <div class="stat-val" id="val-energy">20</div>
-        </div>
+    <div id="narrative">
+        Welcome, traveler. In the scorching dunes of Qas’r Mushroom, Ali Mario labors under the sun. His brother Cassim-Luigi dreams of gold, while the Forty Koopas shadow the kingdom. Choose your destiny.
     </div>
 
-    <div id="main-display"></div>
-
-    <div id="controls">
-        <!-- Buttons generated by JS -->
+    <div id="choices-container">
+        <!-- Buttons injected here -->
     </div>
+
+    <div id="feedback"></div>
 </div>
 
 <script>
-    // --- GAME STATE ---
     const state = {
-        stats: {
-            hype: 20,
-            build: 20,
-            tactics: 20,
-            energy: 20
-        },
-        relationships: {
-            sportacus: 0,
-            stephanie: 0
-        },
-        difficulty: 'normal', // creative, normal, sweat
-        diffMod: 0, // Stat threshold modifier
-        penaltyMod: 1, // Damage multiplier
-        gameOver: false
+        difficulty: 'Normal',
+        stats: { PWR: 10, WIT: 10, SPR: 10, FOR: 10 },
+        cassimAlive: true,
+        isGameOver: false,
+        currentStep: 'intro'
     };
 
-    // --- DOM ELEMENTS ---
-    const dom = {
-        hype: document.getElementById('val-hype'),
-        build: document.getElementById('val-build'),
-        tactics: document.getElementById('val-tactics'),
-        energy: document.getElementById('val-energy'),
-        relSport: document.getElementById('rel-sport'),
-        relSteph: document.getElementById('rel-steph'),
-        display: document.getElementById('main-display'),
-        controls: document.getElementById('controls')
-    };
+    const narrativeElement = document.getElementById('narrative');
+    const choicesContainer = document.getElementById('choices-container');
+    const statsBar = document.getElementById('stats-bar');
+    const feedback = document.getElementById('feedback');
 
-    // --- CORE LOGIC ---
-
-    function log(text, type = 'normal') {
-        const div = document.createElement('div');
-        div.className = `log-entry ${type}`;
-        div.innerHTML = text;
-        dom.display.appendChild(div);
-        dom.display.scrollTop = dom.display.scrollHeight;
+    function updateUI() {
+        document.getElementById('pwr-val').innerText = state.stats.PWR;
+        document.getElementById('wit-val').innerText = state.stats.WIT;
+        document.getElementById('spr-val').innerText = state.stats.SPR;
+        document.getElementById('for-val').innerText = state.stats.FOR;
     }
 
-    function updateStats(hypeChange, buildChange, tacticsChange, energyChange) {
-        // Apply multipliers based on Difficulty for negative values
-        if (state.difficulty === 'creative' && energyChange < 0) energyChange = Math.floor(energyChange * 0.5);
-        if (state.difficulty === 'sweat' && energyChange < 0) energyChange = Math.floor(energyChange * 1.5);
+    function showFeedback(msg) {
+        feedback.innerText = msg;
+        setTimeout(() => { feedback.innerText = ''; }, 3000);
+    }
 
-        // Apply
-        state.stats.hype += hypeChange;
-        state.stats.build += buildChange;
-        state.stats.tactics += tacticsChange;
-        state.stats.energy += energyChange;
-
-        // Caps
-        for (let key in state.stats) {
-            if (state.stats[key] > 100) state.stats[key] = 100;
-        }
-
-        // Render
-        dom.hype.innerText = state.stats.hype;
-        dom.build.innerText = state.stats.build;
-        dom.tactics.innerText = state.stats.tactics;
-        dom.energy.innerText = state.stats.energy;
-
-        // Check Death
-        if (state.stats.energy <= 0) {
-            triggerGameOver("You have run out of Energy and fallen asleep.");
-            return false;
+    function startGame(diff) {
+        state.difficulty = diff;
+        if (diff === 'Toad') {
+            state.stats = { PWR: 15, WIT: 15, SPR: 15, FOR: 15 };
+        } else if (diff === 'Hero') {
+            state.stats = { PWR: 5, WIT: 5, SPR: 5, FOR: 5 };
         }
         
-        // Sweat Mode Death Condition
-        if (state.difficulty === 'sweat') {
-            if (state.stats.hype <= 0 || state.stats.build <= 0 || state.stats.tactics <= 0) {
-                triggerGameOver("SWEAT MODE FAIL: A stat reached zero. You got boxed like a fish.");
-                return false;
-            }
+        statsBar.classList.remove('hidden');
+        updateUI();
+        goToScene('discovery');
+    }
+
+    function checkGameOver(isRiskyFail) {
+        if (state.difficulty === 'Hero' && isRiskyFail) {
+            state.isGameOver = true;
+            gameOver("The Hero has fallen. A single risky failure was your end.");
+            return true;
         }
-
-        return true;
+        return false;
     }
 
-    function updateRel(char, amount) {
-        state.relationships[char] += amount;
-        if (state.relationships[char] > 10) state.relationships[char] = 10;
-        document.getElementById(`rel-${char === 'sportacus' ? 'sport' : 'steph'}`).innerText = state.relationships[char];
+    function gameOver(msg) {
+        narrativeElement.innerHTML = `<span style="color:var(--mario-red)">GAME OVER</span><br><br>${msg}`;
+        choicesContainer.innerHTML = `<button onclick="location.reload()">Try Again</button>`;
     }
 
-    function statCheck(statName, threshold) {
-        const adjustedThreshold = threshold + state.diffMod;
-        const roll = state.stats[statName];
-        return roll >= adjustedThreshold;
-    }
-
-    function triggerGameOver(reason) {
-        state.gameOver = true;
-        dom.controls.innerHTML = '';
-        log(`<h2>GAME OVER</h2><p>${reason}</p>`, 'bad');
-        const btn = document.createElement('button');
-        btn.innerText = "Return to Lobby (Restart)";
-        btn.onclick = () => location.reload();
-        dom.controls.appendChild(btn);
-    }
-
-    function createButtons(choices) {
-        dom.controls.innerHTML = '';
-        if (state.gameOver) return;
-
-        choices.forEach(choice => {
-            const btn = document.createElement('button');
-            
-            // Check visibility conditions
-            if (choice.condition && !choice.condition()) {
-                return; // Don't show this button
-            }
-
-            // Check disable conditions (visible but greyed out)
-            if (choice.requirementText) {
-                const reqMet = choice.check ? choice.check() : true;
-                btn.innerHTML = `${choice.text} <br><small style='font-size:0.8rem'>(${choice.requirementText})</small>`;
-                if (!reqMet) {
-                    btn.disabled = true;
+    const scenes = {
+        intro: {
+            text: "Select your difficulty to begin the journey through the Sand-Kingdom.",
+            choices: [
+                { text: "Toad (Easy): +5 Stats, Safety Mushrooms available.", action: () => startGame('Toad') },
+                { text: "Plumber (Normal): Standard stats.", action: () => startGame('Normal') },
+                { text: "Hero (Hard): -5 Stats, One Risky failure = Game Over.", action: () => startGame('Hero') }
+            ]
+        },
+        discovery: {
+            text: "Ali Mario overhears the Forty Koopas opening a secret pipe-cave shaped like a giant stone Bowser. 'Open, Sesame-Pipe!' the Captain bellows. The jaw creaks open.",
+            choices: [
+                { 
+                    text: "[Wit] Eavesdrop closely to learn the password. (Req: 10)", 
+                    action: () => {
+                        if (state.stats.WIT >= 10) {
+                            state.stats.WIT += 5;
+                            showFeedback("Success! You learned the password.");
+                            goToScene('hoard');
+                        } else {
+                            state.stats.SPR -= 2;
+                            showFeedback("Failure! You were nearly spotted. -2 SPR.");
+                            if(state.difficulty === 'Toad') { state.stats.WIT += 2; showFeedback("Safety Mushroom found! +2 WIT"); }
+                            goToScene('hoard');
+                        }
+                    }
+                },
+                { 
+                    text: "[Power] Try to pry the stone jaw open manually. (Req: 15)", 
+                    action: () => {
+                        if (state.stats.PWR >= 15) {
+                            state.stats.PWR += 5;
+                            showFeedback("Success! Your strength is legendary.");
+                            goToScene('hoard');
+                        } else {
+                            state.stats.PWR -= 5;
+                            showFeedback("Failure! The jaw is too heavy. -5 PWR.");
+                            if(state.difficulty === 'Toad') { state.stats.PWR += 2; showFeedback("Safety Mushroom found! +2 PWR"); }
+                            goToScene('hoard');
+                        }
+                    }
+                },
+                { 
+                    text: "[Risky] Rush the guards to steal a key.", 
+                    className: "risky",
+                    action: () => {
+                        if (Math.random() > 0.5) {
+                            state.stats.FOR += 10;
+                            showFeedback("Huge Success! You stole a gold key!");
+                            goToScene('hoard');
+                        } else {
+                            state.stats.SPR -= 10;
+                            showFeedback("Captured! You were tossed into the dunes.");
+                            if (!checkGameOver(true)) goToScene('hoard');
+                        }
+                    }
                 }
-            } else {
-                btn.innerText = choice.text;
-            }
+            ]
+        },
+        hoard: {
+            text: "Inside, Cassim-Luigi is frantically stuffing Fire-Rubies into his pockets. The cave begins to tremble! 'Ali, we'll be rich!' he yells. You see the Koopas returning on Lakitu clouds.",
+            choices: [
+                { 
+                    text: "[Spirit] Convince Cassim to leave immediately. (Req: 12)", 
+                    action: () => {
+                        if (state.stats.SPR >= 12) {
+                            state.stats.SPR += 5;
+                            showFeedback("Success! You saved your brother.");
+                            goToScene('siege');
+                        } else {
+                            state.stats.FOR -= 5;
+                            state.cassimAlive = false;
+                            showFeedback("Failure! Cassim refused to move. He's trapped! -5 FOR.");
+                            goToScene('siege');
+                        }
+                    }
+                },
+                { 
+                    text: "[Fortune] Grab a Fire Flower power-up for protection. (Req: 12)", 
+                    action: () => {
+                        if (state.stats.FOR >= 12) {
+                            state.stats.PWR += 5;
+                            showFeedback("Success! You found a Rare Flower!");
+                            goToScene('siege');
+                        } else {
+                            state.stats.PWR -= 3;
+                            showFeedback("Failure! It was a Poison Mushroom! -3 PWR.");
+                            goToScene('siege');
+                        }
+                    }
+                },
+                { 
+                    text: "[Risky] Stay to loot the 'Golden Shell.'", 
+                    className: "risky",
+                    action: () => {
+                        if (Math.random() > 0.5) {
+                            state.stats.FOR += 20;
+                            showFeedback("Fortune! You grabbed the Golden Shell!");
+                            goToScene('siege');
+                        } else {
+                            state.cassimAlive = false;
+                            showFeedback("The exit sealed! Cassim is lost to the cave.");
+                            if (!checkGameOver(true)) goToScene('siege');
+                        }
+                    }
+                }
+            ]
+        },
+        siege: {
+            text: "The Captain of the Forty Koopas arrives at your oasis house disguised as an oil merchant. Morgi-Peach whispers, 'He has hidden Koopas in those jars!'",
+            choices: [
+                { 
+                    text: "[Wit] Inspect the oil jars for hidden Koopas. (Req: 15)", 
+                    action: () => {
+                        if (state.stats.WIT >= 15) {
+                            state.stats.WIT += 10;
+                            showFeedback("Genius! You trapped them all inside.");
+                            calculateEnding();
+                        } else {
+                            state.stats.PWR -= 5;
+                            showFeedback("Ambushed! They were ready for you. -5 PWR.");
+                            calculateEnding();
+                        }
+                    }
+                },
+                { 
+                    text: "[Spirit] Challenge the 'Merchant' to riddles. (Req: 15)", 
+                    action: () => {
+                        if (state.stats.SPR >= 15) {
+                            state.stats.SPR += 10;
+                            showFeedback("Success! He leaves in shame.");
+                            calculateEnding();
+                        } else {
+                            showFeedback("He marks your door for death!");
+                            state.stats.FOR -= 10;
+                            calculateEnding();
+                        }
+                    }
+                },
+                { 
+                    text: "[Risky] Attempt to Ground Pound the merchant.", 
+                    className: "risky",
+                    action: () => {
+                        if (Math.random() > 0.5) {
+                            state.stats.PWR += 10;
+                            showFeedback("Victory! You crushed the Captain!");
+                            calculateEnding();
+                        } else {
+                            state.stats.FOR -= 10;
+                            showFeedback("Failure! Your house is on fire!");
+                            if (!checkGameOver(true)) calculateEnding();
+                        }
+                    }
+                }
+            ]
+        }
+    };
 
-            btn.onclick = () => {
-                choice.action();
-            };
-            dom.controls.appendChild(btn);
+    function goToScene(sceneKey) {
+        updateUI();
+        const scene = scenes[sceneKey];
+        narrativeElement.innerText = scene.text;
+        choicesContainer.innerHTML = '';
+        
+        scene.choices.forEach(choice => {
+            const btn = document.createElement('button');
+            btn.innerText = choice.text;
+            if (choice.className) btn.classList.add(choice.className);
+            btn.onclick = choice.action;
+            choicesContainer.appendChild(btn);
         });
     }
 
-    // --- SCENES ---
+    function calculateEnding() {
+        updateUI();
+        let title = "";
+        let desc = "";
 
-    const scenes = {
-        start: () => {
-            log(`<h2>Initialize Operation "Get Active"</h2>
-            <p>Welcome to a glitched server. Select your difficulty.</p>`);
-            
-            createButtons([
-                {
-                    text: "Creative Mode (Easy)",
-                    action: () => {
-                        state.difficulty = 'creative';
-                        state.diffMod = -10;
-                        state.penaltyMod = 0.5;
-                        log("Difficulty Set: Creative. Stat Checks -10. Damage 50%.", 'system');
-                        scenes.intro();
-                    }
-                },
-                {
-                    text: "Battle Royale (Normal)",
-                    action: () => {
-                        state.difficulty = 'normal';
-                        state.diffMod = 0;
-                        state.penaltyMod = 1;
-                        log("Difficulty Set: Battle Royale. Standard Rules.", 'system');
-                        scenes.intro();
-                    }
-                },
-                {
-                    text: "Sweat Mode (Hard)",
-                    action: () => {
-                        state.difficulty = 'sweat';
-                        state.diffMod = 10;
-                        state.penaltyMod = 1.5;
-                        log("Difficulty Set: Sweat Mode. Stat Checks +10. Any 0 Stat = Game Over.", 'system');
-                        scenes.intro();
-                    }
-                }
-            ]);
-        },
-
-        intro: () => {
-            log(`<p>The Battle Bus honks, but the melody is 'Bing Bang'. You drop not onto an island, but into a neon-colored suburb surrounded by a purple Storm. Everyone is asleep... except you.</p>`);
-            setTimeout(scenes.scene1, 1500);
-        },
-
-        scene1: () => {
-            log(`<h2>Scene 1: The Drop</h2>
-            <p>You are gliding down. You spot <strong>Sportacus</strong> hanging precariously from the crashed Airship lodged in a Clock Tower.</p>`);
-
-            createButtons([
-                {
-                    text: "Land Safe & Loot (TACTICS)",
-                    action: () => {
-                        updateStats(0, 0, 10, 5);
-                        log("You stick the landing. You find a stash of Apples (Sports Candy). +10 TACTICS, +5 ENERGY.", 'good');
-                        scenes.scene2();
-                    }
-                },
-                {
-                    text: "Emote Mid-Air (HYPE)",
-                    action: () => {
-                        updateStats(15, 0, 0, -5);
-                        updateRel('stephanie', 1);
-                        log("You 'Floss' mid-air to generate updraft. Stephanie sees you from a window and cheers. +15 HYPE, -5 ENERGY, +1 Steph.", 'good');
-                        scenes.scene2();
-                    }
-                },
-                {
-                    text: "Dive Bomb Save (BUILD)",
-                    requirementText: `Requires ${25 + state.diffMod} BUILD`,
-                    check: () => statCheck('build', 25),
-                    action: () => {
-                        if (statCheck('build', 25)) {
-                            updateStats(0, 20, 0, 0);
-                            updateRel('sportacus', 2);
-                            log("You catch him! +20 BUILD, +2 Sportacus.", 'good');
-                        } else {
-                            updateStats(0, 0, 0, -15);
-                            log("You crash into a billboard. Sportacus saves you. Embarrassing. -15 ENERGY.", 'bad');
-                        }
-                        if(!state.gameOver) scenes.scene2();
-                    }
-                }
-            ]);
-        },
-
-        scene2: () => {
-            log(`<h2>Scene 2: The Loot Phase</h2>
-            <p>Sportacus explains Robbie Rotten has hacked the Storm. You encounter 'Sleepy Henchmen' (robots in pajamas) blocking the path to the lair.</p>`);
-
-            createButtons([
-                {
-                    text: "Crank 90s (BUILD)",
-                    requirementText: `Requires ${30 + state.diffMod} BUILD`,
-                    check: () => true, // Player can always TRY, pass/fail is inside
-                    action: () => {
-                        if (statCheck('build', 30)) {
-                            updateStats(0, 0, 10, 0);
-                            log("You build a tower over them. Clean edits. +10 TACTICS.", 'good');
-                        } else {
-                            updateStats(0, -10, 0, -10);
-                            log("Your tower collapses. You take fall damage. -10 BUILD, -10 ENERGY.", 'bad');
-                        }
-                        if(!state.gameOver) scenes.scene3();
-                    }
-                },
-                {
-                    text: "Dance Battle (HYPE)",
-                    requirementText: `Requires ${30 + state.diffMod} HYPE`,
-                    check: () => true,
-                    action: () => {
-                        if (statCheck('hype', 30)) {
-                            updateStats(20, 0, 0, 0);
-                            updateRel('stephanie', 2);
-                            log("You out-dance the robots. Stephanie is impressed. +20 HYPE, +2 Steph.", 'good');
-                        } else {
-                            updateStats(-15, 0, 0, -10);
-                            log("Your moves are cringe. They throw tomatoes. -15 HYPE, -10 ENERGY.", 'bad');
-                        }
-                        if(!state.gameOver) scenes.scene3();
-                    }
-                },
-                {
-                    text: "Hack Nap-Time (TACTICS)",
-                    requirementText: "Risky Logic Puzzle",
-                    check: () => true,
-                    action: () => {
-                        // Logic puzzle result based on current tactic stat vs fixed number
-                        if (state.stats.tactics > 25) {
-                            updateStats(0, 0, 20, 0);
-                            log("You upload a lullaby virus. The robots sleep. +20 TACTICS.", 'good');
-                        } else {
-                            updateStats(0, 0, 0, -20);
-                            log("Hack failed. Robots enter Tantrum Mode. -20 ENERGY.", 'bad');
-                        }
-                        if(!state.gameOver) scenes.scene3();
-                    }
-                }
-            ]);
-        },
-
-        scene3: () => {
-            // Storm Effect
-            if(!updateStats(0, 0, 0, -2)) return; // -2 Energy drain immediately
-
-            log(`<h2>Scene 3: The Storm Circle</h2>
-            <p>You reach Robbie’s Lair. He is piloting a giant Mech Suit made of recliner chairs. The Storm is shrinking! (-2 Energy).</p>`);
-
-            createButtons([
-                {
-                    text: "Throw Sports Apple (TEAMWORK)",
-                    requirementText: `Need Sportacus Rel > 3 & ${30 + state.diffMod} TACTICS`,
-                    check: () => state.relationships.sportacus > 3 && statCheck('tactics', 30),
-                    action: () => {
-                        log(`<h2>VICTORY ROYALE!</h2>
-                        <p>Sportacus eats the apple, powers up, and flips onto the mech to disable it. You acted as the perfect squad leader.</p>
-                        <p style='color:gold'>ENDING: THE TRUE HERO</p>`, 'good');
-                        scenes.endGame();
-                    }
-                },
-                {
-                    text: "Pump Shotgun / Build Fight (SOLO)",
-                    requirementText: `Need ${50 + state.diffMod} BUILD`,
-                    check: () => true,
-                    action: () => {
-                        if (statCheck('build', 50)) {
-                            log(`<h2>VICTORY ROYALE!</h2>
-                            <p>You box Robbie in, edit a window, and destroy the controls with a Noise Maker. Robbie cries.</p>
-                            <p style='color:silver'>ENDING: SWEATY VICTORY</p>`, 'good');
-                        } else {
-                            triggerGameOver("You ran out of materials. Robbie blasts you with the Laziness Ray.");
-                            return;
-                        }
-                        scenes.endGame();
-                    }
-                },
-                {
-                    text: "Diplomacy (HYPE)",
-                    requirementText: `Need ${60 + state.diffMod} HYPE`,
-                    check: () => true,
-                    action: () => {
-                        if (statCheck('hype', 60)) {
-                            log(`<h2>VICTORY ROYALE!</h2>
-                            <p>You convince Robbie that ruling the world is too much work. He agrees and goes to take a nap.</p>
-                            <p style='color:pink'>ENDING: DIPLOMATIC VICTORY</p>`, 'good');
-                        } else {
-                            updateStats(0,0,0,-100); // Instant kill
-                            triggerGameOver("Robbie laughs at you. 'I have automated everything!' He blasts you.");
-                            return;
-                        }
-                        scenes.endGame();
-                    }
-                }
-            ]);
-        },
-
-        endGame: () => {
-            dom.controls.innerHTML = '';
-            const btn = document.createElement('button');
-            btn.innerText = "Play Again";
-            btn.style.marginTop = "20px";
-            btn.onclick = () => location.reload();
-            dom.display.appendChild(btn);
-            dom.display.scrollTop = dom.display.scrollHeight;
+        if (state.stats.WIT >= 25 || state.stats.SPR >= 25) {
+            title = "The Wise Sultan Mario";
+            desc = "You defeated the Koopas with your mind and heart. Qas’r Mushroom flourishes under your rule with Morgi-Peach as your advisor.";
+        } else if (state.stats.FOR >= 30) {
+            title = "The Wealthy Exile";
+            desc = "You saved the gold but lost your village's respect. You live in a palace of sand, lonely but rich.";
+        } else if (state.cassimAlive && state.stats.PWR >= 20) {
+            title = "The True Brother";
+            desc = "You saved Cassim-Luigi and fought off the hoard. You are the legendary warrior of the dunes.";
+        } else {
+            title = "The Fallen Hero";
+            desc = "You survived, but the village is in ruins and Cassim is gone. You wander the desert, searching for another pipe.";
         }
-    };
 
-    // --- INIT ---
-    scenes.start();
+        narrativeElement.innerHTML = `<h2 style="color:var(--gold)">ENDING: ${title}</h2>${desc}`;
+        choicesContainer.innerHTML = `<button onclick="location.reload()">New Journey</button>`;
+    }
+
+    // Initialize
+    (function() {
+        const intro = scenes.intro;
+        choicesContainer.innerHTML = '';
+        intro.choices.forEach(choice => {
+            const btn = document.createElement('button');
+            btn.innerText = choice.text;
+            btn.onclick = choice.action;
+            choicesContainer.appendChild(btn);
+        });
+    })();
 
 </script>
+
 </body>
 </html>
