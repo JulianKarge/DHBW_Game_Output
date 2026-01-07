@@ -8,9 +8,11 @@
     <style>
         :root {
             --primary: #00f2ff;
+            --title-color: #ffffff;
             --bg: #0a0a0c;
             --card: #16161a;
             --text: #e2e8f0;
+            --author-idle: #475569;
         }
         
         body { 
@@ -22,50 +24,67 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            overflow-x: hidden;
         }
 
-        /* HEADER & ANIMIERTE NAMEN */
+        /* HEADER & 3D ORBIT ANIMATION */
         header {
             width: 100%;
-            padding: 80px 0;
+            padding: 100px 0;
             text-align: center;
             background: linear-gradient(to bottom, #111, var(--bg));
             border-bottom: 1px solid #333;
+            perspective: 1000px; /* Ermöglicht 3D-Effekt */
         }
+        
         header h1 { 
-            color: var(--primary); 
-            font-size: 2.2rem; 
+            color: var(--title-color); 
+            font-size: 2.5rem; 
             letter-spacing: 1px; 
-            margin-bottom: 30px; 
+            margin-bottom: 80px;
+            text-shadow: 0 0 20px rgba(255,255,255,0.1);
         }
 
-        .author-container {
+        .orbit-wrapper {
+            position: relative;
+            height: 100px;
             display: flex;
             justify-content: center;
-            gap: 40px;
-            margin-top: 20px;
+            align-items: center;
+            transform-style: preserve-3d;
         }
 
         .author-name {
-            font-size: 1.2rem;
-            color: #555;
-            font-weight: 500;
-            display: inline-block;
-            transition: all 0.5s ease;
-            animation: highlightNames 6s infinite;
+            position: absolute;
+            font-size: 1.3rem;
+            font-weight: 600;
+            white-space: nowrap;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--author-idle);
+            animation: orbit 9s infinite linear;
+            transition: color 0.3s;
         }
 
-        /* Animation: Jeder Name wird nacheinander groß und leuchtet */
-        @keyframes highlightNames {
-            0%, 100% { transform: scale(1); color: #555; text-shadow: none; }
-            5%, 25% { transform: scale(1.3); color: var(--primary); text-shadow: 0 0 15px var(--primary); }
-            30% { transform: scale(1); color: #555; text-shadow: none; }
+        /* Die 3D-Bahn Animation */
+        @keyframes orbit {
+            0% { transform: translate3d(250px, 0, -150px) scale(0.7); opacity: 0.2; color: var(--author-idle); z-index: 1; }
+            25% { transform: translate3d(0, 0, 0) scale(0.85); opacity: 0.5; z-index: 5; }
+            50% { transform: translate3d(-250px, 0, -150px) scale(0.7); opacity: 0.2; color: var(--author-idle); z-index: 1; }
+            75% { 
+                transform: translate3d(0, 0, 150px) scale(1.4); 
+                opacity: 1; 
+                color: var(--primary); 
+                text-shadow: 0 0 25px var(--primary); 
+                z-index: 10; 
+            }
+            100% { transform: translate3d(250px, 0, -150px) scale(0.7); opacity: 0.2; color: var(--author-idle); z-index: 1; }
         }
 
-        /* Zeitversetzte Animation für die drei Namen */
+        /* Zeitversatz für die 3 Namen (9s Gesamtdauer / 3 Namen = 3s Offset) */
         .author-name:nth-child(1) { animation-delay: 0s; }
-        .author-name:nth-child(2) { animation-delay: 2s; }
-        .author-name:nth-child(3) { animation-delay: 4s; }
+        .author-name:nth-child(2) { animation-delay: -3s; }
+        .author-name:nth-child(3) { animation-delay: -6s; }
 
         .container { max-width: 1000px; width: 90%; margin: 40px 0; }
 
@@ -94,7 +113,7 @@
         }
         iframe { width: 100%; height: 100%; border: none; }
 
-        /* STORY HEADER & DOWNLOAD */
+        /* STORY BEREICH */
         .story-meta-row {
             display: flex;
             justify-content: space-between;
@@ -119,7 +138,6 @@
             box-shadow: 0 5px 20px rgba(0, 242, 255, 0.4);
         }
 
-        /* STORY BEREICH */
         .book-card {
             background: var(--card);
             padding: 80px 100px;
@@ -149,7 +167,12 @@
 
         @media (max-width: 768px) {
             .book-card { padding: 40px 20px; }
-            .author-container { flex-direction: column; gap: 15px; }
+            header h1 { font-size: 1.8rem; }
+            @keyframes orbit {
+                0% { transform: translate3d(100px, 0, -100px) scale(0.6); opacity: 0.2; }
+                75% { transform: translate3d(0, 0, 100px) scale(1.1); opacity: 1; }
+                100% { transform: translate3d(100px, 0, -100px) scale(0.6); opacity: 0.2; }
+            }
         }
     </style>
 </head>
@@ -157,7 +180,7 @@
 
     <header>
         <h1>Integrationsseminar Multi-Agenten Lösung</h1>
-        <div class="author-container">
+        <div class="orbit-wrapper">
             <span class="author-name">Neeshka Chavhan</span>
             <span class="author-name">Tom Brennenstuhl</span>
             <span class="author-name">Julian Karge</span>
