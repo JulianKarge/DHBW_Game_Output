@@ -41,8 +41,23 @@
             color: var(--title-color); 
             font-size: 2.5rem; 
             letter-spacing: 1px; 
-            margin-bottom: 80px;
+            margin-bottom: 15px;
             text-shadow: 0 0 20px rgba(255,255,255,0.1);
+        }
+
+        /* NEU: THEMA BADGE */
+        .theme-badge {
+            display: inline-block;
+            color: var(--primary);
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 70px;
+            padding: 6px 24px;
+            border: 1px solid rgba(0, 242, 255, 0.3);
+            border-radius: 30px;
+            background: rgba(0, 242, 255, 0.05);
+            font-weight: 300;
         }
 
         .orbit-wrapper {
@@ -81,7 +96,7 @@
             100% { transform: translate3d(250px, 0, -150px) scale(0.7); opacity: 0.2; color: var(--author-idle); z-index: 1; }
         }
 
-        /* Zeitversatz für die 3 Namen (9s Gesamtdauer / 3 Namen = 3s Offset) */
+        /* Zeitversatz für die 3 Namen */
         .author-name:nth-child(1) { animation-delay: 0s; }
         .author-name:nth-child(2) { animation-delay: -3s; }
         .author-name:nth-child(3) { animation-delay: -6s; }
@@ -132,6 +147,7 @@
             cursor: pointer;
             transition: all 0.3s ease;
             text-transform: uppercase;
+            font-size: 0.8rem;
         }
         .btn-word:hover {
             transform: translateY(-2px);
@@ -168,11 +184,7 @@
         @media (max-width: 768px) {
             .book-card { padding: 40px 20px; }
             header h1 { font-size: 1.8rem; }
-            @keyframes orbit {
-                0% { transform: translate3d(100px, 0, -100px) scale(0.6); opacity: 0.2; }
-                75% { transform: translate3d(0, 0, 100px) scale(1.1); opacity: 1; }
-                100% { transform: translate3d(100px, 0, -100px) scale(0.6); opacity: 0.2; }
-            }
+            .orbit-wrapper { transform: scale(0.6); }
         }
     </style>
 </head>
@@ -180,6 +192,8 @@
 
     <header>
         <h1>Integrationsseminar Multi-Agenten Lösung</h1>
+        <div class="theme-badge">Fokus: Mord in einer Kleinstadt</div>
+        
         <div class="orbit-wrapper">
             <span class="author-name">Neeshka Chavhan</span>
             <span class="author-name">Tom Brennenstuhl</span>
