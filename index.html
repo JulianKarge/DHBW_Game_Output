@@ -27,9 +27,10 @@
             overflow-x: hidden;
         }
 
+        /* HEADER & 3D ORBIT ANIMATION */
         header {
             width: 100%;
-            padding: 100px 0;
+            padding: 80px 0;
             text-align: center;
             background: linear-gradient(to bottom, #111, var(--bg));
             border-bottom: 1px solid #333;
@@ -40,7 +41,7 @@
             color: var(--title-color); 
             font-size: 2.5rem; 
             letter-spacing: 1px; 
-            margin-bottom: 15px;
+            margin-bottom: 10px;
             text-shadow: 0 0 20px rgba(255,255,255,0.1);
         }
 
@@ -50,7 +51,7 @@
             font-size: 1.1rem;
             text-transform: uppercase;
             letter-spacing: 3px;
-            margin-bottom: 60px;
+            margin-bottom: 40px;
             padding: 6px 24px;
             border: 1px solid rgba(0, 242, 255, 0.3);
             border-radius: 30px;
@@ -58,6 +59,39 @@
             font-weight: 300;
         }
 
+        /* WEBHOOK INTERFACE */
+        .retrigger-box {
+            margin-bottom: 60px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        .retrigger-input {
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #333;
+            background: #111;
+            color: white;
+            width: 350px;
+            font-family: 'Inter', sans-serif;
+            outline: none;
+        }
+        .retrigger-input:focus { border-color: var(--primary); }
+        .btn-trigger {
+            background: var(--primary);
+            color: black;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            transition: 0.3s;
+        }
+        .btn-trigger:hover { transform: scale(1.05); box-shadow: 0 0 15px var(--primary); }
+
+        /* 3D NAMES ORBIT */
         .orbit-wrapper {
             position: relative;
             height: 100px;
@@ -66,7 +100,6 @@
             align-items: center;
             transform-style: preserve-3d;
         }
-
         .author-name {
             position: absolute;
             font-size: 1.3rem;
@@ -76,9 +109,7 @@
             letter-spacing: 1px;
             color: var(--author-idle);
             animation: orbit 9s infinite linear;
-            transition: color 0.3s;
         }
-
         @keyframes orbit {
             0% { transform: translate3d(250px, 0, -150px) scale(0.7); opacity: 0.2; color: var(--author-idle); z-index: 1; }
             25% { transform: translate3d(0, 0, 0) scale(0.85); opacity: 0.5; z-index: 5; }
@@ -92,7 +123,6 @@
             }
             100% { transform: translate3d(250px, 0, -150px) scale(0.7); opacity: 0.2; color: var(--author-idle); z-index: 1; }
         }
-
         .author-name:nth-child(1) { animation-delay: 0s; }
         .author-name:nth-child(2) { animation-delay: -3s; }
         .author-name:nth-child(3) { animation-delay: -6s; }
@@ -100,82 +130,42 @@
         .container { max-width: 1000px; width: 90%; margin: 40px 0; }
 
         .section-label { 
-            display: inline-block; 
-            padding: 6px 16px; 
-            background: var(--primary); 
-            color: #000; 
-            font-weight: bold; 
-            border-radius: 4px; 
-            margin-bottom: 25px;
-            font-size: 0.85rem;
-            text-transform: uppercase;
+            display: inline-block; padding: 6px 16px; background: var(--primary); color: #000; 
+            font-weight: bold; border-radius: 4px; margin-bottom: 25px;
+            font-size: 0.85rem; text-transform: uppercase;
         }
 
         .game-wrapper {
-            width: 100%;
-            height: 1200px;
-            background: #000;
-            border-radius: 12px;
-            border: 2px solid #333;
-            overflow: hidden;
-            box-shadow: 0 0 40px rgba(0, 242, 255, 0.15);
+            width: 100%; height: 1200px; background: #000; border-radius: 12px;
+            border: 2px solid #333; overflow: hidden; box-shadow: 0 0 40px rgba(0, 242, 255, 0.15);
             margin-bottom: 80px;
         }
         iframe { width: 100%; height: 100%; border: none; }
 
-        .story-meta-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
+        .story-meta-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .stats { font-size: 0.9rem; color: #666; }
-
         .btn-word {
-            background: var(--primary);
-            color: #000;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 6px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            font-size: 0.8rem;
+            background: var(--primary); color: black; border: none; padding: 12px 24px;
+            border-radius: 6px; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 0.8rem;
         }
 
         .book-card {
-            background: var(--card);
-            padding: 80px 100px;
-            border-radius: 8px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
-            line-height: 2.0;
-            font-size: 1.25rem;
-            font-family: 'Georgia', serif;
-            color: #ccc;
-            text-align: justify;
+            background: var(--card); padding: 80px 100px; border-radius: 8px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6); line-height: 2.0; font-size: 1.25rem;
+            font-family: 'Georgia', serif; color: #ccc; text-align: justify;
         }
-
         .book-chapter-title {
-            color: var(--primary);
-            font-family: 'Inter', sans-serif;
-            font-size: 1.8rem;
-            margin-top: 0;
-            margin-bottom: 40px;
-            border-left: 6px solid var(--primary);
-            padding-left: 25px;
-            text-align: left;
-            display: block;
+            color: var(--primary); font-family: 'Inter', sans-serif; font-size: 1.8rem;
+            margin-top: 0; margin-bottom: 40px; border-left: 6px solid var(--primary); padding-left: 25px;
         }
 
         .chapter { margin-bottom: 100px; }
-        
         footer { padding: 60px; color: #444; font-size: 0.8rem; text-align: center; }
 
         @media (max-width: 768px) {
             .book-card { padding: 40px 20px; }
-            header h1 { font-size: 1.8rem; }
-            .orbit-wrapper { transform: scale(0.6); }
+            .retrigger-input { width: 100%; }
+            .retrigger-box { flex-direction: column; }
         }
     </style>
 </head>
@@ -184,6 +174,11 @@
     <header>
         <h1>Integrationsseminar Multi-Agenten Lösung</h1>
         <div class="theme-badge">Fokus: Mord in einer Kleinstadt</div>
+
+        <div class="retrigger-box">
+            <input type="text" id="newThemeInput" class="retrigger-input" placeholder="Neues Thema für Game & Story...">
+            <button class="btn-trigger" onclick="triggerN8N()">🚀 Neu generieren</button>
+        </div>
         
         <div class="orbit-wrapper">
             <span class="author-name">Neeshka Chavhan</span>
@@ -615,11 +610,8 @@
         </div>
 
         <span class="section-label">📖 Die Geschichte</span>
-        
         <div class="story-meta-row">
-            <div class="stats">
-                Umfang: <strong>21154 Wörter</strong> | ca. <strong>43 Seiten</strong>
-            </div>
+            <div class="stats">Umfang: <strong>21154 Wörter</strong> | ca. <strong>43 Seiten</strong></div>
             <button class="btn-word" onclick="exportToWord()">⬇ Als Word-Datei speichern</button>
         </div>
 
@@ -673,11 +665,30 @@
         </div>
     </div>
 
-    <footer>
-        Erstellt im Rahmen des Integrationsseminars &copy; 2024
-    </footer>
+    <footer>Erstellt im Rahmen des Integrationsseminars &copy; 2024</footer>
 
     <script>
+        async function triggerN8N() {
+            const theme = document.getElementById('newThemeInput').value;
+            if(!theme) return alert("Bitte gib ein Thema ein!");
+            const webhookUrl = "https://n8n.srv931177.hstgr.cloud/webhook-test/42daaed7-e77b-406c-b91a-3afd8bdf8a80"; 
+            try {
+                const btn = document.querySelector('.btn-trigger');
+                btn.innerText = "⏳ Gesendet...";
+                btn.disabled = true;
+                const response = await fetch(webhookUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ neuesThema: theme })
+                });
+                if(response.ok) {
+                    alert("Erfolg! Der Workflow wurde gestartet. Lade die Seite in ca. 5 Minuten neu.");
+                    btn.innerText = "🚀 Neu generieren";
+                    btn.disabled = false;
+                }
+            } catch (e) { alert("Fehler: " + e.message); }
+        }
+
         function exportToWord() {
             const content = document.getElementById('story-content').innerHTML;
             const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><style>body { font-family: 'Georgia', serif; } .book-chapter-title { color: #007788; font-size: 20pt; font-weight: bold; }</style></head><body>";
