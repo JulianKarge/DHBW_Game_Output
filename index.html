@@ -5,21 +5,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Integrationsseminar Multi-Agenten Lösung</title>
-    
-    <!-- Bibliothek für den PDF-Export -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
     <style>
         :root {
             --primary: #00f2ff;
             --bg: #0a0a0c;
             --card: #16161a;
             --text: #e2e8f0;
-            --accent: #00f2ff;
         }
         
         body { 
-            font-family: 'Inter', system-ui, -apple-system, sans-serif; 
+            font-family: 'Inter', sans-serif; 
             background-color: var(--bg); 
             color: var(--text); 
             margin: 0; 
@@ -29,10 +24,10 @@
             align-items: center;
         }
 
-        /* HEADER */
+        /* HEADER & ANIMIERTE NAMEN */
         header {
             width: 100%;
-            padding: 60px 0;
+            padding: 80px 0;
             text-align: center;
             background: linear-gradient(to bottom, #111, var(--bg));
             border-bottom: 1px solid #333;
@@ -41,19 +36,39 @@
             color: var(--primary); 
             font-size: 2.2rem; 
             letter-spacing: 1px; 
-            margin: 0; 
-            text-transform: none; 
+            margin-bottom: 30px; 
         }
-        .authors {
-            margin-top: 15px;
-            font-size: 1rem;
-            color: #888;
-            font-weight: 300;
+
+        .author-container {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 20px;
         }
+
+        .author-name {
+            font-size: 1.2rem;
+            color: #555;
+            font-weight: 500;
+            display: inline-block;
+            transition: all 0.5s ease;
+            animation: highlightNames 6s infinite;
+        }
+
+        /* Animation: Jeder Name wird nacheinander groß und leuchtet */
+        @keyframes highlightNames {
+            0%, 100% { transform: scale(1); color: #555; text-shadow: none; }
+            5%, 25% { transform: scale(1.3); color: var(--primary); text-shadow: 0 0 15px var(--primary); }
+            30% { transform: scale(1); color: #555; text-shadow: none; }
+        }
+
+        /* Zeitversetzte Animation für die drei Namen */
+        .author-name:nth-child(1) { animation-delay: 0s; }
+        .author-name:nth-child(2) { animation-delay: 2s; }
+        .author-name:nth-child(3) { animation-delay: 4s; }
 
         .container { max-width: 1000px; width: 90%; margin: 40px 0; }
 
-        /* SEKTIONS-TITEL */
         .section-label { 
             display: inline-block; 
             padding: 6px 16px; 
@@ -64,13 +79,12 @@
             margin-bottom: 25px;
             font-size: 0.85rem;
             text-transform: uppercase;
-            letter-spacing: 1px;
         }
 
-        /* GAME BEREICH (FIXED HEIGHT) */
+        /* GAME BEREICH */
         .game-wrapper {
             width: 100%;
-            height: 1200px; /* Deine gewünschte Höhe ohne Scrollen im Frame */
+            height: 1200px;
             background: #000;
             border-radius: 12px;
             border: 2px solid #333;
@@ -86,12 +100,10 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
-            padding: 0 5px;
         }
         .stats { font-size: 0.9rem; color: #666; }
-        .stats strong { color: #aaa; }
 
-        .btn-pdf {
+        .btn-word {
             background: var(--primary);
             color: #000;
             border: none;
@@ -101,14 +113,13 @@
             cursor: pointer;
             transition: all 0.3s ease;
             text-transform: uppercase;
-            font-size: 0.8rem;
         }
-        .btn-pdf:hover {
+        .btn-word:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 20px rgba(0, 242, 255, 0.4);
         }
 
-        /* STORY BEREICH (BUCH-STYLING) */
+        /* STORY BEREICH */
         .book-card {
             background: var(--card);
             padding: 80px 100px;
@@ -119,12 +130,11 @@
             font-family: 'Georgia', serif;
             color: #ccc;
             text-align: justify;
-            hyphens: auto;
         }
 
         .book-chapter-title {
             color: var(--primary);
-            font-family: 'Inter', sans-serif;
+            font-family: sans-serif;
             font-size: 1.8rem;
             margin-top: 0;
             margin-bottom: 40px;
@@ -133,16 +143,13 @@
             text-align: left;
         }
 
-        .chapter { 
-            margin-bottom: 100px; 
-            page-break-after: always; /* Für den PDF Export */
-        }
+        .chapter { margin-bottom: 100px; }
         
         footer { padding: 60px; color: #444; font-size: 0.8rem; text-align: center; }
 
         @media (max-width: 768px) {
             .book-card { padding: 40px 20px; }
-            header h1 { font-size: 1.5rem; }
+            .author-container { flex-direction: column; gap: 15px; }
         }
     </style>
 </head>
@@ -150,7 +157,11 @@
 
     <header>
         <h1>Integrationsseminar Multi-Agenten Lösung</h1>
-        <div class="authors">Neeshka Chavhan, Tom Brennenstuhl, Julian Karge</div>
+        <div class="author-container">
+            <span class="author-name">Neeshka Chavhan</span>
+            <span class="author-name">Tom Brennenstuhl</span>
+            <span class="author-name">Julian Karge</span>
+        </div>
     </header>
 
     <div class="container">
@@ -581,10 +592,10 @@
             <div class="stats">
                 Umfang: <strong>21154 Wörter</strong> | ca. <strong>43 Seiten</strong>
             </div>
-            <button class="btn-pdf" onclick="generatePDF()">⬇ Als PDF speichern</button>
+            <button class="btn-word" onclick="exportToWord()">⬇ Als Word-Datei speichern</button>
         </div>
 
-        <div id="story-pdf-content" class="book-card">
+        <div id="story-content" class="book-card">
             
     <div class="chapter">
         <div class="chapter-body"><h2 class="book-chapter-title">Kapitel 1: Frost im April</h2><br><br>Der April in Eschendorf war eine Lüge. Er versprach Frühling, lieferte aber nur eine klamme, schneidende Kälte, die durch die Ritzen der alten Fachwerkhäuser kroch und sich wie ein bleierner Schleier über die Lungen legte. Elena Voss stand am Fenster ihrer Mansardenwohnung und beobachtete, wie das erste fahle Licht des Morgens mühsam gegen den Nebel ankämpfte. Der Nebel hier oben im Schwarzwald war anders als der Smog in Berlin. Er war dichter, organischer, fast so, als besäße er ein eigenes, bösartiges Bewusstsein.<br><br>Draußen, über dem Marktplatz, flackerte eine einsame Neonreklame an der Fassade des geschlossenen „Säge-Stübles“. Das grelle Pink des Schriftzugs war durch Jahre der Vernachlässigung zu einem kränklichen Violett verblasst. Es summte in einer Frequenz, die Elena in den Zähnen wehtat – ein mechanisches Sterbeglöckchen für ein Dorf, das den Anschluss an die Moderne verpasst hatte und nun langsam im Schlamm versank.<br><br>Ein plötzliches Aufheulen zerriss die Stille. Es war kein Tier, sondern das verzerrte Echo einer Sirene, die gegen die dichten Tannenwände des Tals prallte.<br><br>Elena spürte ein vertrautes Ziehen in ihrer Brust. Das alte Jagdfieber, das sie in Berlin fast umgebracht hatte. Sie griff nach ihrer abgetragenen Lederjacke. Ihre Finger zitterten leicht, ein Überbleibsel des Burnouts, das sie wie einen ungebetenen Schatten aus der Hauptstadt mitgeschleppt hatte. „Lass es, Elena“, flüsterte sie sich selbst zu. „Es geht dich nichts mehr an.“<br><br>Doch zehn Minuten später stand sie am Ufer des alten Mühlenteichs.<br><br>Die Szenerie wirkte wie ein vergessenes Stillleben aus einem Albtraum. Der Teich war eine schwarze, spiegelglatte Fläche, auf der ölige Schlieren tanzten. Am Rand parkte der Streifenwagen von Wachtmeister Huber, dessen Blaulicht im Nebel wie ein nervöser Puls wirkte. Huber selbst, ein Mann, dessen Uniformhemd die besten Jahre hinter sich hatte und gefährlich über seinem Bauch spannte, stand knietief im Schlamm und dirigierte zwei Männer von der freiwilligen Feuerwehr.<br><br>Sie zogen etwas aus dem Wasser. Etwas Schweres.<br><br>Elena hielt sich im Hintergrund, die Hände tief in den Taschen vergraben. Um sie herum hatten sich bereits einige Dorfbewohner versammelt. Sie schwiegen. Es war ein schweres, vorwurfsvolles Schweigen, das Fremden gegenüber wie eine Mauer wirkte. Elena war hier aufgewachsen, doch nach fünfzehn Jahren in Berlin war sie für sie nur noch die „Voss-Tochter, die es nicht geschafft hat“.<br><br>„Vorsichtig, verdammt noch mal!“, brüllte Huber. Sein Gesicht war rot angelaufen, Schweißperlen glänzten auf seiner Stirn trotz der Frosttemperaturen.<br><br>Als der Körper schließlich auf das moosbewachsene Ufer gehievt wurde, ging ein unterdrücktes Keuchen durch die Menge. Das bleiche Gesicht von Lukas Bender starrte in den grauen Himmel. Seine Augen waren weit geöffnet, die Pupillen durch die Kälte zu winzigen schwarzen Punkten verengt. Seine Haut hatte die Farbe von feuchtem Pergament angenommen.<br><br>„Lukas...“, flüsterte eine Stimme hinter Elena. Es war Frau Haug, die alte Bäckerin. Sie schlug sich die Hand vor den Mund.<br><br>Lukas Bender. Der Dorflehrer. Der Mann, der sich gegen den Gemeinderat gestellt hatte, der gegen die neuen Überwachungssensoren im Wald und die Privatisierung der Wasserrechte wetterte. Ein Idealist in einer Welt aus Rost und Korruption.<br><br>Huber wischte sich die Hände an seiner Hose ab. „Ein Unfall“, verkündete er lautstark, wobei er den Blickkontakt zu den Umstehenden mied. „Wahrscheinlich betrunken. Ist auf dem Heimweg vom 'Hirsch' abgerutscht. Die Uferböschung ist tückisch im April.“<br><br>Elena trat unbewusst einen Schritt vor. Ihr Blick scannte den Leichnam mit der Präzision eines Algorithmus, den sie nie ganz hatte abschalten können. Lukas’ Kleidung war zerrissen, aber nicht so, wie man es bei einem Sturz erwarten würde. Die Risse waren zu sauber.<br><br>„Wachtmeister Huber“, sagte sie. Ihre Stimme klang rau vom langen Schweigen.<br><br>Huber fuhr herum. Sein Blick verfinsterte sich, als er Elena erkannte. „Voss. Was machen Sie hier? Gaffen ist eigentlich nicht Ihr Stil.“<br><br>„Haben Sie ihn sich schon angesehen?“, fragte sie und ignorierte den giftigen Unterton.<br><br>„Ich sehe einen betrunkenen Pechvogel, der ertrunken ist. Das ist Routine.“ Huber wandte sich ab und wollte ein Absperrband um einen morschen Pfosten wickeln.<br><br>„Er hat keine Schürfwunden im Gesicht“, warf Elena ein. „Wenn er die Böschung runtergerutscht wäre, hätte der Schiefer ihn gezeichnet. Und sehen Sie sich seine Hände an. Keine Abwehrreaktionen. Keine Splitter unter den Nägeln vom Versuch, sich festzuhalten.“<br><br>Huber hielt inne. Er wirkte nicht einsichtig, sondern eher genervt. „Hören Sie, Voss. Das hier ist nicht Berlin-Kreuzberg. Wir haben hier keine Cyber-Gangs oder High-Tech-Killer. Hier gibt es nur Glatteis, schlechten Schnaps und dumme Zufälle. Gehen Sie nach Hause. Trinken Sie einen Tee. Überlassen Sie die Polizeiarbeit denjenigen, die noch eine Marke tragen.“<br><br>Elena spürte, wie die Hitze in ihr aufstieg – ein alter, vertrauter Zorn. Sie trat näher an den Toten heran, ungeachtet Hubers Protesten. Sie kniete sich in den Matsch.<br><br>„Hey! Weg da!“, rief Huber.<br><br>Elena ignorierte ihn. Ihr Fokus lag auf Lukas’ Hals. Dort, direkt unter dem Kieferwinkel, zeichneten sich drei kleine, symmetrische Male ab. Sie waren nicht blau oder rot, sondern schimmerten in einem unnatürlichen, metallischen Grau. Es sah aus, als hätte jemand drei winzige Elektroden in seine Haut gepresst. Ein Echo-Muster.<br><br>Sie streckte die Hand aus, wollte die Stelle berühren, doch eine schwere Hand legte sich auf ihre Schulter.<br><br>„Das reicht jetzt, Elena.“<br><br>Die Stimme war tief, ruhig und besaß die Autorität von jemanden, der gewohnt war, dass man ihm gehorchte. Elena sah auf. Korbinian Berg stand über ihr. Der Bürgermeister trug einen edlen Mantel aus Cashmere, der in dieser Umgebung so deplatziert wirkte wie ein Diamant in einer Müllhalde. Sein Haar war perfekt nach hinten gekämmt, kein einziges graues Haar tanzte aus der Reihe.<br><br>„Herr Berg“, sagte Elena und stand langsam auf.<br><br>„Es ist eine Tragödie“, sagte Berg und blickte mit gespielter Trauer auf den Toten hinab. „Lukas war ein geschätztes Mitglied unserer Gemeinschaft. Ein wenig hitzköpfig, sicher, aber ein guter Mensch. Sein Tod reißt ein Loch in unser Dorf.“<br><br>„Ein Loch, das für Sie recht gelegen kommt, nicht wahr?“, entgegnete Elena kühl. „Er war der Einzige, der gegen Ihr neues Infrastruktur-Projekt gestimmt hat.“<br><br>Bergs Augen verengten sich für den Bruchteil einer Sekunde, bevor sein professionelles Lächeln zurückkehrte. „Ihre Zeit in der Großstadt hat Sie zynisch gemacht, Elena. Wir trauern hier. Huber, sorgen Sie dafür, dass der Abtransport würdevoll verläuft. Und sperren Sie den Teich weiträumig ab. Wir wollen keine Unfälle mehr.“<br><br>Berg legte Elena die Hand auf den Oberarm – ein väterlicher Gestus, der sich anfühlte wie die Umklammerung einer Schlange. „Geh heim, Elena. Es ist Frost angekündigt. Du solltest dich nicht erkälten.“<br><br>Elena sah, wie sie Lukas’ Körper in einen schwarzen Plastiksack hievten. Das Geräusch des Reißverschlusses klang wie ein endgültiges Urteil.<br><br>Sie wandte sich ab und suchte in der Menge nach einem Gesicht. Dort, am Waldrand, halb verborgen hinter dem massiven Stamm einer uralten Tanne, stand eine Gestalt. Sarah Kern. „Die Stumme“. Ihr langes, verfilztes Haar hing ihr wie ein Vorhang vor dem Gesicht, doch ihre Augen – groß, hellwach und vor Entsetzen geweitet – fixierten Elena.<br><br>Sarah hob langsam die Hand. Sie deutete nicht auf den Leichnam, sondern nach oben, in die dichten Kronen der Bäume, wo die Sensoren der Forstverwaltung wie kleine, tote Augen im Nebel hingen. Dann drehte sie sich um und verschwand lautlos im Unterholz.<br><br>Elena spürte ein Kribbeln im Nacken. Es war nicht die Kälte. Es war das Gefühl, beobachtet zu werden. Nicht von den Dorfbewohnern, nicht von Berg, sondern von etwas Systematischem.<br><br>Sie blickte noch einmal zurück zum Teich. Das Wasser war wieder ruhig. Doch in ihrem Kopf begann der Algorithmus zu arbeiten. Die drei Male an Lukas’ Hals. Die fehlenden Abwehrspuren. Der metallische Glanz.<br><br>Eschendorf war kein Ort für einen Neuanfang. Es war ein Ort, an dem die Geheimnisse tief vergraben lagen, unter Schichten von Moos, Schlamm und digitalem Rauschen.<br><br>Elena Voss begann zu laufen. Nicht weg von dem Tatort, sondern tiefer hinein in das Labyrinth ihrer eigenen Instinkte. Der Frost im April hatte gerade erst begonnen, und er würde alles unter sich begraben, was nicht aus Stahl war.</div>
@@ -639,29 +650,18 @@
     </footer>
 
     <script>
-        function generatePDF() {
-            const element = document.getElementById('story-pdf-content');
-            
-            // Konfiguration für ein sauberes A4-PDF
-            const opt = {
-                margin:       15,
-                filename:     'Integrationsseminar_Story_Abgabe.pdf',
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true, letterRendering: true },
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
-
-            // Temporäre Anpassung für den "Druck-Look" (Schwarz auf Weiß)
-            const originalStyle = element.style.cssText;
-            element.style.backgroundColor = "white";
-            element.style.color = "black";
-            element.style.padding = "20mm";
-
-            // PDF generieren
-            html2pdf().set(opt).from(element).save().then(() => {
-                // Style wieder zurücksetzen für die Web-Ansicht
-                element.style.cssText = originalStyle;
-            });
+        function exportToWord() {
+            const content = document.getElementById('story-content').innerHTML;
+            const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><style>body { font-family: 'Georgia', serif; } .book-chapter-title { color: #007788; font-size: 20pt; font-weight: bold; }</style></head><body>";
+            const footer = "</body></html>";
+            const sourceHtml = header + content + footer;
+            const url = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(sourceHtml);
+            const downloadLink = document.createElement("a");
+            document.body.appendChild(downloadLink);
+            downloadLink.href = url;
+            downloadLink.download = 'Integrationsseminar_Geschichte.doc';
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
         }
     </script>
 
