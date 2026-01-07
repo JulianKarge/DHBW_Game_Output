@@ -1,17 +1,84 @@
 
 <!DOCTYPE html>
-<html>
+<html lang="de">
 <head>
     <meta charset="UTF-8">
+    <title>AI Project: Game & Story</title>
     <style>
-        body { background: #111; color: white; font-family: sans-serif; padding: 20px; }
-        iframe { width: 100%; height: 500px; border: 2px solid cyan; border-radius: 8px; }
-        .story { margin-top: 50px; white-space: pre-wrap; line-height: 1.6; background: #222; padding: 20px; }
+        :root {
+            --bg: #0f172a;
+            --card: #1e293b;
+            --accent: #38bdf8;
+            --text: #f1f5f9;
+        }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: var(--bg); 
+            color: var(--text); 
+            margin: 0; 
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container { width: 95%; max-width: 1100px; margin: 40px auto; }
+        
+        h1.main-title { 
+            text-align: center; 
+            color: var(--accent); 
+            text-transform: uppercase; 
+            letter-spacing: 3px;
+            margin-bottom: 50px;
+        }
+
+        /* GAME SECTION FIX */
+        .game-section {
+            width: 100%;
+            background: #000;
+            border: 2px solid var(--accent);
+            border-radius: 12px;
+            box-shadow: 0 0 30px rgba(56, 189, 248, 0.2);
+            margin-bottom: 80px;
+            overflow: hidden;
+        }
+        /* Wir setzen die Höhe auf 85% des Bildschirms, damit das meiste ohne Scrollen im Frame passt */
+        iframe {
+            width: 100%;
+            height: 85vh; 
+            border: none;
+            display: block;
+        }
+
+        /* STORY SECTION */
+        .story-section {
+            background: var(--card);
+            padding: 50px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            line-height: 1.8;
+            font-size: 1.15rem;
+        }
+        .chapter-content {
+            white-space: pre-wrap; /* Wichtig für die Absätze der KI */
+            margin-bottom: 40px;
+        }
+        .chapter-divider {
+            border: 0;
+            height: 2px;
+            background: linear-gradient(to right, transparent, var(--accent), transparent);
+            margin: 60px 0;
+            opacity: 0.5;
+        }
+        h2.section-head { color: var(--accent); border-left: 4px solid var(--accent); padding-left: 15px; margin-bottom: 30px; }
     </style>
 </head>
 <body>
-    <h1>Dein KI-Game</h1>
-    <iframe srcdoc="<!DOCTYPE html>
+    <div class="container">
+        <h1 class="main-title">KI Adventure Experience</h1>
+        
+        <h2 class="section-head">🎮 Das interaktive Spiel</h2>
+        <div class="game-section">
+            <iframe srcdoc="<!DOCTYPE html>
 <html lang=&quot;de&quot;>
 <head>
     <meta charset=&quot;UTF-8&quot;>
@@ -428,9 +495,11 @@
 
 </body>
 </html>"></iframe>
+        </div>
 
-    <h1>Deine Story</h1>
-    <div class="story">Kapitel 1: Frost im April
+        <h2 class="section-head">📖 Die Geschichte</h2>
+        <div class="story-section">
+            <div class="chapter-content">Kapitel 1: Frost im April
 
 Der April in Eschendorf war eine Lüge. Er versprach Frühling, lieferte aber nur eine klamme, schneidende Kälte, die durch die Ritzen der alten Fachwerkhäuser kroch und sich wie ein bleierner Schleier über die Lungen legte. Elena Voss stand am Fenster ihrer Mansardenwohnung und beobachtete, wie das erste fahle Licht des Morgens mühsam gegen den Nebel ankämpfte. Der Nebel hier oben im Schwarzwald war anders als der Smog in Berlin. Er war dichter, organischer, fast so, als besäße er ein eigenes, bösartiges Bewusstsein.
 
@@ -506,7 +575,7 @@ Sie blickte noch einmal zurück zum Teich. Das Wasser war wieder ruhig. Doch in 
 
 Eschendorf war kein Ort für einen Neuanfang. Es war ein Ort, an dem die Geheimnisse tief vergraben lagen, unter Schichten von Moos, Schlamm und digitalem Rauschen.
 
-Elena Voss begann zu laufen. Nicht weg von dem Tatort, sondern tiefer hinein in das Labyrinth ihrer eigenen Instinkte. Der Frost im April hatte gerade erst begonnen, und er würde alles unter sich begraben, was nicht aus Stahl war.,KAPITEL 2: Alte Wunden
+Elena Voss begann zu laufen. Nicht weg von dem Tatort, sondern tiefer hinein in das Labyrinth ihrer eigenen Instinkte. Der Frost im April hatte gerade erst begonnen, und er würde alles unter sich begraben, was nicht aus Stahl war.</div><hr class="chapter-divider"><div class="chapter-content">KAPITEL 2: Alte Wunden
 
 Der Regen in Eschendorf war kein gewöhnlicher Niederschlag. Er schmeckte nach verharztem Metall und der Bitterkeit von verrottendem Nadelholz. Elena Voss zog den Kragen ihres langen, wasserabweisenden Mantels höher, während sie die schlammige Dorfstraße hinaufstieg. Über ihr surrte eine drohnenähnliche Überwachungskamera der Gemeinde – ein veraltetes Modell mit ruckelndem Gelenk, das sie wie das Auge eines mechanischen Insekts verfolgte. Das Dorf lag im dämmrigen Zwielicht des späten Nachmittags, doch die künstlichen Lichter der wenigen noch funktionierenden Straßenlaternen flackerten bereits in einem kränklichen Violett-Ton.
 
@@ -590,7 +659,7 @@ Draußen im Wald heulte der Wind durch die mechanisch modifizierten Tannen, dere
 
 Sie trat hinaus in den Regen. Im Licht einer flackernden Laterne sah sie Sarah, die Stumme, am Waldrand stehen. Das Mädchen hob den Arm und deutete tief in das Schwarz zwischen den Bäumen, bevor sie lautlos im Dickicht verschwand.
 
-Elena Voss zog ihren Mantel fest um sich und folgte dem Schatten. Die Wunden waren aufgerissen, und diesmal würde kein Dämpfer der Welt den Schmerz lindern können, bis die Wahrheit ans Licht kam.,Kapitel 3: Das Wispern des Waldes
+Elena Voss zog ihren Mantel fest um sich und folgte dem Schatten. Die Wunden waren aufgerissen, und diesmal würde kein Dämpfer der Welt den Schmerz lindern können, bis die Wahrheit ans Licht kam.</div><hr class="chapter-divider"><div class="chapter-content">Kapitel 3: Das Wispern des Waldes
 
 Der Nebel in Eschendorf war kein bloßes Wetterphänomen; er war eine lebendige Substanz, eine graue Lunge, die das Dorf und seine Geheimnisse mit jedem Atemzug tiefer in sich einsaugte. Elena Voss schob den Kragen ihres abgetragenen Trenchcoats nach oben. Die kühle Feuchtigkeit legte sich wie ein klebriger Film auf ihre Haut, kroch unter die Manschetten ihrer Jacke und ließ die alten Narben an ihren Handgelenken pochen. 
 
@@ -668,7 +737,7 @@ Sie spürte den kalten Schauer des Echo-Algorithmus. Es war keine bloße Compute
 
 Sie stieg ins Auto, ignorierte das Knirschen der Glasscherben unter ihren Reifen und startete den Motor. Das Radio flackerte kurz auf, produzierte nur statisches Rauschen, das für einen Moment wie das Lachen einer Eule klang, bevor es ganz erstarb.
 
-Elena Voss war nicht mehr allein in ihrem Heimatdorf. Sie war eine Spielfigur, die sich bewegt hatte. Und der Spieler auf der anderen Seite des Brettes hatte sie bereits im Visier.,Kapitel 4: Der Schatten des Bürgermeisters
+Elena Voss war nicht mehr allein in ihrem Heimatdorf. Sie war eine Spielfigur, die sich bewegt hatte. Und der Spieler auf der anderen Seite des Brettes hatte sie bereits im Visier.</div><hr class="chapter-divider"><div class="chapter-content">Kapitel 4: Der Schatten des Bürgermeisters
 
 Der Regen in Eschendorf war kein gewöhnlicher Niederschlag. Er war eine zähe, silbergraue Substanz, die sich wie flüssiges Blei über die Tannen legte und den Geruch von moderndem Holz und kaltem Ozon aus den Ritzen der verfallenen Häuser drückte. Elena Voss stand im Schatten des vorspringenden Giebels gegenüber dem „Goldenen Hirschen“. Das alte Gasthaus, einst das stolze Zentrum des Dorflebens, wirkte heute wie ein angeschlagener Kadaver. Über dem Eingang flackerte ein billiges Neon-Schild, das in unregelmäßigen Abständen ein kränkliches Violett auf den nassen Asphalt spie. *G-st-hof*, las Elena. Das ‚a‘ war schon vor Jahren gestorben, genau wie die Hoffnung in diesem Tal.
 
@@ -732,7 +801,7 @@ Elena griff in ihre Tasche und umklammerte das kleine Datapad, auf dem sie die u
 
 Sie blickte hinauf zum bewaldeten Hang, wo die Ruine des Sägewerks wie ein hohler Zahn aus dem Nebel ragte. Dort oben, zwischen den rostigen Maschinen und den verrotteten Stämmen, lag die Wahrheit. Und Berg wusste, dass sie nicht aufhören würde zu graben, bis sie entweder auf Gold oder auf ihr eigenes Grab stieß.
 
-Ein tiefes Grollen rollte durch das Tal – Donner oder das Geräusch schwerer Maschinen in der Ferne. Der Echo-Algorithmus hatte begonnen zu arbeiten, und Elena Voss war die einzige Variable, die er nicht berechnet hatte. Noch nicht.,Kapitel 5: Tote Briefe
+Ein tiefes Grollen rollte durch das Tal – Donner oder das Geräusch schwerer Maschinen in der Ferne. Der Echo-Algorithmus hatte begonnen zu arbeiten, und Elena Voss war die einzige Variable, die er nicht berechnet hatte. Noch nicht.</div><hr class="chapter-divider"><div class="chapter-content">Kapitel 5: Tote Briefe
 
 Der Regen in Eschendorf war kein gewöhnlicher Niederschlag. Er war eine zähe, graue Substanz, die sich wie flüssiges Blei über die Tannen legte und das verbliebene Licht der sterbenden Straßenlaternen verschluckte. Elena Voss zog den Kragen ihres synth-ledernen Mantels höher. Das Material war rissig, die Imprägnierung längst vom sauren Dunst des Schwarzwaldes zerfressen, doch es hielt die Kälte für einen Moment auf Distanz.
 
@@ -840,7 +909,7 @@ Sie rannte. Nicht weg vom Dorf, sondern tiefer hinein in den Wald. Dorthin, wo S
 
 Der Regen wusch das Blut von ihren aufgeschürften Händen, doch die Kälte in ihrem Inneren blieb. Sie hatte nun die Namen. Sie hatte die Verbindung. Und sie hatte das Wissen, dass ihr Vater kein Opfer eines Unfalls gewesen war. 
 
-Er war ein gelöschter Datensatz. Und Elena Voss war bereit, das System zu überschreiben.,Kapitel 6: Nachtwache
+Er war ein gelöschter Datensatz. Und Elena Voss war bereit, das System zu überschreiben.</div><hr class="chapter-divider"><div class="chapter-content">Kapitel 6: Nachtwache
 
 Der Keller roch nach feuchtem Beton, altem Schmieröl und dem beißenden Ozon eines überhitzten Kühlkörpers. Elena Voss saß vor dem flackernden Monitor ihres alten Terminals, das sie mühsam aus Berliner Beständen zusammengeschmuggelt hatte. Das bläuliche Licht der Anzeige grub tiefe Furchen in ihr Gesicht und ließ die Narbe an ihrer Schläfe wie einen silbernen Draht schimmern. Vor ihr auf dem improvisierten Tisch lagen Lukas Benders Notizen – ein wirres Geflecht aus handgeschriebenen Randnotizen, topografischen Karten des Schwarzwaldes und kryptischen Zahlenreihen, die aussahen wie Koordinaten oder algorithmische Schlüssel.
 
@@ -940,7 +1009,7 @@ Elena stieg in ihren Wagen. Sie wusste jetzt, dass sie nicht mehr nur nach Antwo
 
 Sie startete den Motor. Das mechanische Grollen war das einzige Geräusch in der unnatürlichen Stille von Eschendorf. Sie schaltete das Licht aus und fuhr nur mit den Standlichtern los, zwei glimmende Augen, die durch die Nacht glitten.
 
-Sie würde Sarah Kern aufsuchen. „Die Stumme“ war die Einzige, die den Wald besser kannte als die Sensoren des Bürgermeisters. Und wenn das Handy nicht mehr in der Asservatenkammer war, dann gab es nur noch einen Ort, an dem die Wahrheit begraben liegen konnte: im tiefen, dunklen Herz des Schwarzwaldes, wo das Echo der Vergangenheit niemals ganz verstummte.,Kapitel 7: Das Geständnis der Stummen
+Sie würde Sarah Kern aufsuchen. „Die Stumme“ war die Einzige, die den Wald besser kannte als die Sensoren des Bürgermeisters. Und wenn das Handy nicht mehr in der Asservatenkammer war, dann gab es nur noch einen Ort, an dem die Wahrheit begraben liegen konnte: im tiefen, dunklen Herz des Schwarzwaldes, wo das Echo der Vergangenheit niemals ganz verstummte.</div><hr class="chapter-divider"><div class="chapter-content">Kapitel 7: Das Geständnis der Stummen
 
 Der Regen in Eschendorf war kein gewöhnlicher Niederschlag. Er fiel schwer und ölig, angereichert mit den Ausdünstungen der alten Industrieanlagen, die wie versteinerte Ungeheuer in den Tälern des Schwarzwalds hockten. Elena Voss saß am Küchentisch ihrer Kindheit, das fahle Licht ihres Cortical-Interfaces warf ein zuckendes, neonblaues Glimmen auf die rissige Wachstischdecke. Ihre Schläfen pochten. Der „Echo-Algorithmus“, jene Software-Ruine in ihrem Kopf, die sie einst zur besten Ermittlerin Berlins gemacht hatte, produzierte heute nur statisches Rauschen. 
 
@@ -1022,7 +1091,7 @@ Hinter ihnen brüllte Berg einen Befehl, gefolgt vom harten metallischen Klacken
 
 Sie rannten um ihr Leben, während hinter ihnen der Schwarzwald die Geheimnisse der Toten mit dem Donnern von Schüssen quittierte. Elena klammerte sich an den Manschettenknopf. Sie hatte den Beweis. Und sie hatte eine Zeugin. 
 
-Jetzt musste sie nur noch die Nacht überleben.,Kapitel 8: Der Verrat
+Jetzt musste sie nur noch die Nacht überleben.</div><hr class="chapter-divider"><div class="chapter-content">Kapitel 8: Der Verrat
 
 Der Regen in Eschendorf war kein gewöhnlicher Niederschlag. Er war eine zähe, silbergraue Substanz, die nach nasser Asche und dem metallischen Beigeschmack von verrottendem Nadelholz schmeckte. Elena Voss zog den Kragen ihres synthetischen Trenchcoats höher. Die feinen Nanofasern des Stoffes arbeiteten mühsam gegen die Feuchtigkeit an, doch die Kälte des Schwarzwaldes kroch tiefer, vorbei an der Kleidung, direkt unter die Haut, wo ihre alten Narben bei jedem Schritt pochten.
 
@@ -1076,7 +1145,7 @@ Elena griff in ihre Tasche und umklammerte ihr Interface-Modul. Die Datenströme
 
 Sie konnte niemandem trauen. Nicht dem Gesetz, nicht den Beweisen, und am wenigsten ihrem eigenen Verstand, der sie immer wieder zurück in die Schatten der Berliner Ruinen ziehen wollte.
 
-Hinter ihr im Rathaus erlosch das Licht in Bergs Büro. Eschendorf versank in vollkommener Dunkelheit, nur unterbrochen vom rhythmischen Summen der Strommasten, die wie riesige Kreuze in den schwarzen Himmel ragten. Sie war allein. Und der Jäger, den sie zu jagen glaubte, stand vielleicht schon längst direkt hinter ihr im Nebel.,Kapitel 9: Im Archiv des Schweigens
+Hinter ihr im Rathaus erlosch das Licht in Bergs Büro. Eschendorf versank in vollkommener Dunkelheit, nur unterbrochen vom rhythmischen Summen der Strommasten, die wie riesige Kreuze in den schwarzen Himmel ragten. Sie war allein. Und der Jäger, den sie zu jagen glaubte, stand vielleicht schon längst direkt hinter ihr im Nebel.</div><hr class="chapter-divider"><div class="chapter-content">Kapitel 9: Im Archiv des Schweigens
 
 Das Flackern der Leuchtstoffröhre im Keller des Eschendorfer Rathauses folgte einem unregelmäßigen, fast schon quälenden Rhythmus. Es war ein sterbendes Licht, das bläuliche Blitze auf die staubigen Regale warf und die Dunkelheit in den Ecken nur noch tiefer erscheinen ließ. Elena Voss spürte die Kälte, die aus dem nackten Betonboden in ihre Stiefel kroch. Es war der Geruch von feuchtem Papier, altem Linoleum und dem metallischen Beigeschmack von Ozon, der in der Luft hing – ein Geruch, der sie an die Asservatenkammer in Berlin erinnerte, nur dass hier das Verbrechen unter einer Schicht aus Jahrzehnten von Gleichgültigkeit begraben lag.
 
@@ -1160,7 +1229,7 @@ Draußen empfing sie der Regen. Er wusch den Staub des Archivs von ihrer Haut, a
 
 Das Archiv des Schweigens war geöffnet worden. Und Elena Voss würde dafür sorgen, dass der Echo-Algorithmus die Wahrheit so laut in dieses Tal zurückwarf, dass niemand mehr die Ohren davor verschließen konnte – selbst wenn sie dabei selbst im Schlamm versinken würde.
 
-Sie blickte hinauf zum bewaldeten Hang, wo das alte Sägewerk wie ein baufälliges Denkmal über dem Dorf thronte. Dort oben, im Schatten der Tannen, wartete die Antwort auf die letzte Frage. Und sie wusste, dass sie dorthin zurückkehren musste, wo alles begonnen hatte. In das Herz der Vergiftung.,Kapitel 10: Die Beichte
+Sie blickte hinauf zum bewaldeten Hang, wo das alte Sägewerk wie ein baufälliges Denkmal über dem Dorf thronte. Dort oben, im Schatten der Tannen, wartete die Antwort auf die letzte Frage. Und sie wusste, dass sie dorthin zurückkehren musste, wo alles begonnen hatte. In das Herz der Vergiftung.</div><hr class="chapter-divider"><div class="chapter-content">Kapitel 10: Die Beichte
 
 Der Regen über Eschendorf war kein gewöhnlicher Niederschlag. Er war eine schwere, ölige Last, die sich wie flüssiges Blei über die Schieferdächer legte und den Geruch von moderndem Holz und altem Eisen aus den Poren des Bodens drückte. Elena Voss stand vor dem Portal der St. Petri-Kirche. Das alte Gemäuer, eine Trutzburg aus grobem Sandstein, wirkte in der Dunkelheit wie ein schlafendes Ungeheuer. Über dem Eingang flackerte ein billiges Neonschild – ein blaues Kreuz, dessen Gasfüllung in den letzten Zügen lag und ein nervöses, summendes Geräusch von sich gab. Es war das einzige Licht in dieser gottverlassenen Gasse.
 
@@ -1226,7 +1295,7 @@ Sie trat zurück und verriegelte die Tür von innen. Das schwere Eisen schlug in
 
 „Gabriel“, sagte sie, ohne ihn anzusehen, während sie nach einem Hinterausgang suchte. „Wenn wir hier lebend rauskommen, wirst du reden. Vor einem echten Gericht. Nicht vor deinem schweigenden Gott.“
 
-Der Pfarrer antwortete nicht. Er starrte nur auf das Foto der Eule, das einsam auf der Bank lag, während das blaue Neonschild über dem Eingang mit einem letzten Zischen erlosch und sie in die absolute Dunkelheit stürzte.,Kapitel 11: In die Enge getrieben
+Der Pfarrer antwortete nicht. Er starrte nur auf das Foto der Eule, das einsam auf der Bank lag, während das blaue Neonschild über dem Eingang mit einem letzten Zischen erlosch und sie in die absolute Dunkelheit stürzte.</div><hr class="chapter-divider"><div class="chapter-content">Kapitel 11: In die Enge getrieben
 
 Der Himmel über Eschendorf hatte die Farbe von abgestandenem Hämatit angenommen, ein schmutziges, metallisches Grau, das schwer auf den Gipfeln der Tannen lastete. Elena Voss stand am Fenster ihrer Küche und beobachtete, wie die ersten schweren Regentropfen gegen die Scheibe klatschten. Sie sahen aus wie Quecksilber, zäh und unnatürlich glänzend im fahlen Licht der wenigen Straßenlaternen, die in diesem Viertel noch funktionierten.
 
@@ -1280,7 +1349,7 @@ Ein zweiter Schlag folgte. Das Glas barst mit einem Geräusch, das im leeren Hau
 
 Elena hielt den Atem an. Sie hörte, wie der Eindringling über die Glasscherben stieg. *Knirsch. Knirsch.* Er war schwer. Er war sicher. Er glaubte, sie sei eine leichte Beute.
 
-Sie wartete, bis er den Rahmen der Tür passierte, bis sein Schatten den Flur verdunkelte. In der absoluten Schwärze zwischen zwei Blitzen stieß sie vor. Nicht planlos, sondern gezielt. Sie war kein Opfer. Sie war das Echo, das nun zurückschlug.,Kapitel 12: Das vergessene Kind
+Sie wartete, bis er den Rahmen der Tür passierte, bis sein Schatten den Flur verdunkelte. In der absoluten Schwärze zwischen zwei Blitzen stieß sie vor. Nicht planlos, sondern gezielt. Sie war kein Opfer. Sie war das Echo, das nun zurückschlug.</div><hr class="chapter-divider"><div class="chapter-content">Kapitel 12: Das vergessene Kind
 
 Der Regen in Eschendorf war kein gewöhnlicher Niederschlag. Er schmeckte nach altem Eisen und verbranntem Harz, eine zähe Flüssigkeit, die wie flüssiges Blei vom Himmel drückte und die Neonröhren des alten „Sägewerk-Stüberls“ in ein verschwommenes, giftiges Violett tauchte. Elena Voss saß am massiven Eichentisch in Lukas Benders ehemaliger Wohnung über der alten Schule. Der Raum roch nach abgestandenem Tee und dem ozonartigen Duft überhitzter Hardware.
 
@@ -1333,7 +1402,7 @@ Stille.
 
 Dann ein leises Lachen, das eher wie das Reiben von Schleifpapier klang. „Wahrheit ist ein Luxus, Elena. Hier im Schwarzwald zählen nur zwei Dinge: Überleben und das Erbe. Und du gehörst zu keinem von beiden.“
 
-Ein greller Blitz zuckte durch den Türspalt, gefolgt von der Druckwelle einer Schockgranate. Das Glas der Fenster barst nach außen, und für einen Moment wurde die Dunkelheit von Eschendorf von einem künstlichen, mörderischen Weiß verschlungen. Elena schloss die Augen, spürte das Adrenalin wie flüssiges Feuer in ihren Venen und wusste: Die Zeit der Ermittlungen war vorbei. Jetzt begann der Krieg um das Echo.,Kapitel 13: Jagdzeit
+Ein greller Blitz zuckte durch den Türspalt, gefolgt von der Druckwelle einer Schockgranate. Das Glas der Fenster barst nach außen, und für einen Moment wurde die Dunkelheit von Eschendorf von einem künstlichen, mörderischen Weiß verschlungen. Elena schloss die Augen, spürte das Adrenalin wie flüssiges Feuer in ihren Venen und wusste: Die Zeit der Ermittlungen war vorbei. Jetzt begann der Krieg um das Echo.</div><hr class="chapter-divider"><div class="chapter-content">Kapitel 13: Jagdzeit
 
 Das Glas der Verandatür zerbarst nicht einfach; es explodierte in einer Kaskade aus geschliffenen Diamanten, die im fahlen Licht der sterbenden Straßenlaterne funkelten. Elena Voss presste sich in der Dunkelheit der Küche flach gegen die Wand, das Atmen fiel ihr schwer, als hätte der dichte Nebel von draußen ihre Lungen mit flüssigem Blei gefüllt. Ihr Herz hämmerte einen unregelmäßigen Takt gegen ihre Rippen – ein defekter Rhythmusgeber in einer Welt, die aus den Fugen geraten war.
 
@@ -1411,7 +1480,7 @@ Sie drehte sich um und ließ ihn im Dunkeln zurück. Hinter ihr hallten seine Fl
 
 Sie musste zu Sarah. Wenn Mark hier war, war niemand mehr sicher. Der Echo-Algorithmus hatte aufgehört zu flüstern – er schrie jetzt, und Elena war die Einzige, die die Frequenz kannte, um ihn zum Schweigen zu bringen. Während sie durch das dichte Blattwerk zurück Richtung Dorf glitt, spürte sie, dass die Jagd gerade erst begonnen hatte. Aber die Rollen hatten sich vertauscht.
 
-In der Ferne heulte eine Sirene im Sägewerk auf, ein mechanischer Klagegesang, der den sozialen Frieden von Eschendorf endgültig zu Grabe trug. Elena Voss war nicht mehr die gebrochene Kommissarin auf der Flucht vor ihrer Vergangenheit. Sie war das Echo, das der Wald zurückwarf – unerbittlich und tödlich.,Kapitel 14: Das Urteil
+In der Ferne heulte eine Sirene im Sägewerk auf, ein mechanischer Klagegesang, der den sozialen Frieden von Eschendorf endgültig zu Grabe trug. Elena Voss war nicht mehr die gebrochene Kommissarin auf der Flucht vor ihrer Vergangenheit. Sie war das Echo, das der Wald zurückwarf – unerbittlich und tödlich.</div><hr class="chapter-divider"><div class="chapter-content">Kapitel 14: Das Urteil
 
 Der Regen über Eschendorf war kein gewöhnlicher Niederschlag. Er fiel als dichte, ölige Last vom schwarz-violetten Himmel, vermischte sich mit dem ewigen Nebel des Schwarzwalds und legte einen schimmernden Film über die verrottenden Überreste des alten Mühlenteichs. In der Ferne flackerte das einzige Neonlicht des Dorfes – das Schild der geschlossenen Tankstelle – in einem kränklichen Blau, das rhythmisch gegen die Dunkelheit ankämpfte, wie ein sterbendes Herz.
 
@@ -1473,7 +1542,7 @@ In der Ferne, hinter den dunklen Silhouetten der Tannen, erschien ein neues Lich
 
 Elena sah zu Sarah. Die junge Frau nickte ihr fast unmerklich zu, bevor sie sich umdrehte und wieder in der Dunkelheit des Waldes verschwand, dorthin, wo keine Algorithmen und keine Korruption sie erreichen konnten.
 
-Elena Voss blieb am Ufer stehen, während die ersten Scheinwerferkegel durch den Nebel schnitten. Ihr HUD flackerte ein letztes Mal auf und erlosch dann vollständig. In der plötzlichen Dunkelheit ihres rechten Auges fühlte sie zum ersten Mal seit Jahren eine seltsame, schmerzhafte Ruhe. Der Echo-Algorithmus hatte sein Ziel erreicht. Die Wahrheit war kein Flüstern mehr. Sie war ein Urteil.,Kapitel 15: Nach dem Regen
+Elena Voss blieb am Ufer stehen, während die ersten Scheinwerferkegel durch den Nebel schnitten. Ihr HUD flackerte ein letztes Mal auf und erlosch dann vollständig. In der plötzlichen Dunkelheit ihres rechten Auges fühlte sie zum ersten Mal seit Jahren eine seltsame, schmerzhafte Ruhe. Der Echo-Algorithmus hatte sein Ziel erreicht. Die Wahrheit war kein Flüstern mehr. Sie war ein Urteil.</div><hr class="chapter-divider"><div class="chapter-content">Kapitel 15: Nach dem Regen
 
 Der Regen hatte aufgehört, die Welt zu ertränken. Es war kein abrupter Abbruch gewesen, kein plötzliches Aufklaren, sondern ein langsames Erschöpfen der Wolken, bis nur noch ein feiner, silbriger Sprühnebel übrig geblieben war, der sich wie flüssiges Quecksilber auf die Tannen legte. Elena Voss stand am Waldrand und atmete tief ein. Die Luft schmeckte anders als in den vergangenen Wochen. Das metallische Aroma von Ozon und die beißende Note des verrottenden Unterholzes waren einer kühlen, fast schmerzhaft sauberen Frische gewichen.
 
@@ -1544,5 +1613,7 @@ Doch während Elena die Haustür aufschloss und das vertraute Knarren der Dielen
 Im Haus war es still, aber es war eine friedliche Stille. Elena ging zum Fenster und sah hinaus. Die Sonne stand nun hoch über dem Schwarzwald, und für diesen einen Moment war die Welt nicht düster, nicht voller Algorithmen und Verrat. Sie war einfach nur da.
 
 Sie atmete aus, schloss die Augen und ließ die Wärme auf ihrem Gesicht wirken. Das Echo war verstummt. Die Zukunft hatte begonnen.</div>
+        </div>
+    </div>
 </body>
 </html>
