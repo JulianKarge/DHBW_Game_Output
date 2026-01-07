@@ -3,117 +3,159 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <title>Integrationsseminar - Multi-Agenten Lösung</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Integrationsseminar Multi-Agenten Lösung</title>
+    
+    <!-- Bibliothek für den PDF-Export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
     <style>
         :root {
-            --bg: #0a0a0b;
+            --primary: #00f2ff;
+            --bg: #0a0a0c;
+            --card: #16161a;
+            --text: #e2e8f0;
             --accent: #00f2ff;
-            --text-color: #d1d5db;
-            --book-bg: #16161a;
-        }
-        body { 
-            font-family: 'Inter', -apple-system, sans-serif; 
-            background: var(--bg); color: var(--text-color); margin: 0; padding: 0; 
         }
         
-        /* HEADER BEREICH */
-        header { 
-            text-align: center; 
-            padding: 60px 20px; 
-            border-bottom: 1px solid #333; 
+        body { 
+            font-family: 'Inter', system-ui, -apple-system, sans-serif; 
+            background-color: var(--bg); 
+            color: var(--text); 
+            margin: 0; 
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* HEADER */
+        header {
+            width: 100%;
+            padding: 60px 0;
+            text-align: center;
             background: linear-gradient(to bottom, #111, var(--bg));
+            border-bottom: 1px solid #333;
         }
         header h1 { 
-            color: var(--accent); 
-            text-transform: uppercase; 
-            letter-spacing: 2px; 
+            color: var(--primary); 
+            font-size: 2.2rem; 
+            letter-spacing: 1px; 
             margin: 0; 
-            font-size: 1.8rem;
-            max-width: 900px;
-            margin: 0 auto;
+            text-transform: none; 
         }
-        .authors { 
-            margin-top: 15px; 
-            font-size: 0.9rem; 
-            color: #888; 
+        .authors {
+            margin-top: 15px;
+            font-size: 1rem;
+            color: #888;
+            font-weight: 300;
+        }
+
+        .container { max-width: 1000px; width: 90%; margin: 40px 0; }
+
+        /* SEKTIONS-TITEL */
+        .section-label { 
+            display: inline-block; 
+            padding: 6px 16px; 
+            background: var(--primary); 
+            color: #000; 
+            font-weight: bold; 
+            border-radius: 4px; 
+            margin-bottom: 25px;
+            font-size: 0.85rem;
+            text-transform: uppercase;
             letter-spacing: 1px;
         }
 
-        .container { width: 90%; max-width: 1000px; margin: 0 auto; padding-bottom: 100px; }
-        
-        .section-title { font-weight: bold; color: var(--accent); margin: 40px 0 20px 0; display: flex; align-items: center; gap: 10px; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 1px; }
-
-        /* GAME BEREICH */
-        .game-frame { 
-            width: 100%; 
-            height: 1200px; 
-            border: 2px solid #333; 
-            border-radius: 12px; 
-            background: #000; 
-            overflow: hidden; 
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5); 
+        /* GAME BEREICH (FIXED HEIGHT) */
+        .game-wrapper {
+            width: 100%;
+            height: 1200px; /* Deine gewünschte Höhe ohne Scrollen im Frame */
+            background: #000;
+            border-radius: 12px;
+            border: 2px solid #333;
+            overflow: hidden;
+            box-shadow: 0 0 40px rgba(0, 242, 255, 0.15);
+            margin-bottom: 80px;
         }
         iframe { width: 100%; height: 100%; border: none; }
 
-        /* STORY BEREICH */
-        .story-header-box {
+        /* STORY HEADER & DOWNLOAD */
+        .story-meta-row {
             display: flex;
             justify-content: space-between;
-            align-items: flex-end;
+            align-items: center;
             margin-bottom: 20px;
-            border-bottom: 1px solid #333;
-            padding-bottom: 10px;
+            padding: 0 5px;
         }
-        .stats-info { font-size: 0.85rem; color: #666; font-family: sans-serif; }
-        
-        .btn-download { 
-            background: var(--accent); color: #000; border: none; padding: 10px 20px; 
-            border-radius: 4px; font-weight: bold; cursor: pointer; transition: 0.2s;
-            font-size: 0.85rem;
-        }
-        .btn-download:hover { opacity: 0.8; transform: translateY(-1px); }
+        .stats { font-size: 0.9rem; color: #666; }
+        .stats strong { color: #aaa; }
 
-        .book-container { 
-            background: var(--book-bg); 
-            padding: 80px 100px; 
-            border-radius: 4px; 
-            box-shadow: 0 10px 60px rgba(0,0,0,0.7);
-            font-family: 'Georgia', serif; 
-            line-height: 2.0; 
-            font-size: 1.2rem; 
-            color: #e5e7eb;
-            max-width: 800px; 
-            margin: 0 auto;
+        .btn-pdf {
+            background: var(--primary);
+            color: #000;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+        }
+        .btn-pdf:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 242, 255, 0.4);
         }
 
-        /* KAPITEL HIGHLIGHTING */
+        /* STORY BEREICH (BUCH-STYLING) */
+        .book-card {
+            background: var(--card);
+            padding: 80px 100px;
+            border-radius: 8px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+            line-height: 2.0;
+            font-size: 1.25rem;
+            font-family: 'Georgia', serif;
+            color: #ccc;
+            text-align: justify;
+            hyphens: auto;
+        }
+
         .book-chapter-title {
-            color: var(--accent);
+            color: var(--primary);
             font-family: 'Inter', sans-serif;
-            font-size: 1.6rem;
+            font-size: 1.8rem;
             margin-top: 0;
             margin-bottom: 40px;
-            border-left: 5px solid var(--accent);
-            padding-left: 20px;
-            text-transform: none;
+            border-left: 6px solid var(--primary);
+            padding-left: 25px;
+            text-align: left;
         }
 
-        .chapter { margin-bottom: 120px; }
-        .chapter-body { text-align: justify; hyphens: auto; }
+        .chapter { 
+            margin-bottom: 100px; 
+            page-break-after: always; /* Für den PDF Export */
+        }
         
-        @media (max-width: 768px) { .book-container { padding: 40px 20px; } }
+        footer { padding: 60px; color: #444; font-size: 0.8rem; text-align: center; }
+
+        @media (max-width: 768px) {
+            .book-card { padding: 40px 20px; }
+            header h1 { font-size: 1.5rem; }
+        }
     </style>
 </head>
 <body>
 
     <header>
-        <h1>The AI Multi-Agent Project - Integrationsseminar Multi-Agenten Lösung</h1>
+        <h1>Integrationsseminar Multi-Agenten Lösung</h1>
         <div class="authors">Neeshka Chavhan, Tom Brennenstuhl, Julian Karge</div>
     </header>
 
     <div class="container">
-        <div class="section-title">🎮 Interaktives Game</div>
-        <div class="game-frame">
+        <span class="section-label">🎮 Interaktives Game</span>
+        <div class="game-wrapper">
             <iframe srcdoc="<!DOCTYPE html>
 <html lang=&quot;de&quot;>
 <head>
@@ -533,16 +575,16 @@
 </html>"></iframe>
         </div>
 
-        <div class="section-title">📖 Die Kurzgeschichte</div>
+        <span class="section-label">📖 Die Geschichte</span>
         
-        <div class="story-header-box">
-            <div class="stats-info">
-                Umfang: <strong>21154 Wörter</strong> | ca. <strong>43 Seiten</strong> (Word-Standard)
+        <div class="story-meta-row">
+            <div class="stats">
+                Umfang: <strong>21154 Wörter</strong> | ca. <strong>43 Seiten</strong>
             </div>
-            <button class="btn-download" onclick="exportToWord()">⬇ ALS WORD DATEI</button>
+            <button class="btn-pdf" onclick="generatePDF()">⬇ Als PDF speichern</button>
         </div>
 
-        <div id="story-content" class="book-container">
+        <div id="story-pdf-content" class="book-card">
             
     <div class="chapter">
         <div class="chapter-body"><h2 class="book-chapter-title">Kapitel 1: Frost im April</h2><br><br>Der April in Eschendorf war eine Lüge. Er versprach Frühling, lieferte aber nur eine klamme, schneidende Kälte, die durch die Ritzen der alten Fachwerkhäuser kroch und sich wie ein bleierner Schleier über die Lungen legte. Elena Voss stand am Fenster ihrer Mansardenwohnung und beobachtete, wie das erste fahle Licht des Morgens mühsam gegen den Nebel ankämpfte. Der Nebel hier oben im Schwarzwald war anders als der Smog in Berlin. Er war dichter, organischer, fast so, als besäße er ein eigenes, bösartiges Bewusstsein.<br><br>Draußen, über dem Marktplatz, flackerte eine einsame Neonreklame an der Fassade des geschlossenen „Säge-Stübles“. Das grelle Pink des Schriftzugs war durch Jahre der Vernachlässigung zu einem kränklichen Violett verblasst. Es summte in einer Frequenz, die Elena in den Zähnen wehtat – ein mechanisches Sterbeglöckchen für ein Dorf, das den Anschluss an die Moderne verpasst hatte und nun langsam im Schlamm versank.<br><br>Ein plötzliches Aufheulen zerriss die Stille. Es war kein Tier, sondern das verzerrte Echo einer Sirene, die gegen die dichten Tannenwände des Tals prallte.<br><br>Elena spürte ein vertrautes Ziehen in ihrer Brust. Das alte Jagdfieber, das sie in Berlin fast umgebracht hatte. Sie griff nach ihrer abgetragenen Lederjacke. Ihre Finger zitterten leicht, ein Überbleibsel des Burnouts, das sie wie einen ungebetenen Schatten aus der Hauptstadt mitgeschleppt hatte. „Lass es, Elena“, flüsterte sie sich selbst zu. „Es geht dich nichts mehr an.“<br><br>Doch zehn Minuten später stand sie am Ufer des alten Mühlenteichs.<br><br>Die Szenerie wirkte wie ein vergessenes Stillleben aus einem Albtraum. Der Teich war eine schwarze, spiegelglatte Fläche, auf der ölige Schlieren tanzten. Am Rand parkte der Streifenwagen von Wachtmeister Huber, dessen Blaulicht im Nebel wie ein nervöser Puls wirkte. Huber selbst, ein Mann, dessen Uniformhemd die besten Jahre hinter sich hatte und gefährlich über seinem Bauch spannte, stand knietief im Schlamm und dirigierte zwei Männer von der freiwilligen Feuerwehr.<br><br>Sie zogen etwas aus dem Wasser. Etwas Schweres.<br><br>Elena hielt sich im Hintergrund, die Hände tief in den Taschen vergraben. Um sie herum hatten sich bereits einige Dorfbewohner versammelt. Sie schwiegen. Es war ein schweres, vorwurfsvolles Schweigen, das Fremden gegenüber wie eine Mauer wirkte. Elena war hier aufgewachsen, doch nach fünfzehn Jahren in Berlin war sie für sie nur noch die „Voss-Tochter, die es nicht geschafft hat“.<br><br>„Vorsichtig, verdammt noch mal!“, brüllte Huber. Sein Gesicht war rot angelaufen, Schweißperlen glänzten auf seiner Stirn trotz der Frosttemperaturen.<br><br>Als der Körper schließlich auf das moosbewachsene Ufer gehievt wurde, ging ein unterdrücktes Keuchen durch die Menge. Das bleiche Gesicht von Lukas Bender starrte in den grauen Himmel. Seine Augen waren weit geöffnet, die Pupillen durch die Kälte zu winzigen schwarzen Punkten verengt. Seine Haut hatte die Farbe von feuchtem Pergament angenommen.<br><br>„Lukas...“, flüsterte eine Stimme hinter Elena. Es war Frau Haug, die alte Bäckerin. Sie schlug sich die Hand vor den Mund.<br><br>Lukas Bender. Der Dorflehrer. Der Mann, der sich gegen den Gemeinderat gestellt hatte, der gegen die neuen Überwachungssensoren im Wald und die Privatisierung der Wasserrechte wetterte. Ein Idealist in einer Welt aus Rost und Korruption.<br><br>Huber wischte sich die Hände an seiner Hose ab. „Ein Unfall“, verkündete er lautstark, wobei er den Blickkontakt zu den Umstehenden mied. „Wahrscheinlich betrunken. Ist auf dem Heimweg vom 'Hirsch' abgerutscht. Die Uferböschung ist tückisch im April.“<br><br>Elena trat unbewusst einen Schritt vor. Ihr Blick scannte den Leichnam mit der Präzision eines Algorithmus, den sie nie ganz hatte abschalten können. Lukas’ Kleidung war zerrissen, aber nicht so, wie man es bei einem Sturz erwarten würde. Die Risse waren zu sauber.<br><br>„Wachtmeister Huber“, sagte sie. Ihre Stimme klang rau vom langen Schweigen.<br><br>Huber fuhr herum. Sein Blick verfinsterte sich, als er Elena erkannte. „Voss. Was machen Sie hier? Gaffen ist eigentlich nicht Ihr Stil.“<br><br>„Haben Sie ihn sich schon angesehen?“, fragte sie und ignorierte den giftigen Unterton.<br><br>„Ich sehe einen betrunkenen Pechvogel, der ertrunken ist. Das ist Routine.“ Huber wandte sich ab und wollte ein Absperrband um einen morschen Pfosten wickeln.<br><br>„Er hat keine Schürfwunden im Gesicht“, warf Elena ein. „Wenn er die Böschung runtergerutscht wäre, hätte der Schiefer ihn gezeichnet. Und sehen Sie sich seine Hände an. Keine Abwehrreaktionen. Keine Splitter unter den Nägeln vom Versuch, sich festzuhalten.“<br><br>Huber hielt inne. Er wirkte nicht einsichtig, sondern eher genervt. „Hören Sie, Voss. Das hier ist nicht Berlin-Kreuzberg. Wir haben hier keine Cyber-Gangs oder High-Tech-Killer. Hier gibt es nur Glatteis, schlechten Schnaps und dumme Zufälle. Gehen Sie nach Hause. Trinken Sie einen Tee. Überlassen Sie die Polizeiarbeit denjenigen, die noch eine Marke tragen.“<br><br>Elena spürte, wie die Hitze in ihr aufstieg – ein alter, vertrauter Zorn. Sie trat näher an den Toten heran, ungeachtet Hubers Protesten. Sie kniete sich in den Matsch.<br><br>„Hey! Weg da!“, rief Huber.<br><br>Elena ignorierte ihn. Ihr Fokus lag auf Lukas’ Hals. Dort, direkt unter dem Kieferwinkel, zeichneten sich drei kleine, symmetrische Male ab. Sie waren nicht blau oder rot, sondern schimmerten in einem unnatürlichen, metallischen Grau. Es sah aus, als hätte jemand drei winzige Elektroden in seine Haut gepresst. Ein Echo-Muster.<br><br>Sie streckte die Hand aus, wollte die Stelle berühren, doch eine schwere Hand legte sich auf ihre Schulter.<br><br>„Das reicht jetzt, Elena.“<br><br>Die Stimme war tief, ruhig und besaß die Autorität von jemanden, der gewohnt war, dass man ihm gehorchte. Elena sah auf. Korbinian Berg stand über ihr. Der Bürgermeister trug einen edlen Mantel aus Cashmere, der in dieser Umgebung so deplatziert wirkte wie ein Diamant in einer Müllhalde. Sein Haar war perfekt nach hinten gekämmt, kein einziges graues Haar tanzte aus der Reihe.<br><br>„Herr Berg“, sagte Elena und stand langsam auf.<br><br>„Es ist eine Tragödie“, sagte Berg und blickte mit gespielter Trauer auf den Toten hinab. „Lukas war ein geschätztes Mitglied unserer Gemeinschaft. Ein wenig hitzköpfig, sicher, aber ein guter Mensch. Sein Tod reißt ein Loch in unser Dorf.“<br><br>„Ein Loch, das für Sie recht gelegen kommt, nicht wahr?“, entgegnete Elena kühl. „Er war der Einzige, der gegen Ihr neues Infrastruktur-Projekt gestimmt hat.“<br><br>Bergs Augen verengten sich für den Bruchteil einer Sekunde, bevor sein professionelles Lächeln zurückkehrte. „Ihre Zeit in der Großstadt hat Sie zynisch gemacht, Elena. Wir trauern hier. Huber, sorgen Sie dafür, dass der Abtransport würdevoll verläuft. Und sperren Sie den Teich weiträumig ab. Wir wollen keine Unfälle mehr.“<br><br>Berg legte Elena die Hand auf den Oberarm – ein väterlicher Gestus, der sich anfühlte wie die Umklammerung einer Schlange. „Geh heim, Elena. Es ist Frost angekündigt. Du solltest dich nicht erkälten.“<br><br>Elena sah, wie sie Lukas’ Körper in einen schwarzen Plastiksack hievten. Das Geräusch des Reißverschlusses klang wie ein endgültiges Urteil.<br><br>Sie wandte sich ab und suchte in der Menge nach einem Gesicht. Dort, am Waldrand, halb verborgen hinter dem massiven Stamm einer uralten Tanne, stand eine Gestalt. Sarah Kern. „Die Stumme“. Ihr langes, verfilztes Haar hing ihr wie ein Vorhang vor dem Gesicht, doch ihre Augen – groß, hellwach und vor Entsetzen geweitet – fixierten Elena.<br><br>Sarah hob langsam die Hand. Sie deutete nicht auf den Leichnam, sondern nach oben, in die dichten Kronen der Bäume, wo die Sensoren der Forstverwaltung wie kleine, tote Augen im Nebel hingen. Dann drehte sie sich um und verschwand lautlos im Unterholz.<br><br>Elena spürte ein Kribbeln im Nacken. Es war nicht die Kälte. Es war das Gefühl, beobachtet zu werden. Nicht von den Dorfbewohnern, nicht von Berg, sondern von etwas Systematischem.<br><br>Sie blickte noch einmal zurück zum Teich. Das Wasser war wieder ruhig. Doch in ihrem Kopf begann der Algorithmus zu arbeiten. Die drei Male an Lukas’ Hals. Die fehlenden Abwehrspuren. Der metallische Glanz.<br><br>Eschendorf war kein Ort für einen Neuanfang. Es war ein Ort, an dem die Geheimnisse tief vergraben lagen, unter Schichten von Moos, Schlamm und digitalem Rauschen.<br><br>Elena Voss begann zu laufen. Nicht weg von dem Tatort, sondern tiefer hinein in das Labyrinth ihrer eigenen Instinkte. Der Frost im April hatte gerade erst begonnen, und er würde alles unter sich begraben, was nicht aus Stahl war.</div>
@@ -592,25 +634,34 @@
         </div>
     </div>
 
+    <footer>
+        Erstellt im Rahmen des Integrationsseminars &copy; 2024
+    </footer>
+
     <script>
-        function exportToWord() {
-            const content = document.getElementById('story-content').innerHTML;
-            const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' "+
-                           "xmlns:w='urn:schemas-microsoft-com:office:word' "+
-                           "xmlns='http://www.w3.org/TR/REC-html40'>"+
-                           "<head><meta charset='utf-8'><title>Story Export</title><style>body { font-family: 'Georgia', serif; } .book-chapter-title { color: #007788; font-size: 18pt; font-weight: bold; margin-bottom: 20pt; }</style></head><body>";
-            const footer = "</body></html>";
-            const sourceHtml = header + content + footer;
+        function generatePDF() {
+            const element = document.getElementById('story-pdf-content');
             
-            const url = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(sourceHtml);
-            const filename = 'KI_Projekt_Story.doc';
-            
-            const downloadLink = document.createElement("a");
-            document.body.appendChild(downloadLink);
-            downloadLink.href = url;
-            downloadLink.download = filename;
-            downloadLink.click();
-            document.body.removeChild(downloadLink);
+            // Konfiguration für ein sauberes A4-PDF
+            const opt = {
+                margin:       15,
+                filename:     'Integrationsseminar_Story_Abgabe.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true, letterRendering: true },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            // Temporäre Anpassung für den "Druck-Look" (Schwarz auf Weiß)
+            const originalStyle = element.style.cssText;
+            element.style.backgroundColor = "white";
+            element.style.color = "black";
+            element.style.padding = "20mm";
+
+            // PDF generieren
+            html2pdf().set(opt).from(element).save().then(() => {
+                // Style wieder zurücksetzen für die Web-Ansicht
+                element.style.cssText = originalStyle;
+            });
         }
     </script>
 
